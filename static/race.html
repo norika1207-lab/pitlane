@@ -54,7 +54,7 @@
 
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · 純虛擬籌碼 · 數據來自 OpenF1 & Ergast</p>
+    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 數據來自 OpenF1 & Ergast</p>
   </div>
 </footer>
 
@@ -114,7 +114,7 @@ async function loadBetPanel(race) {
       <div class="bet-panel">
         <h3>🏆 預測冠軍</h3>
         <p style="color:var(--text-secondary);margin-bottom:20px;font-size:14px">
-          選擇你認為會贏的車手，用虛擬籌碼下注
+          選擇你認為會贏的車手，用 USDClaw 下注
         </p>
         <div class="bet-driver-select" id="driver-select">
           ${driversData.slice(0, 20).map((d, i) => {
@@ -209,12 +209,12 @@ async function placeBet() {
         <strong style="color:var(--green)">✓ 預測成功！</strong><br>
         <span style="font-size:14px;color:var(--text-secondary)">
           下注 ◆${res.amount} · 賠率 x${res.odds} · 潛在回報 ◆${res.potential_win?.toLocaleString()}
-          <br>剩餘籌碼 ◆${res.remaining_coins?.toLocaleString()}
+          <br>剩餘 USDClaw ◆${res.remaining_balance?.toLocaleString()}
         </span>
       </div>
     `;
     // Update coins display
-    user.coins = res.remaining_coins;
+    user.coins = res.remaining_balance;
     localStorage.setItem('pitlane_user', JSON.stringify(user));
     updateAuthUI();
     document.getElementById('place-bet-btn').disabled = true;

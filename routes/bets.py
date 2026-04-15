@@ -1,87 +1,73 @@
+"""Bets — 用 USDClaw 下注預測 F1 比賽結果"""
 from fastapi import APIRouter, HTTPException, Header
 from models import BetCreate
 from database import get_db
 from config import BET_MIN, BET_MAX
-from routes.auth import decode_token
+from routes.auth import get_current_user
+from services.usdclaw import debit, credit, get_balance
 from services.card_engine import calculate_driver_card, calculate_odds
 
 router = APIRouter(prefix="/api/bets", tags=["bets"])
 
 
-async def get_current_user(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(401, "Not authenticated")
-    token = authorization.split(" ")[1]
-    payload = decode_token(token)
-    return payload
-
-
 @router.post("")
 async def place_bet(bet: BetCreate, authorization: str = Header(None)):
-    """Place a prediction bet."""
+    """用 USDClaw 下注預測"""
     user = await get_current_user(authorization)
-    user_id = int(user["sub"])
+    username = user["username"]
 
     if bet.amount < BET_MIN or bet.amount > BET_MAX:
-        raise HTTPException(400, f"Bet must be between {BET_MIN} and {BET_MAX}")
+        raise HTTPException(400, f"Bet must be between {BET_MIN} and {BET_MAX} USDClaw")
 
+    balance = await get_balance(username)
+    if balance < bet.amount:
+        raise HTTPException(400, f"USDClaw 餘額不足。目前餘額: {balance:,.0f}")
+
+    # Calculate odds
+    stats = await calculate_driver_card(bet.prediction)
+    odds = calculate_odds(stats)
+
+    # Deduct USDClaw via trading platform's token system
+    ref_id = f"pitlane_bet:{bet.race_id}:{bet.prediction}"
+    try:
+        await debit(username, bet.amount, "pitlane_bet", ref_id)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+    # Record bet in PitLane's SQLite
     db = await get_db()
     try:
-        rows = await db.execute_fetchall(
-            "SELECT coins FROM users WHERE id = ?", (user_id,)
-        )
-        if not rows:
-            raise HTTPException(404, "User not found")
-        coins = rows[0][0]
-        if coins < bet.amount:
-            raise HTTPException(400, f"Not enough coins. You have {coins}")
-
-        # Calculate odds
-        stats = await calculate_driver_card(bet.prediction)
-        odds = calculate_odds(stats)
-
-        # Deduct coins
         await db.execute(
-            "UPDATE users SET coins = coins - ? WHERE id = ?",
-            (bet.amount, user_id),
-        )
-
-        # Create bet
-        await db.execute(
-            """INSERT INTO bets (user_id, race_id, race_name, bet_type, prediction, amount, odds)
+            """INSERT INTO bets (username, race_id, race_name, bet_type, prediction, amount, odds)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (user_id, bet.race_id, bet.race_name, bet.bet_type, bet.prediction, bet.amount, odds),
-        )
-
-        await db.execute(
-            "UPDATE users SET total_bets = total_bets + 1 WHERE id = ?",
-            (user_id,),
+            (username, bet.race_id, bet.race_name, bet.bet_type, bet.prediction, bet.amount, odds),
         )
         await db.commit()
-
-        new_coins = coins - bet.amount
-        return {
-            "message": "Bet placed!",
-            "amount": bet.amount,
-            "odds": odds,
-            "potential_win": int(bet.amount * odds),
-            "remaining_coins": new_coins,
-        }
     finally:
         await db.close()
+
+    new_balance = await get_balance(username)
+    return {
+        "message": "Bet placed!",
+        "amount": bet.amount,
+        "odds": odds,
+        "potential_win": int(bet.amount * odds),
+        "remaining_balance": new_balance,
+        "currency": "USDClaw",
+    }
 
 
 @router.get("/my")
 async def my_bets(authorization: str = Header(None)):
-    """Get user's betting history."""
+    """取得下注記錄"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:
         rows = await db.execute_fetchall(
             """SELECT id, race_id, race_name, bet_type, prediction, amount, odds,
                       result, payout, created_at
-               FROM bets WHERE user_id = ? ORDER BY created_at DESC LIMIT 50""",
-            (user["sub"],),
+               FROM bets WHERE username = ? ORDER BY created_at DESC LIMIT 50""",
+            (user["username"],),
         )
         bets = []
         for r in rows:
@@ -98,14 +84,14 @@ async def my_bets(authorization: str = Header(None)):
 
 @router.get("/{race_id}/result")
 async def bet_result(race_id: str, authorization: str = Header(None)):
-    """Check bet results for a specific race."""
+    """查看某站的下注結果"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:
         rows = await db.execute_fetchall(
             """SELECT id, prediction, amount, odds, result, payout
-               FROM bets WHERE user_id = ? AND race_id = ?""",
-            (user["sub"], race_id),
+               FROM bets WHERE username = ? AND race_id = ?""",
+            (user["username"], race_id),
         )
         bets = []
         for r in rows:

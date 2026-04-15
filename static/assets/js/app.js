@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   PitLane — Core JS
+   PitLane — Core JS (USDClaw integrated)
    ═══════════════════════════════════════════ */
 
 const API = '';  // same origin
@@ -11,7 +11,7 @@ async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { ...opts, headers });
-  if (res.status === 401) { logout(); throw new Error('Unauthorized'); }
+  if (res.status === 401) { logout(); throw new Error('請重新登入'); }
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'API Error');
   return data;
@@ -23,29 +23,31 @@ function updateAuthUI() {
   if (!authArea) return;
   if (user) {
     authArea.innerHTML = `
-      <span class="nav-coins">◆ <span id="user-coins">${user.coins?.toLocaleString() || '10,000'}</span></span>
+      <span class="nav-coins">◆ <span id="user-coins">${formatNum(user.balance)}</span></span>
       <span style="color:var(--text-secondary);font-size:14px">${user.username}</span>
       <button class="btn btn-outline btn-sm" onclick="logout()">登出</button>
     `;
   } else {
     authArea.innerHTML = `
-      <button class="btn btn-outline btn-sm" onclick="showModal('login')">登入</button>
-      <button class="btn btn-gold btn-sm" onclick="showModal('register')">註冊</button>
+      <button class="btn btn-gold btn-sm" onclick="showModal('login')">登入</button>
     `;
   }
 }
 
-async function register(username, email, password) {
-  const data = await api('/api/auth/register', {
-    method: 'POST',
-    body: JSON.stringify({ username, email, password }),
-  });
-  token = data.access_token;
-  user = { username: data.username, coins: data.coins };
-  localStorage.setItem('pitlane_token', token);
-  localStorage.setItem('pitlane_user', JSON.stringify(user));
-  updateAuthUI();
-  closeModal();
+function formatNum(n) {
+  if (n == null) return '0';
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+async function refreshBalance() {
+  if (!token) return;
+  try {
+    const data = await api('/api/auth/me');
+    user.balance = data.balance;
+    localStorage.setItem('pitlane_user', JSON.stringify(user));
+    const el = document.getElementById('user-coins');
+    if (el) el.textContent = formatNum(data.balance);
+  } catch (e) {}
 }
 
 async function login(username, password) {
@@ -54,7 +56,7 @@ async function login(username, password) {
     body: JSON.stringify({ username, password }),
   });
   token = data.access_token;
-  user = { username: data.username, coins: data.coins };
+  user = { username: data.username, balance: data.balance };
   localStorage.setItem('pitlane_token', token);
   localStorage.setItem('pitlane_user', JSON.stringify(user));
   updateAuthUI();
@@ -75,71 +77,48 @@ function showModal(type) {
   const modal = document.getElementById('auth-modal');
   overlay.classList.add('active');
 
-  if (type === 'register') {
-    modal.innerHTML = `
-      <h2>加入 PitLane</h2>
-      <div class="form-group">
-        <label>用戶名稱</label>
-        <input type="text" id="reg-username" placeholder="your_name" />
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="reg-email" placeholder="you@example.com" />
-      </div>
-      <div class="form-group">
-        <label>密碼</label>
-        <input type="password" id="reg-password" placeholder="至少 4 位" />
-      </div>
-      <div id="auth-error" class="error-msg"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" onclick="closeModal()">取消</button>
-        <button class="btn btn-gold" onclick="handleRegister()">註冊</button>
-      </div>
-      <div class="switch-link">已有帳號？<a href="#" onclick="showModal('login')">登入</a></div>
-    `;
-  } else {
-    modal.innerHTML = `
-      <h2>登入 PitLane</h2>
-      <div class="form-group">
-        <label>用戶名稱</label>
-        <input type="text" id="login-username" placeholder="your_name" />
-      </div>
-      <div class="form-group">
-        <label>密碼</label>
-        <input type="password" id="login-password" placeholder="密碼" />
-      </div>
-      <div id="auth-error" class="error-msg"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" onclick="closeModal()">取消</button>
-        <button class="btn btn-gold" onclick="handleLogin()">登入</button>
-      </div>
-      <div class="switch-link">還沒帳號？<a href="#" onclick="showModal('register')">註冊</a></div>
-    `;
-  }
+  modal.innerHTML = `
+    <h2>登入 PitLane</h2>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;text-align:center">
+      使用你的 ClawStockMarket 交易所帳號
+    </p>
+    <div class="form-group">
+      <label>帳號 / Email</label>
+      <input type="text" id="login-username" placeholder="交易所帳號或 Email" />
+    </div>
+    <div class="form-group">
+      <label>密碼</label>
+      <input type="password" id="login-password" placeholder="密碼" />
+    </div>
+    <div id="auth-error" class="error-msg"></div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-gold" onclick="handleLogin()">登入</button>
+    </div>
+    <div class="switch-link" style="margin-top:16px">
+      還沒有帳號？到 <a href="https://clawstockmarket.com" target="_blank">交易所</a> 註冊
+    </div>
+  `;
+
+  // Focus username input
+  setTimeout(() => document.getElementById('login-username')?.focus(), 100);
 }
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('active');
 }
 
-async function handleRegister() {
-  const u = document.getElementById('reg-username').value.trim();
-  const e = document.getElementById('reg-email').value.trim();
-  const p = document.getElementById('reg-password').value;
-  try {
-    await register(u, e, p);
-  } catch (err) {
-    document.getElementById('auth-error').textContent = err.message;
-  }
-}
-
 async function handleLogin() {
   const u = document.getElementById('login-username').value.trim();
   const p = document.getElementById('login-password').value;
+  const errEl = document.getElementById('auth-error');
+  if (!u || !p) { errEl.textContent = '請輸入帳號和密碼'; return; }
   try {
     await login(u, p);
+    // Reload page to refresh data
+    location.reload();
   } catch (err) {
-    document.getElementById('auth-error').textContent = err.message;
+    errEl.textContent = err.message;
   }
 }
 
@@ -179,18 +158,11 @@ function rarityLabel(rarity) {
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', () => {
   updateAuthUI();
-  // Close modal on overlay click
   document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeModal();
   });
-  // Enter key in modal
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const loginBtn = document.getElementById('login-username');
-      const regBtn = document.getElementById('reg-username');
-      if (loginBtn) handleLogin();
-      else if (regBtn) handleRegister();
-    }
+    if (e.key === 'Enter' && document.getElementById('login-username')) handleLogin();
     if (e.key === 'Escape') closeModal();
   });
 });

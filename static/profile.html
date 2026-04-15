@@ -30,8 +30,8 @@
   <div class="container">
     <div id="profile-content">
       <div id="not-logged-in" style="text-align:center;padding:60px 0">
-        <h2 style="margin-bottom:16px">登入查看你的戰績</h2>
-        <p style="color:var(--text-secondary);margin-bottom:24px">追蹤你的預測記錄、籌碼變化和卡牌收藏</p>
+        <h2 style="margin-bottom:16px">登入查看你的戰績（使用交易所帳號）</h2>
+        <p style="color:var(--text-secondary);margin-bottom:24px">追蹤你的預測記錄、USDClaw變化和卡牌收藏</p>
         <button class="btn btn-gold" onclick="showModal('login')">登入</button>
       </div>
 
@@ -44,7 +44,7 @@
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px">
               <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
                 <div style="color:var(--gold);font-size:2rem;font-weight:900" id="p-coins">0</div>
-                <div style="color:var(--text-secondary);font-size:12px">籌碼</div>
+                <div style="color:var(--text-secondary);font-size:12px">USDClaw</div>
               </div>
               <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
                 <div style="color:var(--text-primary);font-size:2rem;font-weight:900" id="p-bets">0</div>
@@ -103,7 +103,7 @@ async function loadProfile() {
     document.getElementById('profile-name').textContent = profile.username;
     document.getElementById('profile-rarity').innerHTML =
       `<span class="rarity-badge ${rarityClass(profile.rarity_level)}">${rarityLabel(profile.rarity_level)}</span>`;
-    document.getElementById('p-coins').textContent = profile.coins?.toLocaleString();
+    document.getElementById('p-coins').textContent = profile.balance?.toLocaleString();
     document.getElementById('p-bets').textContent = profile.total_bets;
     document.getElementById('p-wins').textContent = profile.total_wins;
     document.getElementById('p-rate').textContent = profile.win_rate + '%';

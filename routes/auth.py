@@ -1,86 +1,95 @@
-from fastapi import APIRouter, HTTPException
-import hashlib
-import secrets
-import jwt
-from datetime import datetime, timedelta
-from models import UserRegister, UserLogin, TokenResponse
-from database import get_db
-from config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRE_HOURS, STARTING_COINS
+"""Auth — 共用交易所帳號系統
+   登入透過轉發到交易所 API，JWT token 共用驗證"""
+from fastapi import APIRouter, HTTPException, Header
+from jose import jwt, JWTError
+import httpx
+from config import JWT_SECRET, JWT_ALGORITHM
+from services.usdclaw import get_user, get_balance
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
+TRADING_API = "http://127.0.0.1:8000"
 
-def create_token(user_id: int, username: str) -> str:
-    payload = {
-        "sub": str(user_id),
-        "username": username,
-        "exp": datetime.utcnow() + timedelta(hours=JWT_EXPIRE_HOURS),
-    }
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 
 def decode_token(token: str) -> dict:
+    """驗證交易所的 JWT token"""
     try:
-        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(401, "Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(401, "Invalid token")
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        username = payload.get("sub")
+        if not username:
+            raise HTTPException(401, "Invalid token")
+        return {"sub": username}
+    except JWTError:
+        raise HTTPException(401, "Invalid or expired token")
 
 
-@router.post("/register", response_model=TokenResponse)
-async def register(data: UserRegister):
-    if len(data.username) < 2 or len(data.password) < 4:
-        raise HTTPException(400, "Username min 2 chars, password min 4 chars")
+async def get_current_user(authorization: str = Header(None)) -> dict:
+    """從 Authorization header 取得當前用戶"""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(401, "請先登入（使用交易所帳號）")
+    token = authorization.split(" ")[1]
+    payload = decode_token(token)
+    username = payload["sub"]
 
-    db = await get_db()
-    try:
-        existing = await db.execute_fetchall(
-            "SELECT id FROM users WHERE username = ? OR email = ?",
-            (data.username, data.email),
-        )
-        if existing:
-            raise HTTPException(400, "Username or email already exists")
+    user = await get_user(username)
+    if not user:
+        raise HTTPException(404, "User not found")
+    if user.get("status") == "suspended":
+        raise HTTPException(403, "Account suspended")
 
-        salt = secrets.token_hex(16)
-        pw_hash = hashlib.sha256((salt + data.password).encode()).hexdigest() + ":" + salt
-        cursor = await db.execute(
-            "INSERT INTO users (username, email, password_hash, coins) VALUES (?, ?, ?, ?)",
-            (data.username, data.email, pw_hash, STARTING_COINS),
-        )
-        await db.commit()
-        user_id = cursor.lastrowid
-        token = create_token(user_id, data.username)
-        return TokenResponse(
-            access_token=token, username=data.username, coins=STARTING_COINS
-        )
-    finally:
-        await db.close()
+    return {"username": username, "balance": user.get("balance", 0)}
 
 
-@router.post("/login", response_model=TokenResponse)
-async def login(data: UserLogin):
-    db = await get_db()
-    try:
-        rows = await db.execute_fetchall(
-            "SELECT id, username, password_hash, coins FROM users WHERE username = ?",
-            (data.username,),
-        )
-        if not rows:
-            raise HTTPException(401, "Invalid credentials")
-        user = rows[0]
-        stored = user[2]
-        parts = stored.split(":")
-        if len(parts) != 2:
-            raise HTTPException(401, "Invalid credentials")
-        stored_hash, salt = parts
-        check_hash = hashlib.sha256((salt + data.password).encode()).hexdigest()
-        if check_hash != stored_hash:
-            raise HTTPException(401, "Invalid credentials")
+@router.post("/login")
+async def login(data: LoginRequest):
+    """登入 — 轉發到交易所 /api/token 取得 JWT"""
+    async with httpx.AsyncClient() as client:
+        try:
+            resp = await client.post(
+                f"{TRADING_API}/api/token",
+                data={"username": data.username, "password": data.password},
+                timeout=10,
+            )
+        except httpx.ConnectError:
+            raise HTTPException(503, "Trading platform unavailable")
 
-        token = create_token(user[0], user[1])
-        return TokenResponse(
-            access_token=token, username=user[1], coins=user[3]
-        )
-    finally:
-        await db.close()
+    if resp.status_code != 200:
+        detail = "帳號或密碼錯誤"
+        try:
+            detail = resp.json().get("detail", detail)
+        except Exception:
+            pass
+        raise HTTPException(401, detail)
+
+    result = resp.json()
+    token = result.get("access_token")
+    username = result.get("username")
+
+    # Get USDClaw balance
+    balance = await get_balance(username)
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "username": username,
+        "balance": balance,
+        "currency": "USDClaw",
+    }
+
+
+@router.get("/me")
+async def me(authorization: str = Header(None)):
+    """取得當前用戶資訊和 USDClaw 餘額"""
+    user = await get_current_user(authorization)
+    balance = await get_balance(user["username"])
+    return {
+        "username": user["username"],
+        "balance": balance,
+        "currency": "USDClaw",
+    }

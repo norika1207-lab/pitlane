@@ -1,50 +1,47 @@
+"""Profile — 戰績和排行榜"""
 from fastapi import APIRouter, HTTPException, Header
 from database import get_db
-from routes.auth import decode_token
+from routes.auth import get_current_user
+from services.usdclaw import get_balance
 from services.card_engine import determine_rarity
 from config import RARITY
 
 router = APIRouter(prefix="/api/profile", tags=["profile"])
 
 
-async def get_current_user(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(401, "Not authenticated")
-    token = authorization.split(" ")[1]
-    return decode_token(token)
-
-
 @router.get("")
 async def my_profile(authorization: str = Header(None)):
-    """Get user profile with stats."""
+    """取得個人戰績"""
     user = await get_current_user(authorization)
+    username = user["username"]
+    balance = await get_balance(username)
+
     db = await get_db()
     try:
-        rows = await db.execute_fetchall(
-            """SELECT username, email, coins, total_bets, total_wins,
-                      rarity_level, created_at FROM users WHERE id = ?""",
-            (user["sub"],),
+        # Get bet stats from SQLite
+        row = await db.execute_fetchall(
+            """SELECT COUNT(*) as total,
+                      SUM(CASE WHEN result = 'won' THEN 1 ELSE 0 END) as wins
+               FROM bets WHERE username = ?""",
+            (username,),
         )
-        if not rows:
-            raise HTTPException(404, "User not found")
-        u = rows[0]
-        win_rate = u[4] / u[3] * 100 if u[3] > 0 else 0
-        rarity = determine_rarity({
-            "total_bets": u[3], "total_wins": u[4]
-        })
+        total_bets = row[0][0] if row else 0
+        total_wins = row[0][1] or 0 if row else 0
+        win_rate = total_wins / total_bets * 100 if total_bets > 0 else 0
+
+        rarity = determine_rarity({"total_bets": total_bets, "total_wins": total_wins})
         rarity_info = RARITY.get(rarity, RARITY["silverstone"])
 
         return {
-            "username": u[0],
-            "email": u[1],
-            "coins": u[2],
-            "total_bets": u[3],
-            "total_wins": u[4],
+            "username": username,
+            "balance": balance,
+            "currency": "USDClaw",
+            "total_bets": total_bets,
+            "total_wins": total_wins,
             "win_rate": round(win_rate, 1),
             "rarity_level": rarity,
             "rarity_name": rarity_info["name"],
             "rarity_label": rarity_info["label"],
-            "joined": u[6],
         }
     finally:
         await db.close()
@@ -52,35 +49,37 @@ async def my_profile(authorization: str = Header(None)):
 
 @router.get("/sharecard")
 async def share_card(authorization: str = Header(None)):
-    """Generate data for a shareable stats card."""
+    """生成可分享的戰績卡數據"""
     user = await get_current_user(authorization)
+    username = user["username"]
+    balance = await get_balance(username)
+
     db = await get_db()
     try:
-        rows = await db.execute_fetchall(
-            """SELECT username, coins, total_bets, total_wins, rarity_level
-               FROM users WHERE id = ?""",
-            (user["sub"],),
+        row = await db.execute_fetchall(
+            """SELECT COUNT(*), SUM(CASE WHEN result='won' THEN 1 ELSE 0 END)
+               FROM bets WHERE username = ?""",
+            (username,),
         )
-        if not rows:
-            raise HTTPException(404, "User not found")
-        u = rows[0]
+        total_bets = row[0][0] if row else 0
+        total_wins = row[0][1] or 0 if row else 0
+        win_rate = total_wins / total_bets * 100 if total_bets > 0 else 0
 
-        # Get recent bet results
         recent = await db.execute_fetchall(
             """SELECT race_name, prediction, result, payout
-               FROM bets WHERE user_id = ? ORDER BY created_at DESC LIMIT 5""",
-            (user["sub"],),
+               FROM bets WHERE username = ? ORDER BY created_at DESC LIMIT 5""",
+            (username,),
         )
 
-        win_rate = u[3] / u[2] * 100 if u[2] > 0 else 0
-        rarity = determine_rarity({"total_bets": u[2], "total_wins": u[3]})
+        rarity = determine_rarity({"total_bets": total_bets, "total_wins": total_wins})
         rarity_info = RARITY.get(rarity, RARITY["silverstone"])
 
         return {
-            "username": u[0],
-            "coins": u[1],
-            "total_bets": u[2],
-            "total_wins": u[3],
+            "username": username,
+            "balance": balance,
+            "currency": "USDClaw",
+            "total_bets": total_bets,
+            "total_wins": total_wins,
             "win_rate": round(win_rate, 1),
             "rarity_level": rarity,
             "rarity_name": rarity_info["name"],
@@ -95,22 +94,30 @@ async def share_card(authorization: str = Header(None)):
 
 @router.get("/leaderboard")
 async def leaderboard():
-    """Global leaderboard."""
+    """PitLane 下注排行榜"""
     db = await get_db()
     try:
         rows = await db.execute_fetchall(
-            """SELECT username, coins, total_bets, total_wins
-               FROM users ORDER BY coins DESC LIMIT 50"""
+            """SELECT username,
+                      COUNT(*) as total_bets,
+                      SUM(CASE WHEN result='won' THEN 1 ELSE 0 END) as wins,
+                      SUM(payout) as total_payout
+               FROM bets
+               GROUP BY username
+               ORDER BY total_payout DESC, wins DESC
+               LIMIT 50"""
         )
         leaders = []
         for i, r in enumerate(rows):
+            total = r[1]
+            wins = r[2] or 0
             leaders.append({
                 "rank": i + 1,
                 "username": r[0],
-                "coins": r[1],
-                "total_bets": r[2],
-                "total_wins": r[3],
-                "win_rate": round(r[3] / r[2] * 100, 1) if r[2] > 0 else 0,
+                "total_bets": total,
+                "total_wins": wins,
+                "win_rate": round(wins / total * 100, 1) if total > 0 else 0,
+                "total_payout": r[3] or 0,
             })
         return {"leaderboard": leaders}
     finally:
