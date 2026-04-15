@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PitLane — 賽車預測卡牌平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <div class="nav-links">
+      <a href="/" class="active">首頁</a>
+      <a href="/race">賽事</a>
+      <a href="/cards">卡牌</a>
+      <a href="/profile">戰績</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="dot" style="width:6px;height:6px"></span>
+      2025 賽季進行中
+    </div>
+    <h1>用卡牌預測 F1<br>讓你秒懂賽車</h1>
+    <p>收集車手卡牌、分析數據、預測比賽結果。<br>不是賭博，是用數據說話的賽車學習平台。</p>
+    <div class="hero-actions">
+      <button class="btn btn-gold" onclick="user ? location.href='/race' : showModal('register')">開始預測</button>
+      <button class="btn btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>為什麼選 PitLane？</h2>
+      <p>我們讓複雜的 F1 策略變得直覺好懂</p>
+    </div>
+    <div class="features">
+      <div class="feature-card">
+        <span class="feature-icon">🃏</span>
+        <h3>真實數據卡牌</h3>
+        <p>每張卡牌的數值都從真實比賽數據計算而來，不是隨便亂編。你手上的 Verstappen 卡，就是他本季的真實實力。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🏎</span>
+        <h3>預測比賽結果</h3>
+        <p>用你收集的卡牌組合預測比賽冠軍。分析天氣、賽道特性、車手歷史，做出你的判斷。</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3>輸了比贏了更有價值</h3>
+        <p>賽後 AI 解析告訴你為什麼預測錯了——進站太早？輪胎策略失誤？每場比賽都是一堂課。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRENT RACE PREVIEW -->
+<section class="section" style="background: var(--bg-secondary);">
+  <div class="container">
+    <div class="section-header">
+      <h2>即將到來的賽事</h2>
+    </div>
+    <div id="current-race" class="loading">
+      <div class="spinner"></div>
+      <p>載入賽事資訊中...</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOP DRIVERS PREVIEW -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>本季車手卡牌</h2>
+      <p>數值來自真實賽事數據，每站更新</p>
+    </div>
+    <div id="drivers-grid" class="card-grid loading">
+      <div class="spinner"></div>
+      <p>載入車手資料中...</p>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="/cards" class="btn btn-outline">查看全部卡牌 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works" style="background: var(--bg-secondary);">
+  <div class="container">
+    <div class="section-header">
+      <h2>怎麼玩？</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>收集卡牌</h4>
+        <p>註冊即獲得入門卡組。看越多比賽、預測越準，解鎖越稀有的卡牌。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>研究數據</h4>
+        <p>看車手數值、天氣預報、賽道歷史。用數據做判斷，不是靠運氣。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>預測下注</h4>
+        <p>選擇你認為會贏的車手，用虛擬籌碼下注。新手只要選冠軍就好。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>學習成長</h4>
+        <p>賽後看 AI 解析，了解為什麼對或錯。累積經驗，解鎖傳奇卡牌。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RARITY SHOWCASE -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>卡牌稀有度</h2>
+      <p>用賽道命名，靠實力解鎖</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center">
+      <div class="feature-card" style="border-color:rgba(160,160,180,0.2)">
+        <div style="font-size:2rem;margin-bottom:8px">🏁</div>
+        <span class="rarity-badge rarity-silverstone">Silverstone</span>
+        <h4 style="margin-top:12px">入門</h4>
+        <p style="color:var(--text-secondary);font-size:13px">註冊即獲得</p>
+      </div>
+      <div class="feature-card" style="border-color:rgba(59,130,246,0.2)">
+        <div style="font-size:2rem;margin-bottom:8px">⚡</div>
+        <span class="rarity-badge rarity-monza">Monza</span>
+        <h4 style="margin-top:12px">進階</h4>
+        <p style="color:var(--text-secondary);font-size:13px">完成 10 站預測</p>
+      </div>
+      <div class="feature-card" style="border-color:rgba(168,85,247,0.2)">
+        <div style="font-size:2rem;margin-bottom:8px">🌀</div>
+        <span class="rarity-badge rarity-suzuka">Suzuka</span>
+        <h4 style="margin-top:12px">經典</h4>
+        <p style="color:var(--text-secondary);font-size:13px">單站完全命中</p>
+      </div>
+      <div class="feature-card" style="border-color:rgba(212,168,67,0.2)">
+        <div style="font-size:2rem;margin-bottom:8px">👑</div>
+        <span class="rarity-badge rarity-monaco">Monaco</span>
+        <h4 style="margin-top:12px">傳奇</h4>
+        <p style="color:var(--text-secondary);font-size:13px">連續 10 站 80%+</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p>PitLane — 賽車預測卡牌平台 · 純虛擬籌碼，非博弈平台 · 數據來自 OpenF1 & Ergast</p>
+  </div>
+</footer>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+// Load current race
+async function loadCurrentRace() {
+  const el = document.getElementById('current-race');
+  try {
+    const data = await api('/api/races/current');
+    if (data.season_over) {
+      el.innerHTML = '<p style="color:var(--text-secondary)">本季賽事已結束，敬請期待下一季！</p>';
+      return;
+    }
+    const date = new Date(data.date);
+    const dateStr = date.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' });
+    el.innerHTML = `
+      <div class="race-banner">
+        <div class="race-info">
+          <h3>${data.race_name || 'Next Race'}</h3>
+          <div class="race-meta">
+            <span>📍 ${data.circuit || data.country || ''}</span>
+            <span>🏴 ${data.country || ''}</span>
+            <span>📅 ${dateStr}</span>
+          </div>
+        </div>
+        <a href="/race" class="btn btn-gold">查看詳情 & 預測</a>
+      </div>
+    `;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary)">暫時無法載入賽事資訊</p>';
+  }
+}
+
+// Load top drivers
+async function loadDrivers() {
+  const el = document.getElementById('drivers-grid');
+  try {
+    const data = await api('/api/drivers');
+    const drivers = data.drivers?.slice(0, 6) || [];
+    if (!drivers.length) {
+      el.innerHTML = '<p style="color:var(--text-secondary)">暫無車手資料</p>';
+      return;
+    }
+
+    // Load cards for top drivers
+    const cards = await Promise.all(
+      drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
+    );
+
+    el.className = 'card-grid';
+    el.innerHTML = cards.map((card, i) => {
+      if (!card) return '';
+      const d = drivers[i];
+      const s = card.stats || {};
+      return `
+        <div class="driver-card" onclick="location.href='/cards#${d.driver_id}'">
+          <div class="number">${d.number || ''}</div>
+          <div class="name">${d.name}</div>
+          <div class="team">${card.team || ''} · ${d.nationality || ''}</div>
+          ${renderStatBar('單圈速度', s.qualifying || 50)}
+          ${renderStatBar('輪胎管理', s.tire_management || 50)}
+          ${renderStatBar('雨戰能力', s.wet_weather || 50)}
+          ${renderStatBar('超車能力', s.overtaking || 50)}
+          ${renderStatBar('街道賽', s.street_circuit || 50)}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+            <span class="rarity-badge rarity-silverstone">Silverstone</span>
+            <span style="color:var(--gold);font-weight:700;font-size:1.2rem">${s.overall || 50}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary)">暫時無法載入車手資料</p>';
+  }
+}
+
+loadCurrentRace();
+loadDrivers();
+</script>
+</body>
+</html>

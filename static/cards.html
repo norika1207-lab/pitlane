@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PitLane — 卡牌收藏</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <div class="nav-links">
+      <a href="/">首頁</a>
+      <a href="/race">賽事</a>
+      <a href="/cards" class="active">卡牌</a>
+      <a href="/profile">戰績</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<!-- Driver Cards -->
+<section style="padding-top:100px" class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>車手卡牌</h2>
+      <p>數值由真實 F1 賽事數據計算，每站更新</p>
+    </div>
+    <div id="all-drivers" class="card-grid loading">
+      <div class="spinner"></div>
+      <p>載入中...</p>
+    </div>
+  </div>
+</section>
+
+<!-- Constructor Cards -->
+<section class="section" style="background:var(--bg-secondary)">
+  <div class="container">
+    <div class="section-header">
+      <h2>車隊卡牌</h2>
+      <p>車隊整體實力評估</p>
+    </div>
+    <div id="all-constructors" class="card-grid loading">
+      <div class="spinner"></div>
+      <p>載入中...</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>PitLane — 賽車預測卡牌平台 · 數據來自 OpenF1 & Ergast</p>
+  </div>
+</footer>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+async function loadAllDriverCards() {
+  const el = document.getElementById('all-drivers');
+  try {
+    const data = await api('/api/drivers');
+    const drivers = data.drivers || [];
+    const cards = await Promise.all(
+      drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
+    );
+
+    el.className = 'card-grid';
+    el.innerHTML = cards.map((card, i) => {
+      if (!card) return '';
+      const d = drivers[i];
+      const s = card.stats || {};
+      return `
+        <div class="driver-card" id="${d.driver_id}">
+          <div class="number">${d.number || ''}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div class="name">${d.name}</div>
+              <div class="team">${card.team || ''} · ${d.nationality || ''}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--gold);font-size:2rem;font-weight:900;line-height:1">${s.overall || 50}</div>
+              <div style="color:var(--text-muted);font-size:11px">OVR</div>
+            </div>
+          </div>
+          ${renderStatBar('單圈速度', s.qualifying || 50)}
+          ${renderStatBar('輪胎管理', s.tire_management || 50)}
+          ${renderStatBar('雨戰能力', s.wet_weather || 50)}
+          ${renderStatBar('超車能力', s.overtaking || 50)}
+          ${renderStatBar('街道賽', s.street_circuit || 50)}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <span class="rarity-badge rarity-silverstone">Silverstone</span>
+            <div style="font-size:12px;color:var(--text-muted)">
+              ${s.wins || 0}勝 · ${s.podiums || 0}頒獎台 · ${s.races || 0}場
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入車手卡牌</p>';
+  }
+}
+
+async function loadConstructorCards() {
+  const el = document.getElementById('all-constructors');
+  try {
+    const data = await api('/api/constructors');
+    const constructors = data.constructors || [];
+    const cards = await Promise.all(
+      constructors.map(c => api(`/api/constructors/${c.constructor_id}/card`).catch(() => null))
+    );
+
+    el.className = 'card-grid';
+    el.innerHTML = cards.map((card, i) => {
+      if (!card) return '';
+      const c = constructors[i];
+      const s = card.stats || {};
+      return `
+        <div class="driver-card">
+          <div class="number">#${c.position}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div class="name">${c.name}</div>
+              <div class="team">${c.nationality || ''} · ${c.points} pts</div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--gold);font-size:2rem;font-weight:900;line-height:1">${s.overall || 50}</div>
+              <div style="color:var(--text-muted);font-size:11px">OVR</div>
+            </div>
+          </div>
+          ${renderStatBar('賽車速度', s.car_speed || 50)}
+          ${renderStatBar('進站效率', s.pit_efficiency || 50)}
+          ${renderStatBar('策略評分', s.strategy || 50)}
+          ${renderStatBar('賽道適性', s.track_adaptability || 50)}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <span class="rarity-badge rarity-silverstone">Silverstone</span>
+            <div style="font-size:12px;color:var(--text-muted)">${c.wins || 0}勝 · P${s.championship_position || '?'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入車隊卡牌</p>';
+  }
+}
+
+loadAllDriverCards();
+loadConstructorCards();
+</script>
+</body>
+</html>

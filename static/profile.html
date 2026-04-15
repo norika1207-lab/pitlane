@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PitLane — 個人戰績</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <div class="nav-links">
+      <a href="/">首頁</a>
+      <a href="/race">賽事</a>
+      <a href="/cards">卡牌</a>
+      <a href="/profile" class="active">戰績</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<section style="padding-top:100px" class="section">
+  <div class="container">
+    <div id="profile-content">
+      <div id="not-logged-in" style="text-align:center;padding:60px 0">
+        <h2 style="margin-bottom:16px">登入查看你的戰績</h2>
+        <p style="color:var(--text-secondary);margin-bottom:24px">追蹤你的預測記錄、籌碼變化和卡牌收藏</p>
+        <button class="btn btn-gold" onclick="showModal('login')">登入</button>
+      </div>
+
+      <div id="profile-data" style="display:none">
+        <!-- Profile Header -->
+        <div style="display:flex;gap:32px;align-items:flex-start;margin-bottom:48px">
+          <div style="flex:1">
+            <h1 id="profile-name" style="margin-bottom:8px">—</h1>
+            <div id="profile-rarity" style="margin-bottom:16px"></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px">
+              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
+                <div style="color:var(--gold);font-size:2rem;font-weight:900" id="p-coins">0</div>
+                <div style="color:var(--text-secondary);font-size:12px">籌碼</div>
+              </div>
+              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
+                <div style="color:var(--text-primary);font-size:2rem;font-weight:900" id="p-bets">0</div>
+                <div style="color:var(--text-secondary);font-size:12px">總預測</div>
+              </div>
+              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
+                <div style="color:var(--green);font-size:2rem;font-weight:900" id="p-wins">0</div>
+                <div style="color:var(--text-secondary);font-size:12px">命中</div>
+              </div>
+              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
+                <div style="color:var(--blue);font-size:2rem;font-weight:900" id="p-rate">0%</div>
+                <div style="color:var(--text-secondary);font-size:12px">命中率</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bet History -->
+        <h2 style="margin-bottom:20px">預測記錄</h2>
+        <div id="bet-history"></div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div style="margin-top:60px">
+      <div class="section-header">
+        <h2>全站排行榜</h2>
+      </div>
+      <div id="leaderboard" class="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>PitLane — 賽車預測卡牌平台</p>
+  </div>
+</footer>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+async function loadProfile() {
+  if (!user) {
+    document.getElementById('not-logged-in').style.display = 'block';
+    document.getElementById('profile-data').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('not-logged-in').style.display = 'none';
+  document.getElementById('profile-data').style.display = 'block';
+
+  try {
+    const profile = await api('/api/profile');
+    document.getElementById('profile-name').textContent = profile.username;
+    document.getElementById('profile-rarity').innerHTML =
+      `<span class="rarity-badge ${rarityClass(profile.rarity_level)}">${rarityLabel(profile.rarity_level)}</span>`;
+    document.getElementById('p-coins').textContent = profile.coins?.toLocaleString();
+    document.getElementById('p-bets').textContent = profile.total_bets;
+    document.getElementById('p-wins').textContent = profile.total_wins;
+    document.getElementById('p-rate').textContent = profile.win_rate + '%';
+
+    // Load bet history
+    const bets = await api('/api/bets/my');
+    const histEl = document.getElementById('bet-history');
+    if (!bets.bets?.length) {
+      histEl.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:32px">還沒有預測記錄，去<a href="/race">賽事頁面</a>下你的第一注！</p>';
+    } else {
+      histEl.innerHTML = `
+        <div style="display:grid;gap:8px">
+          ${bets.bets.map(b => `
+            <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;
+                        background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
+              <div style="width:60px;text-align:center">
+                ${b.result === 'won'
+                  ? '<span style="color:var(--green);font-weight:700">✓ 命中</span>'
+                  : b.result === 'lost'
+                  ? '<span style="color:var(--red);font-weight:700">✗ 未中</span>'
+                  : '<span style="color:var(--gold);font-weight:700">⏳ 等待</span>'}
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:600">${b.race_name}</div>
+                <div style="color:var(--text-secondary);font-size:13px">預測: ${b.prediction}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-weight:600">◆ ${b.amount}</div>
+                <div style="color:var(--text-muted);font-size:12px">x${b.odds}</div>
+              </div>
+              <div style="color:var(--text-muted);font-size:12px;width:80px;text-align:right">
+                ${new Date(b.created_at).toLocaleDateString('zh-TW')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+  } catch (e) {
+    document.getElementById('profile-data').innerHTML = '<p style="color:var(--red)">載入個人資料失敗</p>';
+  }
+}
+
+async function loadLeaderboard() {
+  const el = document.getElementById('leaderboard');
+  try {
+    const data = await api('/api/profile/leaderboard');
+    const lb = data.leaderboard || [];
+    if (!lb.length) {
+      el.innerHTML = '<p style="text-align:center;color:var(--text-secondary)">還沒有玩家，成為第一個！</p>';
+      return;
+    }
+    el.className = '';
+    el.innerHTML = `
+      <div style="display:grid;gap:6px">
+        ${lb.map(p => `
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;
+                      background:var(--bg-card);border:1px solid ${p.rank <= 3 ? 'var(--border-gold)' : 'var(--border)'};
+                      border-radius:8px">
+            <span style="font-size:1.2rem;font-weight:900;width:40px;text-align:center;
+                         color:${p.rank === 1 ? 'var(--gold)' : p.rank === 2 ? '#c0c0c0' : p.rank === 3 ? '#cd7f32' : 'var(--text-muted)'}">
+              ${p.rank <= 3 ? ['🥇','🥈','🥉'][p.rank-1] : '#' + p.rank}
+            </span>
+            <span style="flex:1;font-weight:600">${p.username}</span>
+            <span style="color:var(--gold);font-weight:700">◆ ${p.coins?.toLocaleString()}</span>
+            <span style="color:var(--text-secondary);font-size:13px;width:100px;text-align:right">
+              ${p.total_bets}注 · ${p.win_rate}%
+            </span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入排行榜</p>';
+  }
+}
+
+loadProfile();
+loadLeaderboard();
+</script>
+</body>
+</html>

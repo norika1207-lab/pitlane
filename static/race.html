@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PitLane — 賽事預測</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <div class="nav-links">
+      <a href="/">首頁</a>
+      <a href="/race" class="active">賽事</a>
+      <a href="/cards">卡牌</a>
+      <a href="/profile">戰績</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<section style="padding-top:100px;padding-bottom:40px">
+  <div class="container">
+    <div id="race-info" class="loading">
+      <div class="spinner"></div>
+      <p>載入賽事資訊中...</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div id="bet-section"></div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg-secondary)">
+  <div class="container">
+    <div class="section-header">
+      <h2>賽季賽程表</h2>
+    </div>
+    <div id="schedule" class="loading">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>PitLane — 賽車預測卡牌平台 · 純虛擬籌碼 · 數據來自 OpenF1 & Ergast</p>
+  </div>
+</footer>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+let selectedDriver = null;
+let betAmount = 500;
+let driversData = [];
+
+async function loadRacePage() {
+  // Load race info
+  const raceEl = document.getElementById('race-info');
+  try {
+    const race = await api('/api/races/current');
+    if (race.season_over) {
+      raceEl.innerHTML = '<h2>本季賽事已結束</h2>';
+      return;
+    }
+    const date = new Date(race.date);
+    const dateStr = date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+    raceEl.innerHTML = `
+      <div class="race-banner">
+        <div class="race-info">
+          <h3 style="font-size:2rem">${race.race_name || 'Next Race'}</h3>
+          <div class="race-meta" style="margin-top:8px">
+            <span>📍 ${race.circuit || ''}</span>
+            <span>🏴 ${race.country || ''}</span>
+            <span>📅 ${dateStr}</span>
+            <span>🏁 第 ${race.round || '?'} 站</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Load drivers for betting
+    await loadBetPanel(race);
+  } catch (e) {
+    raceEl.innerHTML = '<p style="color:var(--text-secondary)">暫時無法載入賽事</p>';
+  }
+
+  // Load schedule
+  loadSchedule();
+}
+
+async function loadBetPanel(race) {
+  const betEl = document.getElementById('bet-section');
+  try {
+    const data = await api('/api/drivers');
+    driversData = data.drivers || [];
+
+    // Get odds for each driver
+    const cards = await Promise.all(
+      driversData.slice(0, 20).map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
+    );
+
+    betEl.innerHTML = `
+      <div class="bet-panel">
+        <h3>🏆 預測冠軍</h3>
+        <p style="color:var(--text-secondary);margin-bottom:20px;font-size:14px">
+          選擇你認為會贏的車手，用虛擬籌碼下注
+        </p>
+        <div class="bet-driver-select" id="driver-select">
+          ${driversData.slice(0, 20).map((d, i) => {
+            const card = cards[i];
+            const odds = card?.odds || 5.0;
+            return `
+              <div class="bet-option" data-driver="${d.driver_id}" data-odds="${odds}"
+                   data-race-id="${race.race_id || race.session_key || ''}"
+                   data-race-name="${race.race_name || ''}"
+                   onclick="selectDriver(this)">
+                <div>
+                  <div class="driver-name">${d.name}</div>
+                  <div style="color:var(--text-muted);font-size:12px">${d.points} pts</div>
+                </div>
+                <div class="odds">x${odds}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="bet-amount-row">
+          <input type="number" id="bet-amount" value="500" min="100" max="5000"
+                 placeholder="下注金額" onchange="betAmount=parseInt(this.value)">
+          <div class="bet-quick-amounts">
+            <button onclick="setBetAmount(100)">100</button>
+            <button onclick="setBetAmount(500)">500</button>
+            <button onclick="setBetAmount(1000)">1K</button>
+            <button onclick="setBetAmount(2000)">2K</button>
+            <button onclick="setBetAmount(5000)">5K</button>
+          </div>
+        </div>
+
+        <div id="bet-summary" style="margin-bottom:16px;font-size:14px;color:var(--text-secondary)">
+          請先選擇一位車手
+        </div>
+
+        <button class="btn btn-gold" id="place-bet-btn" onclick="placeBet()" disabled>
+          確認預測
+        </button>
+        <div id="bet-result" style="margin-top:12px"></div>
+      </div>
+    `;
+  } catch (e) {
+    betEl.innerHTML = '<p style="color:var(--text-secondary)">無法載入下注面板</p>';
+  }
+}
+
+function selectDriver(el) {
+  document.querySelectorAll('.bet-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDriver = {
+    id: el.dataset.driver,
+    odds: parseFloat(el.dataset.odds),
+    raceId: el.dataset.raceId,
+    raceName: el.dataset.raceName,
+    name: el.querySelector('.driver-name').textContent,
+  };
+  const amt = parseInt(document.getElementById('bet-amount').value) || 500;
+  document.getElementById('bet-summary').innerHTML = `
+    <span style="color:var(--text-primary)">預測 <strong style="color:var(--gold)">${selectedDriver.name}</strong> 奪冠</span>
+    · 賠率 <strong>x${selectedDriver.odds}</strong>
+    · 預計回報 <strong style="color:var(--green)">◆ ${Math.floor(amt * selectedDriver.odds).toLocaleString()}</strong>
+  `;
+  document.getElementById('place-bet-btn').disabled = false;
+}
+
+function setBetAmount(val) {
+  document.getElementById('bet-amount').value = val;
+  betAmount = val;
+  if (selectedDriver) selectDriver(document.querySelector('.bet-option.selected'));
+}
+
+async function placeBet() {
+  if (!user) { showModal('login'); return; }
+  if (!selectedDriver) return;
+  const amt = parseInt(document.getElementById('bet-amount').value) || 500;
+  const resultEl = document.getElementById('bet-result');
+
+  try {
+    const res = await api('/api/bets', {
+      method: 'POST',
+      body: JSON.stringify({
+        race_id: selectedDriver.raceId,
+        race_name: selectedDriver.raceName,
+        bet_type: 'winner',
+        prediction: selectedDriver.id,
+        amount: amt,
+      }),
+    });
+    resultEl.innerHTML = `
+      <div style="padding:16px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:8px">
+        <strong style="color:var(--green)">✓ 預測成功！</strong><br>
+        <span style="font-size:14px;color:var(--text-secondary)">
+          下注 ◆${res.amount} · 賠率 x${res.odds} · 潛在回報 ◆${res.potential_win?.toLocaleString()}
+          <br>剩餘籌碼 ◆${res.remaining_coins?.toLocaleString()}
+        </span>
+      </div>
+    `;
+    // Update coins display
+    user.coins = res.remaining_coins;
+    localStorage.setItem('pitlane_user', JSON.stringify(user));
+    updateAuthUI();
+    document.getElementById('place-bet-btn').disabled = true;
+  } catch (e) {
+    resultEl.innerHTML = `<div style="color:var(--red)">${e.message}</div>`;
+  }
+}
+
+async function loadSchedule() {
+  const el = document.getElementById('schedule');
+  try {
+    const data = await api('/api/races/schedule');
+    const races = data.races || [];
+    if (!races.length) { el.innerHTML = '<p>暫無賽程資料</p>'; return; }
+
+    const today = new Date().toISOString().slice(0, 10);
+    el.innerHTML = `
+      <div style="display:grid;gap:8px">
+        ${races.map(r => {
+          const isPast = r.date < today;
+          const isNext = !isPast && races.find(x => x.date >= today)?.round === r.round;
+          return `
+            <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;
+                        background:${isNext ? 'rgba(212,168,67,0.08)' : 'var(--bg-card)'};
+                        border:1px solid ${isNext ? 'var(--border-gold)' : 'var(--border)'};
+                        border-radius:8px;opacity:${isPast ? '0.5' : '1'}">
+              <span style="color:var(--text-muted);font-weight:700;width:30px">R${r.round}</span>
+              <span style="flex:1;font-weight:${isNext ? '700' : '500'}">${r.race_name}</span>
+              <span style="color:var(--text-secondary);font-size:13px">${r.country}</span>
+              <span style="color:var(--text-muted);font-size:13px;width:100px;text-align:right">${r.date}</span>
+              ${isNext ? '<span class="rarity-badge rarity-monaco" style="font-size:10px">NEXT</span>' : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入賽程</p>';
+  }
+}
+
+loadRacePage();
+</script>
+</body>
+</html>
