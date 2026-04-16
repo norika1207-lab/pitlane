@@ -152,11 +152,27 @@ async def learning_progress(authorization: str = Header(None)):
 @extra.get("/api/content/{category}")
 async def get_content(category: str):
     """Get pre-generated content by category."""
+    # Normalise: hyphens→underscores, handle plural/singular aliases
+    cat_map = {
+        "classic-races": "classic_race",
+        "classic-race": "classic_race",
+        "drivers": "driver_profile",
+        "driver-profiles": "driver_profile",
+        "teams": "team_profile",
+        "team-profiles": "team_profile",
+        "tracks": "track_analysis",
+        "track-analyses": "track_analysis",
+        "postmortems": "race_postmortem",
+        "race-postmortems": "race_postmortem",
+        "rivalries": "rivalry",
+        "trends": "trend",
+    }
+    db_category = cat_map.get(category, category.replace("-", "_"))
     db = await get_db()
     try:
         rows = await db.execute_fetchall(
             "SELECT key, title, data FROM content_cache WHERE category = ? ORDER BY created_at DESC",
-            (category,),
+            (db_category,),
         )
         import json
         items = []
