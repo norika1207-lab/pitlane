@@ -436,7 +436,27 @@ function renderCards(){
     }
   }
 
-  grid.innerHTML = list.map(buildCard).join('');
+  // If sorted by team, insert team headers
+  if (currentSort === 'team') {
+    let html = '';
+    let lastTeam = '';
+    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
+    list.forEach(d => {
+      if (d.team !== lastTeam) {
+        const tc = teamColors[d.team] || '#888';
+        html += `<div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:8px 0;margin-top:${lastTeam?'12px':'0'}">
+          <div style="width:4px;height:24px;border-radius:2px;background:${tc}"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:${tc};letter-spacing:0.04em">${d.team}</span>
+          <div style="flex:1;height:1px;background:${tc}22"></div>
+        </div>`;
+        lastTeam = d.team;
+      }
+      html += buildCard(d);
+    });
+    grid.innerHTML = html;
+  } else {
+    grid.innerHTML = list.map(buildCard).join('');
+  }
 }
 
 function filterTier(tier, btn){
