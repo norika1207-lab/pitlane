@@ -3,791 +3,705 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PitLane — 賽車預測卡牌平台</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/assets/css/style.css">
+<title>PitLane — 用卡牌預測 F1</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ─── COMPACT HERO ─── */
-.hero-compact {
-  padding: 72px 0 12px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.hero-compact::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(232,255,0,0.03) 0%, transparent 60%);
-}
-.hero-row {
-  display: flex; align-items: center; justify-content: center;
-  gap: 16px; flex-wrap: wrap;
-  position: relative; z-index: 2;
-}
-.hero-logo {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.6rem; font-weight: 900;
-  color: var(--gold); letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.hero-divider { width: 1px; height: 24px; background: var(--border); }
-.hero-slogan {
-  font-size: 0.95rem; color: var(--text-secondary);
-  font-weight: 500;
-}
-.hero-slogan em { color: var(--gold); font-style: normal; font-weight: 700; }
-.hero-cta {
-  display: flex; gap: 8px; align-items: center;
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height:100vh;}
 
-/* ─── CAROUSEL V2 ─── */
-.carousel-section {
-  padding: 16px 0 32px;
-  position: relative;
-  overflow: hidden;
-}
-.carousel-wrap {
-  position: relative; padding: 0 60px;
-  user-select: none; max-width: 1200px;
-  margin: 0 auto;
-}
-.carousel-stage {
-  display: flex; justify-content: center; align-items: center;
-  height: 380px; position: relative; perspective: 1200px;
-}
-.carousel-card {
-  position: absolute; width: 260px;
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 8px; overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  cursor: pointer; transform-style: preserve-3d;
-}
-.carousel-card .cc-team-stripe {
-  position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-  border-radius: 8px 0 0 8px;
-}
-.carousel-card .cc-top {
-  padding: 16px 16px 0 22px;
-  display: flex; align-items: center; gap: 12px; position: relative;
-}
-.carousel-card .cc-ghost {
-  position: absolute; top: 4px; right: 10px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 3.5rem; font-weight: 900;
-  color: rgba(232,255,0,0.04); line-height: 1; pointer-events: none;
-}
-.carousel-card .cc-avatar {
-  width: 48px; height: 48px; border-radius: 50%;
-  object-fit: cover; border: 2px solid var(--border);
-  background: var(--bg-secondary); flex-shrink: 0;
-}
-.carousel-card .cc-avatar-fb {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: rgba(232,255,0,0.06); border: 2px solid var(--border-gold);
-  display: none; align-items: center; justify-content: center;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.4rem; font-weight: 800; color: var(--gold); flex-shrink: 0;
-}
-.carousel-card .cc-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.05rem; font-weight: 700; color: var(--text-primary); line-height: 1.2;
-}
-.carousel-card .cc-team { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
-.carousel-card .cc-stats {
-  padding: 12px 22px 0;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px;
-  opacity: 0; max-height: 0; transition: opacity 0.4s, max-height 0.4s; overflow: hidden;
-}
-.carousel-card.is-center .cc-stats { opacity: 1; max-height: 200px; }
-.cc-stat-item {
-  display: flex; justify-content: space-between; align-items: baseline;
-  padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-.cc-stat-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
-}
-.cc-stat-val {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.8rem; font-weight: 700; color: var(--gold);
-}
-.carousel-card .cc-skills {
-  padding: 8px 22px 0; display: flex; flex-wrap: wrap; gap: 3px;
-  opacity: 0; max-height: 0; transition: opacity 0.4s 0.1s, max-height 0.4s; overflow: hidden;
-}
-.carousel-card.is-center .cc-skills { opacity: 1; max-height: 80px; }
-.cc-skill-tag {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.6rem; font-weight: 600; padding: 2px 6px; border-radius: 3px;
-  background: rgba(232,255,0,0.06); border: 1px solid rgba(232,255,0,0.12);
-  color: var(--gold); text-transform: uppercase; letter-spacing: 0.04em;
-}
-.cc-skill-tag.passive {
-  background: rgba(0,176,255,0.08); border-color: rgba(0,176,255,0.2); color: var(--blue);
-}
-.carousel-card .cc-footer {
-  padding: 10px 22px 14px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.cc-ovr {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
-}
-.cc-ovr-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
-}
-.cc-bet-btn {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-  padding: 6px 14px; border-radius: 4px;
-  background: var(--gold); color: var(--bg-primary); border: none; cursor: pointer;
-  transition: all 0.15s; opacity: 0; transform: translateY(4px);
-}
-.carousel-card.is-center .cc-bet-btn { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
-.cc-bet-btn:hover { box-shadow: 0 0 16px rgba(232,255,0,0.3); }
-.carousel-arrow {
-  position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 1px solid var(--border); background: var(--bg-secondary);
-  color: var(--gold); font-size: 1.4rem; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; font-family: sans-serif; line-height: 1;
-}
-.carousel-prev { left: 0; }
-.carousel-next { right: 0; }
-.carousel-arrow:hover { background: rgba(232,255,0,0.08); border-color: var(--border-gold); }
-.carousel-dots {
-  display: flex; gap: 5px; justify-content: center; margin-top: 12px;
-}
-.carousel-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--text-muted); border: none; cursor: pointer;
-  transition: all 0.3s; padding: 0;
-}
-.carousel-dot.active {
-  background: var(--gold); box-shadow: 0 0 6px rgba(232,255,0,0.4);
-  width: 20px; border-radius: 3px;
-}
+/* NAVBAR */
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:#e8ff00;}
+.nav-links{display:flex;gap:20px;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;}
+.nav-links a:hover{color:#fff;}
+.nav-actions{display:flex;gap:8px;}
+.btn-login{padding:7px 16px;border-radius:8px;border:1px solid #333;background:transparent;color:#ccc;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-register{padding:7px 16px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
-/* ─── DASHBOARD ─── */
-.dash-section { padding: 20px 0 40px; }
-.dash-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 24px;
-}
-.gauge-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 20px 16px 16px;
-  text-align: center; position: relative; overflow: hidden;
-}
-.gauge-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
-}
-.gauge-card.g-speed::before { background: var(--gold); }
-.gauge-card.g-pos::before { background: var(--red); }
-.gauge-card.g-fuel::before { background: var(--green); }
-.gauge-card.g-pressure::before { background: var(--blue); }
-.gauge-svg { width: 100%; max-width: 140px; height: auto; margin: 0 auto 8px; display: block; }
-.gauge-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.12em;
-  margin-bottom: 4px;
-}
-.gauge-value {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.8rem; font-weight: 800; line-height: 1;
-}
-.gauge-unit {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem; color: var(--text-muted); margin-top: 2px;
-}
+/* HERO - 精簡橫條 */
+.hero{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid #1a1a1a;gap:16px;flex-wrap:wrap;}
+.hero-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.hero-badge{padding:4px 10px;border-radius:20px;background:#e8ff0015;border:1px solid #e8ff0033;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#e8ff00;letter-spacing:0.08em;white-space:nowrap;}
+.hero-text h1{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;line-height:1.1;}
+.hero-text h1 span{color:#e8ff00;}
+.hero-text p{font-size:11px;color:#aaa;margin-top:2px;}
+.hero-btns{display:flex;gap:8px;flex-shrink:0;}
+.btn-primary{padding:9px 20px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;cursor:pointer;white-space:nowrap;}
+.btn-secondary{padding:9px 20px;border-radius:8px;border:1px solid #333;background:transparent;color:#ccc;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;}
 
-/* ─── CHARTS ROW ─── */
-.charts-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 14px; margin-bottom: 24px;
-}
-.chart-box {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 18px; position: relative; overflow: hidden;
-}
-.chart-box::before {
-  content: ''; position: absolute; inset: 0;
-  background: var(--scanline); opacity: 0.2; pointer-events: none;
-}
-.chart-title {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--text-muted); margin-bottom: 14px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.chart-title .live-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green); box-shadow: 0 0 6px var(--green);
-  display: inline-block; animation: pulse 1.5s infinite;
-}
-.chart-canvas { width: 100%; position: relative; }
-.chart-canvas svg { width: 100%; height: 100%; }
+/* CAROUSEL */
+.carousel-section{padding:20px 0 8px;border-bottom:1px solid #1a1a1a;}
+.carousel-label{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;color:#666;margin-bottom:12px;}
+.carousel-wrap{position:relative;width:100%;height:400px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.carousel-track{display:flex;align-items:center;gap:16px;transition:transform 0.4s cubic-bezier(.25,.8,.25,1);}
+.dcard{width:180px;height:280px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.4s cubic-bezier(.25,.8,.25,1);flex-shrink:0;position:relative;overflow:hidden;}
+.dcard.active{width:240px;height:360px;border-color:#e8ff00;z-index:10;}
+.dcard.side{opacity:0.55;transform:scale(0.88);}
+.dcard.far{opacity:0.25;transform:scale(0.75);}
+.dc-stripe{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.08;pointer-events:none;}
+.dc-num{position:absolute;top:8px;right:10px;font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;opacity:0.08;color:#fff;line-height:1;}
+.dc-avatar{width:56px;height:56px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:24px;margin:16px 0 8px 16px;position:relative;z-index:2;}
+.dcard.active .dc-avatar{width:72px;height:72px;margin:20px 0 10px 20px;}
+.dc-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#fff;padding:0 16px;line-height:1;}
+.dcard.active .dc-name{font-size:22px;padding:0 20px;}
+.dc-team{font-size:10px;color:#aaa;padding:2px 16px 8px;}
+.dcard.active .dc-team{padding:2px 20px 10px;}
+.ds-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;padding:0 16px;}
+.dcard.active .ds-row{padding:0 20px;}
+.ds-l{font-size:9px;color:#aaa;width:44px;flex-shrink:0;}
+.dcard.active .ds-l{font-size:10px;width:52px;}
+.ds-bg{flex:1;height:3px;background:#222;border-radius:2px;overflow:hidden;}
+.dcard.active .ds-bg{height:4px;}
+.ds-fill{height:100%;border-radius:2px;}
+.ds-v{font-size:9px;font-weight:700;color:#fff;width:18px;text-align:right;}
+.dcard.active .ds-v{font-size:10px;}
+.dc-footer{position:absolute;bottom:0;left:0;right:0;padding:10px 16px;border-top:1px solid #2a2a2a;display:flex;justify-content:space-between;align-items:center;}
+.dcard.active .dc-footer{padding:12px 20px;}
+.dc-rarity{font-size:9px;font-weight:700;letter-spacing:0.08em;padding:2px 6px;border-radius:20px;}
+.dc-ovr{font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;}
+.dcard.active .dc-ovr{font-size:26px;}
+.dc-hover{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(6,6,12,0.97);border-radius:14px;padding:16px;z-index:20;flex-direction:column;gap:5px;}
+.dcard.active:hover .dc-hover{display:flex;}
+.dh-title{font-size:10px;font-weight:700;letter-spacing:0.1em;color:#888;font-family:'Barlow Condensed',sans-serif;}
+.dh-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1a1a28;}
+.dh-row:last-of-type{border:none;}
+.dh-l{font-size:10px;color:#aaa;}
+.dh-v{font-size:11px;font-weight:700;color:#ccc;}
+.dh-v.hi{color:#e8ff00;}
+.dskill{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:20px;background:#1a1a2e;border:1px solid #2a2a3e;margin:2px 2px 0 0;}
+.dsk-n{font-size:9px;color:#bbb;}
+.dsk-s{font-size:9px;color:#e8ff00;}
+.dbet{width:100%;padding:8px;border-radius:8px;border:none;font-size:12px;font-weight:900;cursor:pointer;margin-top:auto;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.05em;}
+.cnav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:#1a1a1a;border:1px solid #333;color:#aaa;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:30;transition:all 0.2s;}
+.cnav:hover{background:#2a2a2a;color:#fff;}
+.cnav-l{left:16px;}
+.cnav-r{right:16px;}
+.cdots{display:flex;justify-content:center;gap:6px;margin-top:10px;margin-bottom:4px;}
+.cdot{width:6px;height:6px;border-radius:50%;background:#333;cursor:pointer;transition:all 0.2s;}
+.cdot.active{background:#e8ff00;width:18px;border-radius:3px;}
 
-/* Bar chart */
-.bar-group { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 8px; }
-.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-.bar-fill {
-  width: 100%; border-radius: 3px 3px 0 0;
-  transition: height 1s cubic-bezier(0.22, 1, 0.36, 1);
-  position: relative;
-}
-.bar-fill::after {
-  content: ''; position: absolute; inset: 0;
-  background: var(--scanline); opacity: 0.3;
-}
-.bar-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 0.6rem; color: var(--text-muted); text-align: center;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 50px;
-}
-.bar-val {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem; color: var(--text-secondary);
-}
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:16px 20px;}
 
-/* ─── TRACK MINI ─── */
-.track-mini {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 18px;
-}
-.track-mini-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 14px;
-}
-.track-mini-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.1rem; font-weight: 700;
-}
-.track-mini-type {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem; padding: 3px 8px; border-radius: 3px;
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
-.track-mini-type.street { background: rgba(225,6,0,0.12); color: var(--red); }
-.track-mini-type.high_speed { background: rgba(0,210,190,0.12); color: var(--green); }
-.track-mini-type.technical { background: rgba(160,32,240,0.12); color: var(--purple); }
-.track-mini-body {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-}
-.track-mini-stat { text-align: center; }
-.track-mini-stat-val {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.6rem; font-weight: 800; color: var(--text-primary);
-}
-.track-mini-stat-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.55rem; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
-.track-chars-list {
-  grid-column: 1 / -1;
-  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;
-}
-.track-char-tag {
-  font-size: 0.65rem; padding: 3px 8px; border-radius: 3px;
-  background: var(--bg-secondary); border: 1px solid var(--border);
-  color: var(--text-secondary);
-}
+/* LIVE BAR */
+.live-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#111;border-radius:10px;border:1px solid #222;margin-bottom:10px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#00ff88;animation:pulse 1.5s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,0.5)}50%{box-shadow:0 0 0 6px rgba(0,255,136,0)}}
+.live-text{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#00ff88;font-weight:700;letter-spacing:0.05em;}
+.live-count{font-family:'Share Tech Mono',monospace;font-size:13px;color:#bbb;margin-left:auto;}
 
-/* ─── BOTTOM ACTIONS ─── */
-.bottom-actions {
-  display: flex; gap: 14px; justify-content: center; padding: 24px 0 40px;
-}
-.action-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 24px 32px; text-align: center;
-  flex: 1; max-width: 280px; transition: all 0.2s; cursor: pointer;
-}
-.action-card:hover { border-color: var(--border-gold); transform: translateY(-2px); }
-.action-card-icon { font-size: 1.8rem; margin-bottom: 8px; }
-.action-card h3 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1rem; font-weight: 700; margin-bottom: 4px;
-}
-.action-card p { font-size: 0.75rem; color: var(--text-secondary); }
+/* TOP STATS */
+.top-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.top-card{background:#111;border-radius:10px;padding:14px;border:1px solid #222;}
+.tc-label{font-size:10px;color:#888;letter-spacing:0.1em;font-family:'Barlow Condensed',sans-serif;font-weight:700;margin-bottom:4px;}
+.tc-main{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;line-height:1;}
+.tc-sub{font-size:12px;color:#aaa;margin-top:4px;}
 
-@media (max-width: 768px) {
-  .dash-grid { grid-template-columns: repeat(2, 1fr); }
-  .charts-grid { grid-template-columns: 1fr; }
-  .carousel-stage { height: 340px; }
-  .carousel-card { width: 220px; }
-  .bottom-actions { flex-direction: column; align-items: center; }
-}
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1.2fr 1fr 0.9fr;gap:8px;margin-bottom:10px;}
+.panel{background:#111;border-radius:10px;padding:14px;border:1px solid #222;}
+.panel-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;color:#888;margin-bottom:10px;}
+
+/* 熱門下注 */
+.bet-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid #1a1a1a;cursor:pointer;border-radius:4px;transition:background 0.15s;}
+.bet-row:hover{background:#161616;}
+.bet-row:last-of-type{border:none;}
+.bet-rank{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#666;width:16px;flex-shrink:0;}
+.bet-color{width:3px;height:34px;border-radius:2px;flex-shrink:0;}
+.bet-info{flex:1;}
+.bet-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fff;line-height:1;}
+.bet-reason{font-size:10px;color:#aaa;margin-top:2px;line-height:1.3;}
+.bet-odds-num{font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:700;}
+.bet-bar-wrap{width:100%;height:2px;background:#1a1a1a;border-radius:1px;margin-top:6px;}
+.bet-bar{height:100%;border-radius:1px;}
+
+/* 賽道 */
+.track-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.track-stat{text-align:center;background:#0d0d0d;border-radius:6px;padding:8px;}
+.ts-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#e8ff00;line-height:1;}
+.ts-label{font-size:10px;color:#aaa;margin-top:2px;}
+.track-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
+.tag{font-size:10px;padding:3px 8px;border-radius:20px;background:#1a1a1a;color:#ccc;border:1px solid #2a2a2a;}
+.tag.danger{color:#ff7777;border-color:#3a1a1a;}
+.tag.highlight{color:#e8ff00;border-color:#3a3a00;}
+.track-strategy{background:#0a1400;border:1px solid #1a2a00;border-radius:8px;padding:8px 10px;font-size:11px;color:#9aaa44;line-height:1.5;}
+
+/* 戰績 */
+.rank-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;margin-bottom:10px;background:#1a1a2e;border:1px solid #534AB7;}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.ps-box{background:#0d0d0d;border-radius:6px;padding:8px;text-align:center;}
+.ps-num{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1;}
+.ps-label{font-size:10px;color:#aaa;margin-top:2px;}
+.result-dot{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;}
+.result-win{background:#0a1a0a;color:#00cc66;border:1px solid #1a3a1a;}
+.result-loss{background:#1a0a0a;color:#ff5555;border:1px solid #3a1a1a;}
+.result-pending{background:#1a1a1a;color:#666;border:1px solid #2a2a2a;}
+.result-label{font-size:9px;color:#888;display:block;text-align:center;margin-top:3px;}
+.bet-now-btn{width:100%;padding:10px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:0.05em;margin-top:4px;}
+
+/* FEED */
+.feed-bar{background:#111;border-radius:10px;padding:14px;border:1px solid #222;margin-bottom:16px;}
+.feed-item{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid #1a1a1a;transition:background 0.3s;border-radius:4px;}
+.feed-item:last-child{border:none;}
+.feed-item.flash{background:#e8ff0008;}
+.fa{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:900;flex-shrink:0;}
+.ft{font-size:11px;color:#bbb;flex:1;line-height:1.4;}
+.ft strong{color:#fff;}
+.ft .hi{color:#e8ff00;}
+.ftime{font-size:10px;color:#666;flex-shrink:0;}
+
+/* NEWBIE */
+.newbie-section{border-left:3px solid #e8ff00;padding-left:16px;margin-bottom:16px;}
+.newbie-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;margin-bottom:12px;}
+.welcome-banner{background:#0a1200;border:1px solid #2a3a00;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.wb-icon{width:44px;height:44px;border-radius:10px;background:#e8ff0015;border:1px solid #e8ff0033;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.wb-text{flex:1;}
+.wb-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:#e8ff00;}
+.wb-sub{font-size:11px;color:#8aaa00;margin-top:3px;}
+.wb-btn{padding:9px 18px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.step{background:#111;border-radius:10px;padding:12px;border:1px solid #222;position:relative;}
+.step.done{border-color:#1a3a1a;}
+.step.current{border-color:#e8ff00;}
+.step-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.step-num{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;flex-shrink:0;}
+.step.done .step-num{background:#1a3a1a;color:#00cc66;}
+.step.current .step-num{background:#e8ff0022;color:#e8ff00;border:1px solid #e8ff0044;}
+.step:not(.done):not(.current) .step-num{background:#1a1a1a;color:#777;}
+.step-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;}
+.step.done .step-title{color:#aaa;}
+.step.current .step-title{color:#fff;}
+.step:not(.done):not(.current) .step-title{color:#999;}
+.step-desc{font-size:10px;color:#aaa;line-height:1.5;}
+.step-action{margin-top:8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#e8ff00;display:none;}
+.step.current .step-action{display:block;}
+.current-arrow{position:absolute;top:10px;right:10px;width:6px;height:6px;border-radius:50%;background:#e8ff00;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.recommend-card{background:#111;border-radius:10px;padding:14px;border:1px solid #222;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color 0.2s;margin-bottom:12px;}
+.recommend-card:hover{border-color:#444;}
+.rc-badge{flex-shrink:0;width:52px;height:68px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.rc-num{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;line-height:1;}
+.rc-tag{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:0.08em;padding:2px 5px;border-radius:4px;}
+.rc-info{flex:1;}
+.rc-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;}
+.rc-team{font-size:11px;margin-top:2px;margin-bottom:8px;}
+.rc-reason{font-size:11px;color:#ccc;line-height:1.5;margin-bottom:8px;}
+.rc-stats{display:flex;gap:8px;}
+.rc-stat{background:#0d0d0d;border-radius:6px;padding:4px 10px;text-align:center;}
+.rc-stat-num{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;line-height:1;}
+.rc-stat-label{font-size:9px;color:#aaa;margin-top:1px;}
+.rc-bet{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.rc-odds{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;line-height:1;}
+.rc-odds-label{font-size:10px;color:#aaa;}
+.rc-bet-btn{padding:9px 14px;border-radius:8px;border:none;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;cursor:pointer;}
+.tips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+.tip-card{background:#111;border-radius:10px;padding:12px;border:1px solid #222;}
+.tip-icon{font-size:20px;margin-bottom:6px;display:block;}
+.tip-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;}
+.tip-desc{font-size:11px;color:#ccc;line-height:1.5;}
+.tip-hi{color:#e8ff00;}
+.simple-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ss-card{background:#111;border-radius:10px;padding:12px;border:1px solid #222;text-align:center;}
+.ss-emoji{font-size:22px;display:block;margin-bottom:6px;}
+.ss-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#e8ff00;line-height:1;}
+.ss-label{font-size:11px;color:#ccc;margin-top:3px;}
+.ss-sub{font-size:10px;color:#777;margin-top:2px;}
+
+footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11px;color:#666;margin-top:20px;}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
-    <div class="nav-links">
-      <a href="/" class="active">首頁</a>
-      <a href="/race">賽事</a>
-      <a href="/cards">卡牌</a>
-      <a href="/battle">對戰</a>
-      <a href="/leaderboard">排行榜</a>
-      <a href="/profile">個人</a>
-    </div>
-    <div id="nav-auth" class="nav-auth"></div>
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo"><div class="logo-dot"></div>PITLANE</div>
+  <div class="nav-links">
+    <a href="/">首頁</a><a href="/race">賽事</a><a href="/cards">卡牌</a>
+    <a href="/battle">對戰</a><a href="/leaderboard">排行榜</a><a href="/profile">個人</a>
+  </div>
+  <div class="nav-actions" id="nav-auth">
+    <button class="btn-login" onclick="showLoginModal()">登入</button>
   </div>
 </nav>
 
-<!-- AUTH MODAL -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="auth-modal"></div>
-</div>
-
-<!-- COMPACT HERO: one line -->
-<section class="hero-compact">
-  <div class="speed-particle" style="--y:20%;--dur:2.5s;--delay:0s"></div>
-  <div class="speed-particle" style="--y:50%;--dur:1.8s;--delay:0.7s"></div>
-  <div class="speed-particle" style="--y:75%;--dur:3s;--delay:0.3s"></div>
-  <div class="hero-row">
-    <span class="hero-logo">PitLane</span>
-    <span class="hero-divider"></span>
-    <span class="hero-slogan">用卡牌預測 <em>F1</em>，讓你秒懂賽車</span>
-    <span class="hero-divider"></span>
-    <div class="hero-cta">
-      <button class="btn btn-gold btn-sm" onclick="user ? location.href='/race' : showModal('login')">開始預測</button>
+<!-- LOGIN MODAL -->
+<div id="login-overlay" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center">
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:28px;max-width:380px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;text-align:center;margin-bottom:16px;color:#e8ff00">登入 PitLane</div>
+    <div style="font-size:11px;color:#888;text-align:center;margin-bottom:16px">使用 ClawStockMarket 交易所帳號</div>
+    <input id="lg-user" type="text" placeholder="帳號 / Email" style="width:100%;padding:10px 12px;background:#111;border:1px solid #333;border-radius:6px;color:#eee;font-size:14px;margin-bottom:10px">
+    <input id="lg-pass" type="password" placeholder="密碼" style="width:100%;padding:10px 12px;background:#111;border:1px solid #333;border-radius:6px;color:#eee;font-size:14px;margin-bottom:6px">
+    <div id="lg-err" style="color:#ff4444;font-size:11px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeLoginModal()" style="flex:1;padding:10px;border-radius:6px;border:1px solid #333;background:transparent;color:#aaa;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700">取消</button>
+      <button onclick="doLogin()" style="flex:1;padding:10px;border-radius:6px;border:none;background:#e8ff00;color:#000;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700">登入</button>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CARD CAROUSEL -->
-<section class="carousel-section">
+<!-- HERO 精簡橫條 -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">2026 賽季進行中</div>
+    <div class="hero-text">
+      <h1>用卡牌預測 <span>F1</span>，讓你秒懂賽車</h1>
+      <p>收集車手卡牌、分析數據、預測比賽結果。不是賭博，是學習。</p>
+    </div>
+  </div>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="user ? location.href='/race' : showLoginModal()">開始預測</button>
+    <button class="btn-secondary" onclick="document.querySelector('.newbie-section').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
+  </div>
+</div>
+
+<!-- 卡牌輪播 主視覺 -->
+<div class="carousel-section">
+  <div class="carousel-label">本季車手卡 · 移到中央卡片查看本站數據與技能</div>
   <div class="carousel-wrap">
-    <button class="carousel-arrow carousel-prev" onclick="carouselPrev()">&#8249;</button>
-    <div class="carousel-stage" id="carousel-stage"></div>
-    <button class="carousel-arrow carousel-next" onclick="carouselNext()">&#8250;</button>
-    <div class="carousel-dots" id="carousel-dots"></div>
+    <button class="cnav cnav-l" onclick="cmove(-1)">&#8249;</button>
+    <div class="carousel-track" id="ctrack"></div>
+    <button class="cnav cnav-r" onclick="cmove(1)">&#8250;</button>
   </div>
-</section>
-
-<!-- DASHBOARD: Racing Gauges -->
-<section class="dash-section">
-  <div class="container">
-    <div class="dash-grid" id="dash-gauges">
-      <!-- Filled by JS -->
-      <div class="gauge-card g-speed"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
-      <div class="gauge-card g-pos"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
-      <div class="gauge-card g-fuel"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
-      <div class="gauge-card g-pressure"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
-    </div>
-
-    <!-- CHARTS: Bar + Line -->
-    <div class="charts-grid" id="charts-area">
-      <div class="chart-box" id="chart-odds">
-        <div class="chart-title"><span>冠軍賠率分布</span><span class="live-dot"></span></div>
-        <div class="chart-canvas"><div class="bar-group" id="odds-bars"></div></div>
-      </div>
-      <div class="chart-box" id="chart-stats">
-        <div class="chart-title"><span>車手能力雷達</span><span class="live-dot"></span></div>
-        <div class="chart-canvas" id="radar-canvas" style="height:160px"></div>
-      </div>
-    </div>
-
-    <!-- TRACK + AI ANALYSIS ROW -->
-    <div class="charts-grid">
-      <div class="track-mini" id="track-card">
-        <div class="track-mini-header">
-          <span class="track-mini-name">載入中...</span>
-        </div>
-      </div>
-      <div class="chart-box" id="ai-preview">
-        <div class="chart-title"><span>AI 賽前分析</span><span class="live-dot"></span></div>
-        <div id="ai-content" style="font-size:0.8rem;color:var(--text-secondary)">
-          <div class="spinner" style="margin:20px auto"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- BOTTOM ACTIONS -->
-<div class="container">
-  <div class="bottom-actions">
-    <div class="action-card" onclick="location.href='/race'">
-      <div class="action-card-icon">🏁</div>
-      <h3>下注預測</h3>
-      <p>用 USDClaw 預測比賽結果</p>
-    </div>
-    <div class="action-card" onclick="location.href='/cards'">
-      <div class="action-card-icon">🃏</div>
-      <h3>卡牌收藏</h3>
-      <p>車手 · 車隊 · 賽道卡</p>
-    </div>
-    <div class="action-card" onclick="location.href='/battle'">
-      <div class="action-card-icon">⚔️</div>
-      <h3>P2P 對戰</h3>
-      <p>跟朋友對賭比眼光</p>
-    </div>
-    <div class="action-card" onclick="location.href='/leaderboard'">
-      <div class="action-card-icon">🏆</div>
-      <h3>排行榜</h3>
-      <p>看誰預測最準</p>
-    </div>
-  </div>
+  <div class="cdots" id="cdots"></div>
 </div>
 
-<footer class="footer">
-  <div class="container">PitLane — F1 賽車預測卡牌平台 · USDClaw 虛擬幣 · 與 ClawStockMarket 帳號互通</div>
-</footer>
+<!-- MAIN DASHBOARD -->
+<div class="main">
+
+  <div class="live-bar">
+    <div class="live-dot"></div>
+    <span class="live-text">LIVE — 沙烏地阿拉伯大獎賽 4天後開跑</span>
+    <span class="live-count" id="liveCount">2,847 人正在下注</span>
+  </div>
+
+  <div class="top-bar">
+    <div class="top-card">
+      <div class="tc-label">NEXT RACE</div>
+      <div class="tc-main" style="color:#e8ff00">4 <span style="font-size:14px;color:#aaa">DAYS</span></div>
+      <div class="tc-sub">沙烏地阿拉伯大獎賽 · 吉達</div>
+    </div>
+    <div class="top-card">
+      <div class="tc-label">SEASON LEADER</div>
+      <div class="tc-main" style="color:#3671C6">Verstappen</div>
+      <div class="tc-sub">94 分 · 領先 Norris 16分</div>
+    </div>
+    <div class="top-card">
+      <div class="tc-label">YOUR STATUS</div>
+      <div class="tc-main" style="color:#AFA9EC">SUZUKA</div>
+      <div class="tc-sub">準度 61% · 排名 #1,204</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- 熱門下注 -->
+    <div class="panel">
+      <div class="panel-title">本站熱門下注</div>
+      <div class="bet-row">
+        <span class="bet-rank">1</span>
+        <div class="bet-color" style="background:#3671C6"></div>
+        <div class="bet-info">
+          <div class="bet-name">Verstappen</div>
+          <div class="bet-reason">積分領先16分，吉達勝率50%，策略穩定</div>
+        </div>
+        <div class="bet-odds-num" style="color:#3671C6">2.1x</div>
+      </div>
+      <div class="bet-bar-wrap"><div class="bet-bar" style="width:42%;background:#3671C6"></div></div>
+      <div class="bet-row">
+        <span class="bet-rank">2</span>
+        <div class="bet-color" style="background:#F47600"></div>
+        <div class="bet-info">
+          <div class="bet-name">Norris</div>
+          <div class="bet-reason">McLaren 進站最快 2.3秒，二停優勢大</div>
+        </div>
+        <div class="bet-odds-num" style="color:#F47600">3.8x</div>
+      </div>
+      <div class="bet-bar-wrap"><div class="bet-bar" style="width:26%;background:#F47600"></div></div>
+      <div class="bet-row">
+        <span class="bet-rank">3</span>
+        <div class="bet-color" style="background:#E8002D"></div>
+        <div class="bet-info">
+          <div class="bet-name">Leclerc</div>
+          <div class="bet-reason">街道賽專家，排位圈速全場最強</div>
+        </div>
+        <div class="bet-odds-num" style="color:#E8002D">5.5x</div>
+      </div>
+      <div class="bet-bar-wrap"><div class="bet-bar" style="width:18%;background:#E8002D"></div></div>
+      <div class="bet-row">
+        <span class="bet-rank">4</span>
+        <div class="bet-color" style="background:#E8002D"></div>
+        <div class="bet-info">
+          <div class="bet-name">Hamilton</div>
+          <div class="bet-reason">Ferrari 新陣容，雨戰最強車手</div>
+        </div>
+        <div class="bet-odds-num" style="color:#ccc">6.8x</div>
+      </div>
+      <div class="bet-bar-wrap"><div class="bet-bar" style="width:14%;background:#888"></div></div>
+      <div class="bet-row" style="margin-top:8px;background:#0a0a00;border-radius:8px;border:1px solid #2a2a00;padding:7px 8px;">
+        <span class="bet-rank" style="color:#e8ff00">★</span>
+        <div class="bet-color" style="background:#e8ff00"></div>
+        <div class="bet-info">
+          <div class="bet-name" style="color:#e8ff00">黑馬推薦</div>
+          <div class="bet-reason" style="color:#bbb">Gasly · 吉達歷史前五，賠率被市場低估</div>
+        </div>
+        <div class="bet-odds-num" style="color:#e8ff00">18x</div>
+      </div>
+    </div>
+
+    <!-- 賽道解析 -->
+    <div class="panel">
+      <div class="panel-title">賽道快速解析</div>
+      <div class="track-stats">
+        <div class="track-stat">
+          <div class="ts-num">8<span style="font-size:11px;color:#888">/10</span></div>
+          <div class="ts-label">難易度</div>
+        </div>
+        <div class="track-stat">
+          <div class="ts-num">3<span style="font-size:11px;color:#888">/10</span></div>
+          <div class="ts-label">超車機會</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:10px;">
+        <svg viewBox="0 0 200 120" width="175">
+          <path d="M30 90 L30 40 Q30 25 45 25 L80 25 Q95 25 100 35 L115 60 Q120 70 130 70 L155 70 Q165 70 165 80 L165 90 Q165 100 155 100 L40 100 Q30 100 30 90Z" fill="none" stroke="#e8ff00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="30" cy="90" r="4" fill="#00ff88"/>
+          <text x="12" y="115" font-family="Barlow Condensed,sans-serif" font-size="7" fill="#888">START</text>
+          <text x="148" y="65" font-family="Barlow Condensed,sans-serif" font-size="7" fill="#888">DRS</text>
+        </svg>
+      </div>
+      <div class="track-tags">
+        <span class="tag highlight">夜間賽事</span>
+        <span class="tag">高速街道</span>
+        <span class="tag">3個DRS區</span>
+        <span class="tag danger">護牆超近</span>
+      </div>
+      <div class="track-strategy">⚡ 策略建議：一停為主，軟胎起跑。<br>排位賽決定七成結果——超車極難。</div>
+    </div>
+
+    <!-- 個人戰績 -->
+    <div class="panel">
+      <div class="panel-title">你的本季戰績</div>
+      <div class="rank-badge">
+        <span style="font-size:11px;color:#AFA9EC;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.08em">SUZUKA 等級</span>
+      </div>
+      <div class="profile-stats">
+        <div class="ps-box"><div class="ps-num" style="color:#e8ff00">61%</div><div class="ps-label">預測準度</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#fff">4,280</div><div class="ps-label">累積代幣</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#ccc">#1,204</div><div class="ps-label">全站排名</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#ccc">23</div><div class="ps-label">已預測站數</div></div>
+      </div>
+      <div class="panel-title" style="margin-bottom:6px">近三站結果</div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">巴林</span></div>
+        <div style="text-align:center"><div class="result-dot result-loss">✗</div><span class="result-label">沙特</span></div>
+        <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">澳洲</span></div>
+        <div style="text-align:center"><div class="result-dot result-pending">?</div><span class="result-label">吉達</span></div>
+      </div>
+      <button class="bet-now-btn" onclick="user ? location.href='/race' : showLoginModal()">立即押注 →</button>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div class="feed-bar">
+    <div class="panel-title">即時動態</div>
+    <div id="feedList"></div>
+  </div>
+
+  <!-- NEWBIE -->
+  <div class="newbie-section">
+    <div class="newbie-title">第一次來？從這裡開始</div>
+    <div class="welcome-banner">
+      <div class="wb-icon">🏁</div>
+      <div class="wb-text">
+        <div class="wb-title">歡迎來到 PitLane！</div>
+        <div class="wb-sub">你不需要懂賽車——我們幫你看懂，你只需要押對人</div>
+      </div>
+      <button class="wb-btn">新手教學 →</button>
+    </div>
+    <div class="steps">
+      <div class="step done">
+        <div class="step-header"><div class="step-num">✓</div><div class="step-title">建立帳號</div></div>
+        <div class="step-desc">已完成！你有 1,000 USDC 起始代幣可以用</div>
+      </div>
+      <div class="step current">
+        <div class="current-arrow"></div>
+        <div class="step-header"><div class="step-num">2</div><div class="step-title">認識車手卡</div></div>
+        <div class="step-desc">看每個車手的能力數值，找到你覺得這站最強的人</div>
+        <div class="step-action">→ 去看車手卡</div>
+      </div>
+      <div class="step">
+        <div class="step-header"><div class="step-num">3</div><div class="step-title">押注冠軍</div></div>
+        <div class="step-desc">選一個車手，押他拿冠軍，等比賽結果</div>
+      </div>
+    </div>
+    <div class="panel-title" style="margin-bottom:8px">AI 今日推薦 · 給新手的最佳選擇</div>
+    <div class="recommend-card">
+      <div class="rc-badge" style="background:#F4760022;border:1px solid #F4760044">
+        <div class="rc-num">4</div>
+        <div class="rc-tag" style="background:#F4760033;color:#F47600">HOT</div>
+      </div>
+      <div class="rc-info">
+        <div class="rc-name">Lando Norris</div>
+        <div class="rc-team" style="color:#F47600">McLaren F1 Team</div>
+        <div class="rc-reason">McLaren 本季進站全場最快（平均 2.3 秒），吉達高速賽道對 Norris 的超車能力非常有利。積分落後 Verstappen，這站必須積極搶分。</div>
+        <div class="rc-stats">
+          <div class="rc-stat"><div class="rc-stat-num" style="color:#F47600">88</div><div class="rc-stat-label">超車能力</div></div>
+          <div class="rc-stat"><div class="rc-stat-num" style="color:#F47600">85</div><div class="rc-stat-label">輪胎管理</div></div>
+          <div class="rc-stat"><div class="rc-stat-num" style="color:#e8ff00">28%</div><div class="rc-stat-label">勝率預測</div></div>
+        </div>
+      </div>
+      <div class="rc-bet">
+        <div class="rc-odds" style="color:#F47600">3.8x</div>
+        <div class="rc-odds-label">賠率</div>
+        <button class="rc-bet-btn" style="background:#F47600;color:#000">押他 →</button>
+      </div>
+    </div>
+    <div class="panel-title" style="margin-bottom:8px">新手須知</div>
+    <div class="tips">
+      <div class="tip-card">
+        <span class="tip-icon">🎯</span>
+        <div class="tip-title">賠率是什麼意思？</div>
+        <div class="tip-desc">賠率 <span class="tip-hi">3.8x</span> 表示押 100 USDC，贏了拿回 380 USDC。賠率越高 = 越冷門，但贏了賺更多。</div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">🌧</span>
+        <div class="tip-title">天氣會影響結果</div>
+        <div class="tip-desc">下雨天會完全改變比賽——平時弱的車手可能爆冷奪冠。看天氣預報再押注！</div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">🏎</span>
+        <div class="tip-title">排位賽很重要</div>
+        <div class="tip-desc">吉達超車很難，<span class="tip-hi">排位賽第一名</span>有很大優勢。正賽前先看排位結果再押注。</div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-icon">📊</span>
+        <div class="tip-title">輸了也有收穫</div>
+        <div class="tip-desc">每次押注結束，AI 會告訴你<span class="tip-hi">為什麼對或錯</span>。輸了也學到東西，下次更準。</div>
+      </div>
+    </div>
+    <div class="panel-title" style="margin-bottom:8px">本站關鍵數字</div>
+    <div class="simple-stats">
+      <div class="ss-card"><span class="ss-emoji">🏁</span><div class="ss-num">57</div><div class="ss-label">比賽圈數</div><div class="ss-sub">約 2 小時</div></div>
+      <div class="ss-card"><span class="ss-emoji">⛽</span><div class="ss-num">1–2</div><div class="ss-label">預測進站次數</div><div class="ss-sub">一停策略為主</div></div>
+      <div class="ss-card"><span class="ss-emoji">🌡</span><div class="ss-num">28°C</div><div class="ss-label">賽道氣溫</div><div class="ss-sub">降雨機率 8%</div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>© 2026 PitLane · 不是賭博，是用數據說話的賽車學習平台</footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
-// ═══════════════════════════════════════
-// GAUGE SVG GENERATOR
-// ═══════════════════════════════════════
-function renderGaugeSVG(value, max, color, label) {
-  const pct = Math.min(value / max, 1);
-  const angle = pct * 240; // 240 degree arc
-  const startAngle = 150; // start from bottom-left
-  const r = 52;
-  const cx = 65, cy = 65;
-
-  function polarToCart(deg) {
-    const rad = (deg - 90) * Math.PI / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-  }
-
-  // Background arc
-  const bgStart = polarToCart(startAngle);
-  const bgEnd = polarToCart(startAngle + 240);
-  // Value arc
-  const valEnd = polarToCart(startAngle + angle);
-  const largeArc = angle > 180 ? 1 : 0;
-  const bgLargeArc = 1;
-
-  // Tick marks
-  let ticks = '';
-  for (let i = 0; i <= 8; i++) {
-    const tickAngle = startAngle + (240 / 8) * i;
-    const inner = polarToCart(tickAngle);
-    const outerR = r + 6;
-    const outerRad = (tickAngle - 90) * Math.PI / 180;
-    const outer = { x: cx + outerR * Math.cos(outerRad), y: cy + outerR * Math.sin(outerRad) };
-    ticks += `<line x1="${inner.x}" y1="${inner.y}" x2="${outer.x}" y2="${outer.y}" stroke="${i <= pct * 8 ? color : 'rgba(255,255,255,0.1)'}" stroke-width="1.5"/>`;
-  }
-
-  // Needle
-  const needleAngle = startAngle + angle;
-  const needleEnd = polarToCart(needleAngle);
-  const needleR = r - 14;
-  const needleRad = (needleAngle - 90) * Math.PI / 180;
-  const needleTip = { x: cx + needleR * Math.cos(needleRad), y: cy + needleR * Math.sin(needleRad) };
-
-  return `<svg viewBox="0 0 130 100" class="gauge-svg">
-    <!-- bg arc -->
-    <path d="M${bgStart.x},${bgStart.y} A${r},${r} 0 ${bgLargeArc},1 ${bgEnd.x},${bgEnd.y}"
-          fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8" stroke-linecap="round"/>
-    <!-- value arc -->
-    ${angle > 0 ? `<path d="M${bgStart.x},${bgStart.y} A${r},${r} 0 ${largeArc},1 ${valEnd.x},${valEnd.y}"
-          fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
-          style="filter:drop-shadow(0 0 6px ${color}40)"/>` : ''}
-    ${ticks}
-    <!-- center dot -->
-    <circle cx="${cx}" cy="${cy}" r="4" fill="${color}" opacity="0.8"/>
-    <!-- needle -->
-    <line x1="${cx}" y1="${cy}" x2="${needleTip.x}" y2="${needleTip.y}"
-          stroke="${color}" stroke-width="2" stroke-linecap="round"/>
-  </svg>`;
+// ─── AUTH ───
+function showLoginModal() { document.getElementById('login-overlay').style.display='flex'; setTimeout(()=>document.getElementById('lg-user').focus(),100); }
+function closeLoginModal() { document.getElementById('login-overlay').style.display='none'; }
+async function doLogin() {
+  const u=document.getElementById('lg-user').value.trim(), p=document.getElementById('lg-pass').value;
+  if(!u||!p){document.getElementById('lg-err').textContent='請輸入帳號和密碼';return;}
+  try{
+    const d=await api('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
+    token=d.access_token; user={username:d.username,balance:d.balance};
+    localStorage.setItem('pitlane_token',token); localStorage.setItem('pitlane_user',JSON.stringify(user));
+    closeLoginModal(); updateNavAuth();
+  }catch(e){document.getElementById('lg-err').textContent=e.message;}
 }
+function updateNavAuth(){
+  const el=document.getElementById('nav-auth');
+  if(user){
+    el.innerHTML=`<span style="font-family:'Share Tech Mono';font-size:12px;color:#e8ff00">◆ ${Number(user.balance||0).toLocaleString()}</span>
+      <span style="font-size:12px;color:#aaa">${user.username}</span>
+      <button class="btn-login" onclick="token=null;user=null;localStorage.removeItem('pitlane_token');localStorage.removeItem('pitlane_user');updateNavAuth()">登出</button>`;
+  }else{
+    el.innerHTML='<button class="btn-login" onclick="showLoginModal()">登入</button>';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLoginModal();if(e.key==='Enter'&&document.getElementById('lg-user'))doLogin();});
+updateNavAuth();
 
-// ═══════════════════════════════════════
-// LOAD DASHBOARD
-// ═══════════════════════════════════════
-async function loadDashboard() {
+// ─── LOAD REAL DATA ───
+async function loadPage() {
+  // Race info
   try {
-    const [raceRes, driversRes, oddsRes, analysisRes] = await Promise.allSettled([
-      api('/api/races/current'),
-      api('/api/drivers'),
-      api('/api/races/x/odds'),
-      api('/api/races/x/analysis'),
-    ]);
+    const race = await api('/api/races/current');
+    const raceDate = new Date(race.date);
+    const days = Math.max(0, Math.floor((raceDate - new Date()) / 86400000));
+    document.querySelector('.live-text').textContent = `LIVE — ${race.race_name} ${days}天後開跑`;
+    document.querySelector('.top-bar').children[0].querySelector('.tc-main').innerHTML = `${days} <span style="font-size:14px;color:#aaa">DAYS</span>`;
+    document.querySelector('.top-bar').children[0].querySelector('.tc-sub').textContent = `${race.race_name} · ${race.circuit}`;
+  } catch(e) {}
 
-    const race = raceRes.status === 'fulfilled' ? raceRes.value : {};
-    const drivers = driversRes.status === 'fulfilled' ? (driversRes.value.drivers || []) : [];
-    const odds = oddsRes.status === 'fulfilled' ? (oddsRes.value.odds || []) : [];
-    const analysis = analysisRes.status === 'fulfilled' ? analysisRes.value : {};
-
-    // ── GAUGES ──
-    const raceDate = new Date(race.date || Date.now());
-    const daysLeft = Math.max(0, Math.floor((raceDate - new Date()) / 86400000));
-    const topOdds = odds[0]?.winner_odds || 2.0;
-    const topProb = odds[0]?.win_probability || 50;
-    const totalDrivers = drivers.length || 20;
-
-    const el = document.getElementById('dash-gauges');
-    el.innerHTML = `
-      <div class="gauge-card g-speed">
-        ${renderGaugeSVG(daysLeft, 14, '#e8ff00', 'days')}
-        <div class="gauge-label">Next Race</div>
-        <div class="gauge-value" style="color:var(--gold)">${daysLeft}</div>
-        <div class="gauge-unit">${race.race_name || '---'}</div>
-      </div>
-      <div class="gauge-card g-pos">
-        ${renderGaugeSVG(topProb, 100, '#E10600', 'prob')}
-        <div class="gauge-label">Top Favourite</div>
-        <div class="gauge-value" style="color:var(--red)">${topProb}%</div>
-        <div class="gauge-unit">${odds[0]?.name?.split(' ').pop() || '---'} x${topOdds}</div>
-      </div>
-      <div class="gauge-card g-fuel">
-        ${renderGaugeSVG(totalDrivers, 24, '#00D2BE', 'drivers')}
-        <div class="gauge-label">Drivers</div>
-        <div class="gauge-value" style="color:var(--green)">${totalDrivers}</div>
-        <div class="gauge-unit">${race.circuit_type || 'Loading'}</div>
-      </div>
-      <div class="gauge-card g-pressure">
-        ${renderGaugeSVG(odds.length, 22, '#00b0ff', 'market')}
-        <div class="gauge-label">Market Odds</div>
-        <div class="gauge-value" style="color:var(--blue)">${odds.length}</div>
-        <div class="gauge-unit">Active Entries</div>
-      </div>
-    `;
-
-    // ── ODDS BAR CHART ──
-    const barsEl = document.getElementById('odds-bars');
-    const topN = odds.slice(0, 8);
-    const maxProb = Math.max(...topN.map(o => o.win_probability), 1);
-    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
-
-    barsEl.innerHTML = topN.map(o => {
-      const h = (o.win_probability / maxProb) * 100;
-      const color = teamColors[o.team] || 'var(--gold)';
-      const lastName = o.name?.split(' ').pop() || '?';
-      return `<div class="bar-item">
-        <div class="bar-val">${o.win_probability}%</div>
-        <div class="bar-fill" style="height:${h}%;background:${color}"></div>
-        <div class="bar-label">${lastName}</div>
-      </div>`;
-    }).join('');
-
-    // ── RADAR CHART (top driver) ──
-    const radarEl = document.getElementById('radar-canvas');
-    if (drivers[0]) {
-      try {
-        const card = await api(`/api/drivers/${drivers[0].driver_id}/card`);
-        const s = card.stats || {};
-        const dims = [
-          {label:'SPD', val:s.qualifying||50},
-          {label:'TYRE', val:s.tire_management||50},
-          {label:'WET', val:s.wet_weather||50},
-          {label:'OVT', val:s.overtaking||50},
-          {label:'STR', val:s.street_circuit||50},
-        ];
-        const cx=100,cy=80,r=60;
-        let polyPoints = '';
-        let labels = '';
-        let axes = '';
-        dims.forEach((d,i) => {
-          const angle = (i / dims.length) * Math.PI * 2 - Math.PI/2;
-          const px = cx + r * (d.val/100) * Math.cos(angle);
-          const py = cy + r * (d.val/100) * Math.sin(angle);
-          polyPoints += `${px},${py} `;
-          const lx = cx + (r+16) * Math.cos(angle);
-          const ly = cy + (r+16) * Math.sin(angle);
-          labels += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-muted)" font-size="7" font-family="Share Tech Mono">${d.label} ${d.val}</text>`;
-          axes += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(angle)}" y2="${cy+r*Math.sin(angle)}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
-        });
-        // Grid rings
-        let rings = '';
-        [0.25,0.5,0.75,1].forEach(s => {
-          let pts='';
-          dims.forEach((_,i)=>{
-            const a=(i/dims.length)*Math.PI*2-Math.PI/2;
-            pts+=`${cx+r*s*Math.cos(a)},${cy+r*s*Math.sin(a)} `;
-          });
-          rings+=`<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>`;
-        });
-
-        radarEl.innerHTML = `<svg viewBox="0 0 200 160" style="width:100%;height:100%">
-          ${rings}${axes}
-          <polygon points="${polyPoints}" fill="rgba(232,255,0,0.1)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/>
-          ${labels}
-          <text x="${cx}" y="155" text-anchor="middle" fill="var(--text-secondary)" font-size="8" font-family="Barlow Condensed" font-weight="600">${card.name || 'Driver'}</text>
-        </svg>`;
-      } catch(e) {
-        radarEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem;text-align:center;padding:40px 0">數據載入中...</p>';
-      }
-    }
-
-    // ── TRACK CARD ──
-    const trackEl = document.getElementById('track-card');
-    try {
-      const track = await api(`/api/tracks/${encodeURIComponent(race.circuit || 'Jeddah')}`);
-      const typeClass = track.type || 'technical';
-      const typeMap = {street:'街道賽', high_speed:'高速賽道', technical:'技術賽道'};
-      trackEl.innerHTML = `
-        <div class="track-mini-header">
-          <span class="track-mini-name">${track.name_zh || race.circuit || '---'}</span>
-          <span class="track-mini-type ${typeClass}">${typeMap[typeClass] || typeClass}</span>
-        </div>
-        <div class="track-mini-body">
-          <div class="track-mini-stat">
-            <div class="track-mini-stat-val">${track.difficulty || '?'}<span style="font-size:0.8rem;color:var(--text-muted)">/10</span></div>
-            <div class="track-mini-stat-label">難度</div>
-          </div>
-          <div class="track-mini-stat">
-            <div class="track-mini-stat-val">${track.overtaking || '?'}<span style="font-size:0.8rem;color:var(--text-muted)">/10</span></div>
-            <div class="track-mini-stat-label">超車機會</div>
-          </div>
-          <div class="track-chars-list">
-            ${(track.characteristics || []).map(c => `<span class="track-char-tag">${c}</span>`).join('')}
-          </div>
-          <div style="grid-column:1/-1;margin-top:6px;font-size:0.75rem;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:8px">
-            <strong style="color:var(--gold)">策略建議：</strong>${track.strategy || '---'}
-          </div>
-        </div>`;
-    } catch(e) {
-      trackEl.innerHTML = '<p style="color:var(--text-muted);padding:20px;font-size:0.8rem">賽道資料載入中...</p>';
-    }
-
-    // ── AI ANALYSIS ──
-    const aiEl = document.getElementById('ai-content');
-    if (analysis.top_picks) {
-      const tp = analysis.top_picks || [];
-      const dh = analysis.dark_horse || {};
-      aiEl.innerHTML = `
-        <div style="margin-bottom:10px">
-          <div style="font-family:'Barlow Condensed';font-weight:700;color:var(--gold);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">推薦車手</div>
-          ${tp.map((p,i) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
-            <span>${i+1}. ${p.driver}</span>
-            <span style="color:var(--gold);font-family:'Share Tech Mono';font-size:0.75rem">${p.confidence}%</span>
-          </div>`).join('')}
-        </div>
-        <div style="margin-bottom:8px">
-          <span style="font-family:'Barlow Condensed';font-weight:700;color:var(--red);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em">黑馬</span>
-          <span style="margin-left:8px">${dh.driver || '?'}</span>
-        </div>
-        <div style="font-size:0.72rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px">
-          ${analysis.one_liner || analysis.key_factor || ''}
-        </div>
-        ${analysis.source === 'data_analysis' ? '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px">⚡ 基於歷史數據分析</div>' : ''}
-      `;
-    } else {
-      aiEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem">分析資料暫不可用</p>';
-    }
-
-  } catch(e) {
-    console.error('Dashboard error:', e);
-  }
-}
-
-// ═══════════════════════════════════════
-// CAROUSEL (same logic as before)
-// ═══════════════════════════════════════
-let carouselCards = [];
-let carouselIdx = 0;
-let carouselTimer = null;
-
-async function loadCarousel() {
+  // Drivers for carousel
   try {
     const data = await api('/api/drivers');
-    const drivers = (data.drivers || []).slice(0, 10);
-    if (!drivers.length) return;
-    const cards = await Promise.all(
-      drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
-    );
-    carouselCards = drivers.map((d, i) => {
+    const drivers = (data.drivers || []).slice(0, 8);
+    const cards = await Promise.all(drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null)));
+    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
+
+    CDRIVERS.length = 0;
+    drivers.forEach((d, i) => {
       const card = cards[i];
       const s = card?.stats || {};
       const sk = card?.skills || {};
-      return {
-        id: d.driver_id, name: d.name || '', number: d.number || '',
-        team: card?.team || d.team || '',
-        teamColour: card?.team_colour || d.team_colour || 'e8ff00',
-        headshot: card?.headshot_url || d.headshot_url || '',
-        overall: s.overall || 50, odds: card?.odds || 5.0,
-        winProb: card?.odds ? Math.round(1 / card.odds * 100) : 20,
-        qualifying: s.qualifying||50, tireMgmt: s.tire_management||50,
-        wetWeather: s.wet_weather||50, overtaking: s.overtaking||50,
-        passive: sk.passive?.name || '',
-        skills: (sk.skills || []).map(x => `${x.name} ${'★'.repeat(x.stars)}`),
-      };
+      const color = teamColors[card?.team || d.team] || '#888';
+      const ovr = s.overall || 50;
+      let rarity='SILVERSTONE',rBg='#1a1a1a',rColor='#888',rBorder='#333';
+      if(ovr>=88){rarity='MONACO';rBg='#1e1400';rColor='#e8ff00';rBorder='#BA7517';}
+      else if(ovr>=80){rarity='SUZUKA';rBg='#1a1a2e';rColor='#AFA9EC';rBorder='#534AB7';}
+      else if(ovr>=70){rarity='MONZA';rBg='#0d1a18';rColor='#27F4D2';rBorder='#1D9E75';}
+
+      CDRIVERS.push({
+        num: d.number||'?', name: d.name?.split(' ').pop()||'?',
+        fullName: d.name||'?',
+        team: card?.team||d.team||'', color,
+        headshot: card?.headshot_url||d.headshot_url||'',
+        rarity, rBg, rColor, rBorder,
+        stats: {q:s.qualifying||50, t:s.tire_management||50, w:s.wet_weather||50, o:s.overtaking||50},
+        ovr, win_rate: card?.odds ? Math.round(1/card.odds*100) : 10,
+        odds: card?.odds||10.0, points: d.points||0,
+        passive: sk.passive?.name||'',
+        skills: (sk.skills||[]).map(x=>({n:x.name, s:'★'.repeat(x.stars)+'☆'.repeat(3-x.stars)})),
+        driver_id: d.driver_id,
+        carImg: getCarImage(card?.team||d.team||''),
+      });
     });
-    renderCarousel();
-    carouselTimer = setInterval(carouselNext, 4000);
-  } catch(e) {}
+    ccur = 0;
+    crender();
+
+    // Update top bet panel
+    const oddsData = await api('/api/races/x/odds').catch(()=>({odds:[]}));
+    const topOdds = (oddsData.odds||[]).slice(0,4);
+    const betPanel = document.querySelector('.panel'); // first panel = bets
+    if(betPanel && topOdds.length) {
+      const betsHtml = topOdds.map((o,i) => {
+        const tc = teamColors[o.team]||'#888';
+        return `<div class="bet-row">
+          <span class="bet-rank">${i+1}</span>
+          <div class="bet-color" style="background:${tc}"></div>
+          <div class="bet-info">
+            <div class="bet-name">${o.name?.split(' ').pop()}</div>
+            <div class="bet-reason">勝率 ${o.win_probability}%</div>
+          </div>
+          <div class="bet-odds-num" style="color:${tc}">${o.winner_odds}x</div>
+        </div>
+        <div class="bet-bar-wrap"><div class="bet-bar" style="width:${o.win_probability}%;background:${tc}"></div></div>`;
+      }).join('');
+      betPanel.innerHTML = `<div class="panel-title">本站熱門下注</div>${betsHtml}`;
+    }
+
+    // Leader
+    if(drivers[0]) {
+      const leader = document.querySelector('.top-bar').children[1];
+      leader.querySelector('.tc-main').textContent = drivers[0].name?.split(' ').pop();
+      leader.querySelector('.tc-main').style.color = teamColors[drivers[0].team]||'#fff';
+    }
+  } catch(e) { console.error(e); }
 }
 
-function renderCarousel() {
-  const stage = document.getElementById('carousel-stage');
-  const dotsEl = document.getElementById('carousel-dots');
-  if (!stage || !carouselCards.length) return;
-  const total = carouselCards.length;
-  const half = 2;
-  let html = '';
-  for (let offset = -half; offset <= half; offset++) {
-    const idx = ((carouselIdx + offset) % total + total) % total;
-    const c = carouselCards[idx];
-    const isCenter = offset === 0;
-    const absOff = Math.abs(offset);
-    const tx = offset * 200;
-    const scale = isCenter ? 1 : Math.max(0.72, 1 - absOff * 0.14);
-    const opacity = isCenter ? 1 : Math.max(0.35, 1 - absOff * 0.3);
-    const z = 10 - absOff;
-    const rotY = offset * -3;
-    html += `
-      <div class="carousel-card ${isCenter ? 'is-center' : ''}"
-           style="transform:translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${z};
-                  ${isCenter ? 'box-shadow:0 6px 30px rgba(232,255,0,0.06),0 0 0 1px rgba(232,255,0,0.08);' : ''}"
-           ${isCenter ? 'onmouseenter="clearInterval(carouselTimer)" onmouseleave="carouselTimer=setInterval(carouselNext,4000)"' : `onclick="carouselIdx=${idx};renderCarousel()"`}>
-        <div class="cc-team-stripe" style="background:#${c.teamColour}"></div>
-        <div class="cc-top">
-          <span class="cc-ghost">${c.number}</span>
-          <img class="cc-avatar" src="${c.headshot}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="cc-avatar-fb">#${c.number}</div>
-          <div><div class="cc-name">${c.name}</div><div class="cc-team">${c.team}</div></div>
+const CDRIVERS = [
+  {num:'1', name:'Verstappen', team:'Red Bull Racing', color:'#3671C6', emoji:'🏎', rarity:'MONACO', rBg:'#1e1400', rColor:'#e8ff00', rBorder:'#BA7517', stats:{q:95,t:88,w:92,o:85}, ovr:91, win_rate:42, odds:2.1, points:94, passive:'冠軍心態', skills:[{n:'雨中之神',s:'★★★'},{n:'開賽衝刺',s:'★★'}]},
+  {num:'4', name:'Norris',     team:'McLaren F1 Team',  color:'#F47600', emoji:'🧡', rarity:'SUZUKA', rBg:'#1a1a2e', rColor:'#AFA9EC', rBorder:'#534AB7', stats:{q:90,t:85,w:78,o:88}, ovr:85, win_rate:28, odds:3.8, points:78, passive:'橘色閃電', skills:[{n:'超車機器',s:'★★★'},{n:'輪胎刺客',s:'★★'}]},
+  {num:'16',name:'Leclerc',    team:'Scuderia Ferrari',  color:'#E8002D', emoji:'🔴', rarity:'SUZUKA', rBg:'#1a1a2e', rColor:'#AFA9EC', rBorder:'#534AB7', stats:{q:92,t:80,w:75,o:78}, ovr:83, win_rate:18, odds:5.5, points:61, passive:'摩納哥之子', skills:[{n:'排位飛人',s:'★★★'},{n:'街道賽王',s:'★★★'}]},
+  {num:'44',name:'Hamilton',   team:'Scuderia Ferrari',  color:'#E8002D', emoji:'🏆', rarity:'MONACO', rBg:'#1e1400', rColor:'#e8ff00', rBorder:'#BA7517', stats:{q:88,t:90,w:95,o:82}, ovr:89, win_rate:15, odds:6.8, points:52, passive:'七冠傳說', skills:[{n:'雨神降臨',s:'★★★'},{n:'逆轉大師',s:'★★★'}]},
+  {num:'63',name:'Russell',    team:'Mercedes-AMG',      color:'#27F4D2', emoji:'⚡', rarity:'MONZA',  rBg:'#0d1a18', rColor:'#27F4D2', rBorder:'#1D9E75', stats:{q:87,t:78,w:80,o:76}, ovr:79, win_rate:8,  odds:12.0,points:44, passive:'積分獵人', skills:[{n:'穩定完賽',s:'★★★'},{n:'進站把握',s:'★★'}]},
+];
+
+let ccur = 2;
+
+function crender(){
+  const track = document.getElementById('ctrack');
+  const dots  = document.getElementById('cdots');
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+  CDRIVERS.forEach((d,i) => {
+    const diff = i - ccur;
+    let cls = 'dcard';
+    if(diff===0) cls+=' active';
+    else if(Math.abs(diff)===1) cls+=' side';
+    else cls+=' far';
+
+    const card = document.createElement('div');
+    card.className = cls;
+    card.onclick = () => { if(i!==ccur){ccur=i;crender();} };
+    card.innerHTML = `
+      <div class="dc-stripe" style="background:linear-gradient(135deg,${d.color},transparent)"></div>
+      <div class="dc-num">${d.num}</div>
+      <div class="dc-avatar" style="border-color:${d.color};background:${d.color}22;overflow:hidden">
+        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span style=font-size:${diff===0?28:22}px>${d.num}</span>'">` : `<span style="font-size:${diff===0?'28px':'22px'}">${d.num}</span>`}
+      </div>
+      <div class="dc-name">${d.name}</div>
+      <div class="dc-team" style="color:${d.color}">${d.team}</div>
+      <div class="ds-row"><span class="ds-l">單圈</span><div class="ds-bg"><div class="ds-fill" style="width:${d.stats.q}%;background:${d.color}"></div></div><span class="ds-v">${d.stats.q}</span></div>
+      <div class="ds-row"><span class="ds-l">輪胎</span><div class="ds-bg"><div class="ds-fill" style="width:${d.stats.t}%;background:${d.color}"></div></div><span class="ds-v">${d.stats.t}</span></div>
+      <div class="ds-row"><span class="ds-l">雨戰</span><div class="ds-bg"><div class="ds-fill" style="width:${d.stats.w}%;background:${d.color}"></div></div><span class="ds-v">${d.stats.w}</span></div>
+      <div class="ds-row"><span class="ds-l">超車</span><div class="ds-bg"><div class="ds-fill" style="width:${d.stats.o}%;background:${d.color}"></div></div><span class="ds-v">${d.stats.o}</span></div>
+      <div class="dc-footer">
+        <span class="dc-rarity" style="background:${d.rBg};color:${d.rColor};border:1px solid ${d.rBorder}">${d.rarity}</span>
+        <span class="dc-ovr" style="color:${d.color}">${d.ovr}</span>
+      </div>
+      ${diff===0?`
+      <div class="dc-hover">
+        <div class="dh-title">本站數據 · 吉達</div>
+        <div class="dh-row"><span class="dh-l">勝率預測</span><span class="dh-v hi">${d.win_rate}%</span></div>
+        <div class="dh-row"><span class="dh-l">市場賠率</span><span class="dh-v hi">${d.odds}x</span></div>
+        <div class="dh-row"><span class="dh-l">賽季積分</span><span class="dh-v">${d.points} pts</span></div>
+        <div style="margin-top:6px">
+          <div class="dh-title" style="margin-bottom:4px">技能</div>
+          <div class="dskill"><span class="dsk-n">${d.passive}</span><span class="dsk-s">被動</span></div>
+          ${d.skills.map(s=>`<div class="dskill"><span class="dsk-n">${s.n}</span><span class="dsk-s">${s.s}</span></div>`).join('')}
         </div>
-        <div class="cc-stats">
-          <div class="cc-stat-item"><span class="cc-stat-label">Win</span><span class="cc-stat-val">${c.winProb}%</span></div>
-          <div class="cc-stat-item"><span class="cc-stat-label">Odds</span><span class="cc-stat-val">x${c.odds}</span></div>
-          <div class="cc-stat-item"><span class="cc-stat-label">Qual</span><span class="cc-stat-val">${c.qualifying}</span></div>
-          <div class="cc-stat-item"><span class="cc-stat-label">Tyre</span><span class="cc-stat-val">${c.tireMgmt}</span></div>
-          <div class="cc-stat-item"><span class="cc-stat-label">Wet</span><span class="cc-stat-val">${c.wetWeather}</span></div>
-          <div class="cc-stat-item"><span class="cc-stat-label">Ovt</span><span class="cc-stat-val">${c.overtaking}</span></div>
-        </div>
-        <div class="cc-skills">
-          ${c.passive ? `<span class="cc-skill-tag passive">${c.passive}</span>` : ''}
-          ${c.skills.slice(0,2).map(s => `<span class="cc-skill-tag">${s}</span>`).join('')}
-        </div>
-        ${isCenter ? `<div style="padding:0 14px;text-align:center;max-height:60px;overflow:hidden">
-          <img src="${getCarImage(c.team)}" alt="${c.team}" style="width:100%;max-height:50px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(232,255,0,0.12))">
-        </div>` : ''}
-        <div class="cc-footer">
-          <div><div class="cc-ovr">${c.overall}</div><div class="cc-ovr-label">Overall</div></div>
-          <button class="cc-bet-btn" onclick="event.stopPropagation();location.href='/race?pick=${c.id}'">押這個人 →</button>
-        </div>
-      </div>`;
-  }
-  stage.innerHTML = html;
-  dotsEl.innerHTML = carouselCards.map((_, i) =>
-    `<button class="carousel-dot ${i === carouselIdx ? 'active' : ''}" onclick="carouselIdx=${i};renderCarousel()"></button>`
-  ).join('');
+        ${d.carImg?`<div style="text-align:center;margin:4px 0"><img src="${d.carImg}" style="width:90%;max-height:40px;object-fit:contain;opacity:0.8;filter:drop-shadow(0 1px 4px ${d.color}33)"></div>`:''}
+        <button class="dbet" style="background:${d.color};color:${d.color==='#e8ff00'?'#000':'#fff'}" onclick="event.stopPropagation();location.href='/race?pick=${d.driver_id||''}'">押 ${d.name} →</button>
+      </div>`:''}
+    `;
+    track.appendChild(card);
+
+    const dot = document.createElement('div');
+    dot.className = 'cdot'+(i===ccur?' active':'');
+    dot.onclick = () => { ccur=i; crender(); };
+    dots.appendChild(dot);
+  });
 }
 
-function carouselNext() { carouselIdx = (carouselIdx + 1) % carouselCards.length; renderCarousel(); }
-function carouselPrev() { carouselIdx = (carouselIdx - 1 + carouselCards.length) % carouselCards.length; renderCarousel(); }
+function cmove(dir){
+  ccur = (ccur+dir+CDRIVERS.length)%CDRIVERS.length;
+  crender();
+}
 
-// ═══════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════
-loadCarousel();
-loadDashboard();
+crender();
+setInterval(()=>{ cmove(1); }, 4000);
+
+// Load real data
+loadPage();
+
+// FEED
+const FEED=[
+  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'押注了 <span class="hi">Verstappen 奪冠</span> · 500 USDC',time:'剛剛'},
+  {u:'SpeedDemon', c:'#E8002D',i:'SD',t:'解鎖了 <span class="hi">SUZUKA 等級卡</span> · 連續命中5站',time:'1分鐘前'},
+  {u:'F1Expert',   c:'#F47600',i:'FE',t:'挑戰 MX · <span class="hi">Norris vs Hamilton</span> · 1,000 USDC',time:'2分鐘前'},
+  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'命中預測 <span class="hi">最快圈速 Norris</span> · +300 USDC',time:'3分鐘前'},
+  {u:'ApexHunter', c:'#534AB7',i:'AH',t:'獲得 <span class="hi">MONACO 傳奇卡</span> · 舒馬克2004版',time:'5分鐘前'},
+  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'押注了 <span class="hi">Ferrari 前三名組合</span> · 800 USDC',time:'7分鐘前'},
+];
+document.getElementById('feedList').innerHTML=FEED.map(f=>`
+  <div class="feed-item">
+    <div class="fa" style="background:${f.c}22;color:${f.c};border:1px solid ${f.c}33">${f.i}</div>
+    <div class="ft"><strong>${f.u}</strong> ${f.t}</div>
+    <div class="ftime">${f.time}</div>
+  </div>
+`).join('');
+
+let n=2847;
+setInterval(()=>{ n+=Math.floor(Math.random()*3+1); document.getElementById('liveCount').textContent=n.toLocaleString()+' 人正在下注'; },4000);
+
+let fi=0;
+setInterval(()=>{
+  document.querySelectorAll('.feed-item').forEach(i=>i.classList.remove('flash'));
+  const items=document.querySelectorAll('.feed-item');
+  if(items[fi%items.length]) items[fi%items.length].classList.add('flash');
+  fi++;
+},3000);
 </script>
 </body>
 </html>
