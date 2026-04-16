@@ -3,7 +3,7 @@
    Asphalt dark + Neon Yellow (F1 timing board)
    ═══════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap');
 
 :root {
   --bg-primary: #0d0d0d;
@@ -26,7 +26,7 @@
   --radius-sm: 4px;
   --shadow: 0 4px 24px rgba(0,0,0,0.6);
   --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-hud: 'Orbitron', monospace;
+  --font-hud: 'Share Tech Mono', 'Orbitron', monospace;
   --scanline: repeating-linear-gradient(
     0deg,
     transparent,
@@ -554,6 +554,364 @@ a:hover { color: var(--gold-light); }
 .hud-box .hud-value.lap { color: var(--gold); }
 .hud-box .hud-value.time { color: var(--blue); }
 .hud-box .hud-value.pos { color: var(--red); }
+
+/* ═══════════════════════════════════════════
+   V3 EFFECTS — Hero speed lines, 3D cards,
+   HUD info bar, telemetry charts, G-force map
+   ═══════════════════════════════════════════ */
+
+/* ─── HERO SPEED LINES ─── */
+.hero {
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 60px,
+      rgba(232,255,0,0.02) 60px,
+      rgba(232,255,0,0.02) 61px
+    );
+  animation: speedLinesH 8s linear infinite;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 200px;
+  background: linear-gradient(0deg,
+    var(--bg-primary) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+@keyframes speedLinesH {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-61px); }
+}
+
+/* Speed particles in hero */
+.speed-particle {
+  position: absolute;
+  width: 80px; height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity: 0;
+  animation: speedParticle var(--dur, 2s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  top: var(--y, 50%);
+}
+@keyframes speedParticle {
+  0% { transform: translateX(-100px); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateX(calc(100vw + 100px)); opacity: 0; }
+}
+
+/* ─── HUD INFO BAR ─── */
+.hud-info-bar {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid rgba(232,255,0,0.08);
+  padding: 12px 0;
+  position: relative;
+  overflow: hidden;
+}
+.hud-info-bar::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.4;
+}
+.hud-info-bar-inner {
+  display: flex; align-items: center; justify-content: center;
+  gap: 32px; flex-wrap: wrap;
+  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+}
+.hud-info-item {
+  display: flex; align-items: center; gap: 8px;
+}
+.hud-info-item .hud-info-label {
+  font-size: 9px; color: var(--text-muted);
+  font-family: var(--font-hud); text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.hud-info-item .hud-info-val {
+  font-size: 15px; font-family: var(--font-hud);
+  font-weight: 700; color: var(--gold);
+  animation: dataFlicker 8s infinite;
+}
+.hud-info-item .hud-info-val.red { color: var(--red); }
+.hud-info-item .hud-info-val.blue { color: var(--blue); }
+.hud-info-divider {
+  width: 1px; height: 20px; background: var(--border);
+}
+
+/* ─── 3D CARD FLIP / TILT ─── */
+.card-3d {
+  perspective: 800px;
+}
+.card-3d-inner {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+.card-3d:hover .card-3d-inner {
+  transform: rotateY(-5deg) rotateX(3deg) scale(1.02);
+  box-shadow:
+    10px 10px 30px rgba(0,0,0,0.4),
+    0 0 15px rgba(232,255,0,0.05);
+}
+
+/* Monaco rarity gold sweep */
+.rarity-monaco {
+  position: relative; overflow: hidden;
+}
+.rarity-monaco::after {
+  content: '';
+  position: absolute; top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(232,255,0,0.15) 45%,
+    rgba(232,255,0,0.25) 50%,
+    rgba(232,255,0,0.15) 55%,
+    transparent 60%
+  );
+  animation: goldSweep 3s ease-in-out infinite;
+}
+@keyframes goldSweep {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(0deg); }
+}
+
+/* ─── TELEMETRY CHART ─── */
+.telemetry-chart {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative; overflow: hidden;
+}
+.telemetry-chart::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--scanline);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.telemetry-chart-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.telemetry-chart-title {
+  font-family: var(--font-hud);
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted);
+}
+.telemetry-chart-live {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-hud); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--green);
+}
+.telemetry-chart-live::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 1.5s infinite;
+}
+.telemetry-canvas {
+  width: 100%; height: 120px;
+  position: relative;
+}
+.telemetry-svg {
+  width: 100%; height: 100%;
+}
+.telemetry-svg .grid-line {
+  stroke: rgba(255,255,255,0.04); stroke-width: 0.5;
+}
+.telemetry-svg .data-line {
+  fill: none; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+.telemetry-svg .data-line.throttle { stroke: var(--green); }
+.telemetry-svg .data-line.brake { stroke: var(--red); }
+.telemetry-svg .data-line.speed { stroke: var(--gold); }
+.telemetry-svg .data-area {
+  opacity: 0.08;
+}
+.telemetry-svg .data-area.throttle { fill: var(--green); }
+.telemetry-svg .data-area.brake { fill: var(--red); }
+.telemetry-svg .data-area.speed { fill: var(--gold); }
+
+/* Sweep scanner on chart */
+.telemetry-scanner {
+  position: absolute; top: 0; bottom: 0;
+  width: 2px; background: var(--gold);
+  opacity: 0.6;
+  box-shadow: 0 0 8px var(--gold), -20px 0 30px rgba(232,255,0,0.1);
+  animation: scanChart 4s linear infinite;
+}
+@keyframes scanChart {
+  0% { left: 0; }
+  100% { left: 100%; }
+}
+
+/* ─── G-FORCE HEATMAP ─── */
+.gforce-map {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px; position: relative;
+}
+.gforce-map-title {
+  font-family: var(--font-hud);
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.gforce-svg {
+  width: 100%; max-height: 300px;
+}
+.gforce-svg .track-outline {
+  fill: none; stroke: #333; stroke-width: 3;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.gforce-svg .gforce-segment {
+  fill: none; stroke-width: 5;
+  stroke-linecap: round;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.gforce-svg .gforce-segment:hover {
+  stroke-width: 8;
+  filter: brightness(1.3);
+}
+.gforce-tooltip {
+  position: absolute;
+  background: rgba(13,13,13,0.95);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: var(--text-primary);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+.gforce-tooltip.visible { opacity: 1; }
+.gforce-tooltip .gf-val {
+  color: var(--gold); font-weight: 700;
+  font-size: 14px;
+}
+
+/* G-Force color scale */
+.gforce-low { stroke: var(--green); }
+.gforce-mid { stroke: var(--gold); }
+.gforce-high { stroke: #ff6600; }
+.gforce-extreme { stroke: var(--red); }
+
+/* ─── PIT STOP COMPARISON BAR ─── */
+.pit-compare {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.pit-compare-title {
+  font-family: var(--font-hud);
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted);
+  margin-bottom: 14px;
+}
+.pit-compare-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.pit-compare-team {
+  width: 100px; font-size: 12px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pit-compare-bar-bg {
+  flex: 1; height: 16px; background: rgba(255,255,255,0.03);
+  border-radius: 2px; position: relative; overflow: hidden;
+}
+.pit-compare-bar-fill {
+  height: 100%; border-radius: 2px;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+.pit-compare-bar-fill::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--scanline);
+  opacity: 0.3;
+}
+.pit-compare-time {
+  width: 50px; text-align: right;
+  font-family: var(--font-hud); font-size: 12px;
+  font-weight: 700; color: var(--text-primary);
+}
+
+/* ─── WEATHER DASHBOARD ─── */
+.weather-dash {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+.weather-gauge {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px; text-align: center;
+  position: relative;
+}
+.weather-gauge::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  border-radius: 2px 0 0 2px;
+}
+.weather-gauge.temp::before { background: #ff6600; }
+.weather-gauge.track::before { background: var(--red); }
+.weather-gauge.humid::before { background: var(--blue); }
+.weather-gauge.rain::before { background: var(--purple); }
+.weather-gauge.wind::before { background: var(--green); }
+.weather-gauge-label {
+  font-family: var(--font-hud); font-size: 8px;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); margin-bottom: 6px;
+}
+.weather-gauge-val {
+  font-family: var(--font-hud); font-size: 1.3rem;
+  font-weight: 700; color: var(--text-primary);
+  animation: dataFlicker 6s infinite;
+}
+.weather-gauge-unit {
+  font-size: 10px; color: var(--text-muted); margin-top: 2px;
+}
+
+/* ─── LAP TIME SPARKLINE ─── */
+.laptime-sparkline {
+  display: inline-block; vertical-align: middle;
+  margin-left: 8px;
+}
+.laptime-sparkline svg {
+  width: 60px; height: 20px;
+}
+.laptime-sparkline .spark-line {
+  fill: none; stroke: var(--gold); stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.laptime-sparkline .spark-area {
+  fill: rgba(232,255,0,0.08);
+}
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {

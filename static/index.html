@@ -249,19 +249,58 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="container">
+  <!-- Speed particles -->
+  <div class="speed-particle" style="--y:15%;--dur:2.5s;--delay:0s"></div>
+  <div class="speed-particle" style="--y:30%;--dur:1.8s;--delay:0.7s"></div>
+  <div class="speed-particle" style="--y:50%;--dur:3.2s;--delay:0.3s"></div>
+  <div class="speed-particle" style="--y:65%;--dur:2.0s;--delay:1.2s"></div>
+  <div class="speed-particle" style="--y:80%;--dur:2.8s;--delay:0.5s"></div>
+  <div class="speed-particle" style="--y:22%;--dur:3.5s;--delay:1.8s"></div>
+  <div class="speed-particle" style="--y:45%;--dur:1.5s;--delay:2.1s"></div>
+  <div class="speed-particle" style="--y:72%;--dur:2.2s;--delay:0.9s"></div>
+  <div class="container" style="position:relative;z-index:2">
     <div class="hero-badge">
       <span class="dot" style="width:6px;height:6px"></span>
-      2025 賽季進行中
+      2026 Season Live
     </div>
-    <h1>用卡牌預測 F1<br>讓你秒懂賽車</h1>
+    <h1>用卡牌預測 <span>F1</span><br>讓你秒懂賽車</h1>
     <p>收集車手卡牌、分析數據、預測比賽結果。<br>不是賭博，是用數據說話的賽車學習平台。</p>
+    <div class="race-lights" id="hero-lights">
+      <div class="race-light"></div><div class="race-light"></div>
+      <div class="race-light"></div><div class="race-light"></div>
+      <div class="race-light"></div>
+    </div>
     <div class="hero-actions">
       <button class="btn btn-gold" onclick="user ? location.href='/race' : showModal('login')">開始預測</button>
       <button class="btn btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
     </div>
   </div>
 </section>
+
+<!-- HUD INFO BAR -->
+<div class="hud-info-bar" id="hud-bar">
+  <div class="hud-info-bar-inner" id="hud-bar-inner">
+    <div class="hud-info-item">
+      <span class="hud-info-label">Next Race</span>
+      <span class="hud-info-val" id="hud-next-race">---</span>
+    </div>
+    <div class="hud-info-divider"></div>
+    <div class="hud-info-item">
+      <span class="hud-info-label">Countdown</span>
+      <span class="hud-info-val red" id="hud-countdown">--d --h</span>
+    </div>
+    <div class="hud-info-divider"></div>
+    <div class="hud-info-item">
+      <span class="hud-info-label">Leader</span>
+      <span class="hud-info-val" id="hud-leader">---</span>
+    </div>
+    <div class="hud-info-divider"></div>
+    <div class="hud-info-item">
+      <span class="hud-info-label">Your Rank</span>
+      <span class="hud-info-val blue" id="hud-rank">#--</span>
+    </div>
+  </div>
+</div>
 
 <!-- ACTION BAR -->
 <div class="action-bar" id="action-bar" style="display:none">
@@ -663,9 +702,53 @@ async function loadTrackInfo(circuit) {
   }
 }
 
+// ─── HUD INFO BAR ───
+async function loadHudBar() {
+  try {
+    const race = await api('/api/races/current');
+    if (race.race_name) {
+      document.getElementById('hud-next-race').textContent = race.race_name;
+      const raceDate = new Date(race.date);
+      const now = new Date();
+      const diffMs = raceDate - now;
+      const days = Math.floor(diffMs / 86400000);
+      const hrs = Math.floor((diffMs % 86400000) / 3600000);
+      document.getElementById('hud-countdown').textContent = days > 0 ? `${days}d ${hrs}h` : 'RACE DAY';
+    }
+    // Leader
+    const drivers = await api('/api/drivers');
+    if (drivers.drivers?.length) {
+      document.getElementById('hud-leader').textContent = drivers.drivers[0].name?.split(' ').pop() || '---';
+    }
+  } catch(e) {}
+}
+
+// ─── RACE LIGHTS ANIMATION ───
+function raceLightsAnim() {
+  const lights = document.querySelectorAll('#hero-lights .race-light');
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < lights.length) {
+      lights[i].classList.add('on');
+      i++;
+    } else {
+      clearInterval(interval);
+      setTimeout(() => {
+        lights.forEach(l => { l.classList.remove('on'); l.classList.add('go'); });
+        setTimeout(() => {
+          lights.forEach(l => l.classList.remove('go'));
+          setTimeout(raceLightsAnim, 3000);
+        }, 1500);
+      }, 800);
+    }
+  }, 400);
+}
+
 // ─── INIT ───
 loadCurrentRace();
 loadDrivers();
+loadHudBar();
+setTimeout(raceLightsAnim, 1000);
 </script>
 </body>
 </html>

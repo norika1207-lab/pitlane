@@ -85,9 +85,12 @@
 }
 .driver-ovr .score {
   font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
+  font-family: var(--font-hud);
+  animation: dataFlicker 8s infinite;
 }
 .driver-ovr .score-label {
-  font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+  font-family: var(--font-hud);
 }
 
 .driver-stats { padding: 0 20px 12px; }
@@ -395,7 +398,7 @@ async function loadAllDriverCards() {
       const imgUrl = card.headshot_url || `/api/drivers/${d.driver_id}/headshot`;
 
       return `
-        <div class="driver-card-v2" id="${d.driver_id}">
+        <div class="card-3d"><div class="card-3d-inner driver-card-v2" id="${d.driver_id}">
           <!-- TOP: clickable card body -->
           <div class="driver-card-top" style="border-left-color:${color}"
                onclick="toggleAnalysis('${d.driver_id}')">
@@ -460,7 +463,7 @@ async function loadAllDriverCards() {
               <span>AI 分析載入中...</span>
             </div>
           </div>
-        </div>
+        </div></div>
       `;
     }).join('');
 
