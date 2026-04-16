@@ -34,12 +34,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 /* CAROUSEL */
 .carousel-section{padding:20px 0 8px;border-bottom:1px solid #1a1a1a;}
 .carousel-label{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;color:#666;margin-bottom:12px;}
-.carousel-wrap{position:relative;width:100%;height:400px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.carousel-track{display:flex;align-items:center;gap:16px;transition:transform 0.4s cubic-bezier(.25,.8,.25,1);}
-.dcard{width:180px;height:280px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.4s cubic-bezier(.25,.8,.25,1);flex-shrink:0;position:relative;overflow:hidden;}
-.dcard.active{width:240px;height:360px;border-color:#e8ff00;z-index:10;}
-.dcard.side{opacity:0.55;transform:scale(0.88);}
-.dcard.far{opacity:0.25;transform:scale(0.75);}
+.carousel-wrap{position:relative;width:100%;height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.carousel-track{display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%;}
+.dcard{width:180px;height:280px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.5s cubic-bezier(.25,.8,.25,1);position:absolute;left:50%;top:50%;overflow:hidden;}
+.dcard.active{width:250px;height:370px;border-color:#e8ff00;z-index:10;}
 .dc-stripe{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.08;pointer-events:none;}
 .dc-num{position:absolute;top:8px;right:10px;font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;opacity:0.08;color:#fff;line-height:1;}
 .dc-avatar{width:56px;height:56px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:24px;margin:16px 0 8px 16px;position:relative;z-index:2;}
@@ -566,7 +564,7 @@ async function loadPage() {
         carImg: getCarImage(card?.team||d.team||''),
       });
     });
-    ccur = 0;
+    ccur = Math.floor(CDRIVERS.length / 2);  // start from middle
     crender();
 
     // Update top bet panel
@@ -607,28 +605,39 @@ const CDRIVERS = [
   {num:'63',name:'Russell',    team:'Mercedes-AMG',      color:'#27F4D2', emoji:'⚡', rarity:'MONZA',  rBg:'#0d1a18', rColor:'#27F4D2', rBorder:'#1D9E75', stats:{q:87,t:78,w:80,o:76}, ovr:79, win_rate:8,  odds:12.0,points:44, passive:'積分獵人', skills:[{n:'穩定完賽',s:'★★★'},{n:'進站把握',s:'★★'}]},
 ];
 
-let ccur = 2;
+let ccur = 0;
 
 function crender(){
   const track = document.getElementById('ctrack');
   const dots  = document.getElementById('cdots');
   track.innerHTML = '';
   dots.innerHTML  = '';
-  CDRIVERS.forEach((d,i) => {
-    const diff = i - ccur;
-    let cls = 'dcard';
-    if(diff===0) cls+=' active';
-    else if(Math.abs(diff)===1) cls+=' side';
-    else cls+=' far';
+  const total = CDRIVERS.length;
+  if(!total) return;
+
+  // Show 5 cards centered around ccur
+  for(let offset = -2; offset <= 2; offset++) {
+    const i = ((ccur + offset) % total + total) % total;
+    const d = CDRIVERS[i];
+    const isCenter = offset === 0;
+    const absOff = Math.abs(offset);
+
+    // Position: center card at 0, others offset left/right
+    const tx = offset * 200;  // horizontal spacing
+    const scale = isCenter ? 1 : (absOff === 1 ? 0.85 : 0.7);
+    const opacity = isCenter ? 1 : (absOff === 1 ? 0.6 : 0.25);
+    const zIdx = 10 - absOff;
+    const rotY = offset * -5;
 
     const card = document.createElement('div');
-    card.className = cls;
-    card.onclick = () => { if(i!==ccur){ccur=i;crender();} };
+    card.className = 'dcard' + (isCenter ? ' active' : '');
+    card.style.cssText = `transform:translate(-50%,-50%) translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${zIdx};`;
+    if(!isCenter) card.onclick = () => { ccur=i; crender(); };
     card.innerHTML = `
       <div class="dc-stripe" style="background:linear-gradient(135deg,${d.color},transparent)"></div>
       <div class="dc-num">${d.num}</div>
       <div class="dc-avatar" style="border-color:${d.color};background:${d.color}22;overflow:hidden">
-        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span style=font-size:${diff===0?28:22}px>${d.num}</span>'">` : `<span style="font-size:${diff===0?'28px':'22px'}">${d.num}</span>`}
+        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span style=font-size:${isCenter?28:22}px>${d.num}</span>'">` : `<span style="font-size:${isCenter?'28px':'22px'}">${d.num}</span>`}
       </div>
       <div class="dc-name">${d.name}</div>
       <div class="dc-team" style="color:${d.color}">${d.team}</div>
@@ -640,7 +649,7 @@ function crender(){
         <span class="dc-rarity" style="background:${d.rBg};color:${d.rColor};border:1px solid ${d.rBorder}">${d.rarity}</span>
         <span class="dc-ovr" style="color:${d.color}">${d.ovr}</span>
       </div>
-      ${diff===0?`
+      ${isCenter?`
       <div class="dc-hover">
         <div class="dh-title">本站數據 · 吉達</div>
         <div class="dh-row"><span class="dh-l">勝率預測</span><span class="dh-v hi">${d.win_rate}%</span></div>
@@ -656,12 +665,15 @@ function crender(){
       </div>`:''}
     `;
     track.appendChild(card);
+  }
 
+  // Dots for all drivers
+  for(let i = 0; i < total; i++) {
     const dot = document.createElement('div');
     dot.className = 'cdot'+(i===ccur?' active':'');
     dot.onclick = () => { ccur=i; crender(); };
     dots.appendChild(dot);
-  });
+  }
 }
 
 function cmove(dir){
