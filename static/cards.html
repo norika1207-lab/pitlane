@@ -43,10 +43,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 /* ── 共用卡片基礎 ── */
 .card{border-radius:16px;overflow:visible;position:relative;cursor:pointer;transition:transform 0.3s cubic-bezier(.25,.8,.25,1);}
 .card:hover{transform:translateY(-12px) scale(1.04);}
-.card-inner{border-radius:16px;overflow:hidden;position:relative;width:100%;height:auto;min-height:290px;}
+.card-inner{border-radius:16px;overflow:hidden;position:relative;width:100%;height:420px;display:flex;flex-direction:column;padding-bottom:56px;}
 .c-num{position:absolute;top:6px;right:10px;font-size:55px;font-weight:900;line-height:1;z-index:2;pointer-events:none;font-family:'Barlow Condensed',sans-serif;}
 .c-rarity{position:absolute;top:10px;left:12px;font-size:8px;font-weight:900;letter-spacing:0.12em;z-index:10;font-family:'Barlow Condensed',sans-serif;}
-.c-art{height:105px;display:flex;align-items:center;justify-content:center;position:relative;z-index:5;}
+.c-art{height:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:5;margin-top:24px;}
 .c-emoji{font-size:52px;}
 .c-info{padding:0 12px;position:relative;z-index:5;}
 .c-name{font-size:20px;font-weight:900;color:#fff;line-height:1;font-family:'Barlow Condensed',sans-serif;}
@@ -58,7 +58,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 .c-sf{height:100%;border-radius:2px;}
 .c-sv{font-size:8px;font-weight:700;width:14px;text-align:right;font-family:'Barlow Condensed',sans-serif;}
 .c-divider{margin:8px 12px 0;height:1px;}
-.c-bottom{padding:8px 12px 10px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;position:relative;z-index:5;}
+.c-bottom{position:absolute;bottom:0;left:0;right:0;padding:8px 12px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;z-index:15;border-top:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(2px);}
 .c-wn{font-size:14px;font-weight:900;line-height:1;font-family:'Barlow Condensed',sans-serif;}
 .c-wl{font-size:11px;color:#aaa;letter-spacing:0.08em;margin-top:2px;font-family:'Barlow Condensed',sans-serif;}
 .c-ov{font-size:24px;font-weight:900;line-height:1;text-align:center;font-family:'Barlow Condensed',sans-serif;}
@@ -101,7 +101,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 .spa .sp-outer{position:absolute;inset:-3px;border-radius:19px;box-shadow:0 0 20px rgba(0,180,255,0.5),0 0 40px rgba(0,180,255,0.2);pointer-events:none;z-index:0;}
 
 /* ── 5. MONACO ── */
-.monaco .card-inner{background:#050400;border:2px solid #c9a84c;min-height:420px;height:auto;}
+.monaco .card-inner{background:#050400;border:2px solid #c9a84c;}
+.monaco .c-art{margin-top:58px;}
 .monaco .mc-diamond{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,0.09) 0px,rgba(201,168,76,0.09) 1px,transparent 1px,transparent 7px),repeating-linear-gradient(-45deg,rgba(201,168,76,0.09) 0px,rgba(201,168,76,0.09) 1px,transparent 1px,transparent 7px);z-index:2;}
 .monaco .mc-rotate{position:absolute;inset:-60%;background:conic-gradient(transparent 0deg,rgba(201,168,76,0.12) 40deg,rgba(255,220,100,0.06) 80deg,transparent 120deg,rgba(201,168,76,0.10) 200deg,transparent 250deg,rgba(201,168,76,0.12) 320deg,transparent 360deg);animation:spin 6s linear infinite;z-index:3;}
 .monaco .mc-rainbow{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,50,0,0) 0%,rgba(255,150,0,0.06) 20%,rgba(255,220,0,0.10) 35%,rgba(100,255,100,0.06) 50%,rgba(0,200,255,0.08) 65%,rgba(150,0,255,0.06) 80%,transparent 100%);animation:rb 4s linear infinite;mix-blend-mode:screen;z-index:4;}
@@ -370,7 +371,7 @@ function buildCard(d) {
       </div>`,
   }[d.tier];
 
-  const monacoArtStyle = d.tier==='monaco'?`margin-top:18px;`:'';
+  const monacoArtStyle = '';  // handled by CSS .monaco .c-art
   const monacoFlag = d.tier==='monaco'?`
     <div style="display:flex;justify-content:center;margin-bottom:5px;position:relative;z-index:10;">
       <svg width="80" height="6" viewBox="0 0 80 6">
@@ -389,7 +390,7 @@ function buildCard(d) {
     }[d.tier]} 0%,transparent 70%);animation:tg 2s ease-in-out infinite;"></div>`:'';
 
   const ovrStyle = `color:${t.ovrColor};${t.ovrShadow?`text-shadow:${t.ovrShadow};`:''}${d.tier==='monaco'?'font-size:28px;':''}`;
-  const rarityTop = d.tier==='monaco'?'top:44px;':'';
+  const rarityTop = d.tier==='monaco'?'top:46px;':'';
 
   return `
     <div class="card ${d.tier}" data-tier="${d.tier}">
