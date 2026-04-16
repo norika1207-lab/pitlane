@@ -26,7 +26,7 @@ async def generate_share_card_image(username: str) -> io.BytesIO:
 
     # Create image
     W, H = 1080, 1080
-    img = Image.new("RGB", (W, H), "#0a0a0f")
+    img = Image.new("RGB", (W, H), "#15151E")
     draw = ImageDraw.Draw(img)
 
     # Try to load font, fallback to default
@@ -41,10 +41,10 @@ async def generate_share_card_image(username: str) -> io.BytesIO:
         font_sm = font_lg
         font_xs = font_lg
 
-    gold = "#d4a843"
+    gold = "#e8ff00"
     white = "#f0f0f5"
-    gray = "#888899"
-    dark = "#1a1a25"
+    gray = "#8888a0"
+    dark = "#242432"
 
     # Background gradient effect (subtle)
     for y in range(0, 200):
