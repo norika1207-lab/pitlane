@@ -713,8 +713,8 @@ async function loadPage() {
           <div class="dc-stripe" style="background:linear-gradient(135deg,${d.color},transparent)"></div>
           <div class="dc-num" style="font-size:${Math.round(s.w*.24)}px">${d.num}</div>
           <div class="dc-art" style="height:${artH}px;overflow:hidden;display:flex;align-items:flex-start;justify-content:center">
-            <img src="${d.img}" alt="${d.name}"
-              style="height:${Math.round(artH*1.45)}px;width:auto;object-fit:contain;object-position:top center;filter:drop-shadow(0 0 ${isCtr?10:4}px ${d.color}66)"
+            <img src="${d.img.replace('1col','4col')}" alt="${d.name}"
+              style="height:${Math.round(artH*1.9)}px;width:auto;object-fit:contain;object-position:top center;filter:drop-shadow(0 0 ${isCtr?10:4}px ${d.color}66)"
               onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'👤',style:'font-size:${s.es}px;line-height:${artH}px'}))">
           </div>
           <div class="dc-name" style="font-size:${s.ns}px;padding:0 ${s.fp}px">${d.name}</div>
