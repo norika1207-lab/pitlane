@@ -564,12 +564,12 @@ async function loadPage() {
 // ── 新版輪播（你的設計稿，完全不改） ──
 (function(){
   const DR = [
-    {num:'1', name:'Verstappen',team:'Red Bull',   color:'#3671C6',emoji:'🏎',rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:95,t:88,w:92,o:85},ovr:91,win:42,odds:2.1,pts:94,passive:'冠軍心態',  skills:[{n:'雨中之神',s:'★★★'},{n:'開賽衝刺',s:'★★'}]},
-    {num:'4', name:'Norris',    team:'McLaren',    color:'#F47600',emoji:'🧡',rarity:'SPA',    rBg:'#060810',rC:'#00ccff',rB:'#00b8ff',s:{q:90,t:85,w:78,o:88},ovr:85,win:28,odds:3.8,pts:78,passive:'橘色閃電',  skills:[{n:'超車機器',s:'★★★'},{n:'輪胎刺客',s:'★★'}]},
-    {num:'16',name:'Leclerc',   team:'Ferrari',    color:'#E8002D',emoji:'🔴',rarity:'SUZUKA', rBg:'#1a1a2e',rC:'#AFA9EC',rB:'#534AB7',s:{q:92,t:80,w:75,o:78},ovr:83,win:18,odds:5.5,pts:61,passive:'摩納哥之子',skills:[{n:'排位飛人',s:'★★★'},{n:'街道賽王',s:'★★★'}]},
-    {num:'44',name:'Hamilton',  team:'Ferrari',    color:'#E8002D',emoji:'🏆',rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:88,t:90,w:95,o:82},ovr:89,win:15,odds:6.8,pts:52,passive:'七冠傳說',  skills:[{n:'雨神降臨',s:'★★★'},{n:'逆轉大師',s:'★★★'}]},
-    {num:'63',name:'Russell',   team:'Mercedes',   color:'#27F4D2',emoji:'⚡',rarity:'MONZA',  rBg:'#0d1a18',rC:'#27F4D2',rB:'#1D9E75',s:{q:87,t:78,w:80,o:76},ovr:79,win:8, odds:12, pts:44,passive:'積分獵人',  skills:[{n:'穩定完賽',s:'★★★'},{n:'進站把握',s:'★★'}]},
-    {num:'14',name:'Alonso',    team:'Aston Martin',color:'#358C75',emoji:'🎯',rarity:'SUZUKA', rBg:'#1a1a2e',rC:'#AFA9EC',rB:'#534AB7',s:{q:82,t:92,w:88,o:78},ovr:85,win:6, odds:15, pts:38,passive:'策略教父',  skills:[{n:'輪胎巫師',s:'★★★'},{n:'雨戰老狐',s:'★★'}]},
+    {num:'1', name:'Verstappen',team:'Red Bull',   color:'#3671C6',img:'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png.transform/1col/image.png',rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:95,t:88,w:92,o:85},ovr:91,win:42,odds:2.1,pts:94,passive:'冠軍心態',  skills:[{n:'雨中之神',s:'★★★'},{n:'開賽衝刺',s:'★★'}]},
+    {num:'4', name:'Norris',    team:'McLaren',    color:'#F47600',img:'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png.transform/1col/image.png',rarity:'SPA',    rBg:'#060810',rC:'#00ccff',rB:'#00b8ff',s:{q:90,t:85,w:78,o:88},ovr:85,win:28,odds:3.8,pts:78,passive:'橘色閃電',  skills:[{n:'超車機器',s:'★★★'},{n:'輪胎刺客',s:'★★'}]},
+    {num:'16',name:'Leclerc',   team:'Ferrari',    color:'#E8002D',img:'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC16_Charles_Leclerc/chalec16.png.transform/1col/image.png',rarity:'SUZUKA', rBg:'#1a1a2e',rC:'#AFA9EC',rB:'#534AB7',s:{q:92,t:80,w:75,o:78},ovr:83,win:18,odds:5.5,pts:61,passive:'摩納哥之子',skills:[{n:'排位飛人',s:'★★★'},{n:'街道賽王',s:'★★★'}]},
+    {num:'44',name:'Hamilton',  team:'Ferrari',    color:'#E8002D',img:'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/1col/image.png',rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:88,t:90,w:95,o:82},ovr:89,win:15,odds:6.8,pts:52,passive:'七冠傳說',  skills:[{n:'雨神降臨',s:'★★★'},{n:'逆轉大師',s:'★★★'}]},
+    {num:'63',name:'Russell',   team:'Mercedes',   color:'#27F4D2',img:'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS63_George_Russell/georus63.png.transform/1col/image.png',rarity:'MONZA',  rBg:'#0d1a18',rC:'#27F4D2',rB:'#1D9E75',s:{q:87,t:78,w:80,o:76},ovr:79,win:8, odds:12, pts:44,passive:'積分獵人',  skills:[{n:'穩定完賽',s:'★★★'},{n:'進站把握',s:'★★'}]},
+    {num:'14',name:'Alonso',    team:'Aston Martin',color:'#358C75',img:'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FERALO14_Fernando_Alonso/feralo14.png.transform/1col/image.png',rarity:'SUZUKA', rBg:'#1a1a2e',rC:'#AFA9EC',rB:'#534AB7',s:{q:82,t:92,w:88,o:78},ovr:85,win:6, odds:15, pts:38,passive:'策略教父',  skills:[{n:'輪胎巫師',s:'★★★'},{n:'雨戰老狐',s:'★★'}]},
   ];
 
   const SIZES = {
@@ -632,8 +632,10 @@ async function loadPage() {
         <div class="dc" style="width:${s.w}px;height:${s.h}px;opacity:${op};border-color:${bdr};box-shadow:${bsh};">
           <div class="dc-stripe" style="background:linear-gradient(135deg,${d.color},transparent)"></div>
           <div class="dc-num" style="font-size:${Math.round(s.w*.24)}px">${d.num}</div>
-          <div class="dc-art" style="height:${artH}px">
-            <span style="font-size:${s.es}px;filter:drop-shadow(0 0 ${isCtr?12:6}px ${d.color}88)">${d.emoji}</span>
+          <div class="dc-art" style="height:${artH}px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center">
+            <img src="${d.img}" alt="${d.name}"
+              style="height:${Math.round(artH*1.9)}px;width:auto;object-fit:contain;object-position:top center;filter:drop-shadow(0 0 ${isCtr?10:4}px ${d.color}66)"
+              onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'👤',style:'font-size:${s.es}px;line-height:${artH}px'}))">
           </div>
           <div class="dc-name" style="font-size:${s.ns}px;padding:0 ${s.fp}px">${d.name}</div>
           <div class="dc-team" style="font-size:${s.ts}px;color:${d.color};padding:2px ${s.fp}px ${s.fp*.6}px">${d.team}</div>
