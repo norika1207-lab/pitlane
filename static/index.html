@@ -671,32 +671,27 @@ function cslide() {
   if (!total) return;
   const cards = document.querySelectorAll('#ctrack .dcard');
   const dots = document.querySelectorAll('#cdots .cdot');
+  const half = Math.floor(total / 2);
 
   cards.forEach(card => {
     const i = parseInt(card.dataset.idx);
-    // Calculate shortest circular offset from ccur
+    // Circular offset: always wraps, never leaves a gap
     let offset = i - ccur;
-    if (offset > total / 2) offset -= total;
-    if (offset < -total / 2) offset += total;
+    if (offset > half) offset -= total;
+    if (offset < -half) offset += total;
 
     const absOff = Math.abs(offset);
     const isCenter = offset === 0;
 
-    if (absOff > 3) {
-      card.style.cssText = 'transform:translate(-50%,-50%) translateX(0) scale(0.4);opacity:0;z-index:0;pointer-events:none;';
-      card.classList.remove('active');
-      return;
-    }
-
-    // macOS Dock style: smooth size falloff
+    // ALL cards get positioned — no hiding. Far cards just go to edges.
     const tx = offset * 190;
-    const scale = Math.max(0.55, 1 - absOff * 0.18);
-    const opacity = Math.max(0.15, 1 - absOff * 0.3);
+    const scale = Math.max(0.45, 1 - absOff * 0.14);
+    const opacity = Math.max(0.08, 1 - absOff * 0.25);
     const zIdx = 10 - absOff;
     const rotY = offset * -3;
-    const ty = absOff * 8; // slight vertical push down for non-center
+    const ty = Math.min(absOff * 6, 24);
 
-    card.style.cssText = `transform:translate(-50%,-50%) translateX(${tx}px) translateY(${ty}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${zIdx};pointer-events:${absOff <= 3 ? 'auto' : 'none'};`;
+    card.style.cssText = `transform:translate(-50%,-50%) translateX(${tx}px) translateY(${ty}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${zIdx};pointer-events:${absOff <= half ? 'auto' : 'none'};`;
 
     if (isCenter) {
       card.classList.add('active');
