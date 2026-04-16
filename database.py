@@ -68,10 +68,48 @@ async def init_db():
             cached_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS user_rpg (
+            username TEXT PRIMARY KEY,
+            xp INTEGER DEFAULT 0,
+            win_streak INTEGER DEFAULT 0,
+            dark_horse_wins INTEGER DEFAULT 0,
+            frame TEXT DEFAULT 'silverstone',
+            custom_title TEXT,
+            status TEXT DEFAULT 'online',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS xp_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            amount INTEGER NOT NULL,
+            reason TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS trophies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            trophy_type TEXT NOT NULL,
+            race_name TEXT,
+            driver TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS content_cache (
+            key TEXT PRIMARY KEY,
+            category TEXT NOT NULL,
+            title TEXT,
+            data TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE INDEX IF NOT EXISTS idx_bets_username ON bets(username);
         CREATE INDEX IF NOT EXISTS idx_bets_race ON bets(race_id);
         CREATE INDEX IF NOT EXISTS idx_p2p_status ON p2p_orders(status);
         CREATE INDEX IF NOT EXISTS idx_challenge_code ON challenges(code);
+        CREATE INDEX IF NOT EXISTS idx_xp_log_user ON xp_log(username);
+        CREATE INDEX IF NOT EXISTS idx_trophies_user ON trophies(username);
     """)
     await db.commit()
     await db.close()

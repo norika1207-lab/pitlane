@@ -36,6 +36,7 @@ from routes.bets import router as bets_router
 from routes.profile import router as profile_router
 from routes.p2p import router as p2p_router
 from routes.challenge import router as challenge_router
+from routes.rpg import router as rpg_router
 
 app.include_router(auth_router)
 app.include_router(races_router)
@@ -44,6 +45,7 @@ app.include_router(bets_router)
 app.include_router(profile_router)
 app.include_router(p2p_router)
 app.include_router(challenge_router)
+app.include_router(rpg_router)
 
 # AI analysis + track + odds endpoints
 from fastapi import APIRouter, Header
@@ -145,6 +147,48 @@ async def learning_progress(authorization: str = Header(None)):
     """用戶學習進度追蹤"""
     user = await get_current_user(authorization)
     return await generate_learning_progress(user["username"])
+
+
+@extra.get("/api/content/{category}")
+async def get_content(category: str):
+    """Get pre-generated content by category."""
+    db = await get_db()
+    try:
+        rows = await db.execute_fetchall(
+            "SELECT key, title, data FROM content_cache WHERE category = ? ORDER BY created_at DESC",
+            (category,),
+        )
+        import json
+        items = []
+        for r in rows:
+            try:
+                data = json.loads(r[2])
+            except:
+                data = {"raw": r[2]}
+            items.append({"key": r[0], "title": r[1], "data": data})
+        return {"category": category, "count": len(items), "items": items}
+    finally:
+        await db.close()
+
+
+@extra.get("/api/content/{category}/{key}")
+async def get_content_item(category: str, key: str):
+    """Get single content item."""
+    db = await get_db()
+    try:
+        rows = await db.execute_fetchall(
+            "SELECT title, data FROM content_cache WHERE key = ?", (key,),
+        )
+        if not rows:
+            return {"error": "Not found"}
+        import json
+        try:
+            data = json.loads(rows[0][1])
+        except:
+            data = {"raw": rows[0][1]}
+        return {"key": key, "title": rows[0][0], "data": data}
+    finally:
+        await db.close()
 
 
 @extra.get("/api/races/{race_id}/odds")
