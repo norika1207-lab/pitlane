@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from services import ergast, openf1
 from services.card_engine import calculate_driver_card, calculate_constructor_card, calculate_odds
+from services.driver_skills import get_driver_skills
+from services.odds_engine import calculate_winner_odds
 from datetime import datetime
 
 router = APIRouter(prefix="/api", tags=["cards"])
@@ -54,9 +56,9 @@ async def driver_card(driver_id: str):
             headshot = d.get("headshot_url", "")
             break
 
-    # Try to get stats from Ergast history, fallback to generated stats
     stats = await calculate_driver_card(driver_id)
-    odds = calculate_odds(stats)
+    odds = calculate_winner_odds(driver_id)
+    skills = get_driver_skills(driver_id)
 
     return {
         "driver_id": driver_id,
@@ -69,6 +71,7 @@ async def driver_card(driver_id: str):
         "year": datetime.now().year,
         "stats": stats,
         "odds": odds,
+        "skills": skills,
     }
 
 

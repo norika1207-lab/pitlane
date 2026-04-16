@@ -7,6 +7,222 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+  /* ─── ACTION BAR ─── */
+  .action-bar {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-gold);
+    border-bottom: 1px solid var(--border-gold);
+    padding: 20px 0;
+  }
+  .action-bar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .action-bar-left {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .action-bar-race {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .action-bar-race-flag {
+    font-size: 1.8rem; line-height: 1;
+  }
+  .action-bar-race-name {
+    font-size: 1rem; font-weight: 700; color: var(--gold);
+  }
+  .action-bar-race-meta {
+    font-size: 12px; color: var(--text-secondary); margin-top: 2px;
+  }
+  .action-bar-countdown {
+    padding: 6px 14px; border-radius: var(--radius-sm);
+    background: rgba(212,168,67,0.1); border: 1px solid var(--border-gold);
+    color: var(--gold); font-weight: 700; font-size: 13px;
+    white-space: nowrap;
+  }
+  .action-bar-msg {
+    color: var(--text-secondary); font-size: 14px;
+  }
+  .action-bar-msg strong { color: var(--text-primary); }
+  .action-bar-divider {
+    width: 1px; height: 36px; background: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* ─── AI ANALYSIS ─── */
+  .analysis-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .analysis-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+    position: relative; overflow: hidden;
+  }
+  .analysis-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .analysis-card.top-picks::before {
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .analysis-card.dark-horse::before {
+    background: linear-gradient(90deg, var(--red), transparent);
+  }
+  .analysis-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .analysis-card.top-picks .analysis-label { color: var(--gold); }
+  .analysis-card.dark-horse .analysis-label { color: var(--red); }
+  .analysis-pick {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .analysis-pick:last-child { border-bottom: none; }
+  .analysis-pick-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .top-picks .analysis-pick-num {
+    background: rgba(212,168,67,0.15); color: var(--gold);
+  }
+  .dark-horse .analysis-pick-num {
+    background: rgba(232,54,78,0.15); color: var(--red);
+  }
+  .analysis-pick-info { flex: 1; }
+  .analysis-pick-name { font-weight: 600; font-size: 14px; }
+  .analysis-pick-reason { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .analysis-pick-prob {
+    font-weight: 700; font-size: 15px;
+  }
+  .top-picks .analysis-pick-prob { color: var(--gold); }
+  .dark-horse .analysis-pick-prob { color: var(--red); }
+
+  /* ─── ENHANCED DRIVER CARD ─── */
+  .driver-card-v2 {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0;
+    transition: all 0.3s; position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .driver-card-v2:hover {
+    border-color: var(--border-gold);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(212,168,67,0.1);
+  }
+  .driver-card-top {
+    padding: 20px 20px 16px;
+    border-left: 4px solid transparent;
+    display: flex; align-items: center; gap: 14px;
+    position: relative;
+  }
+  .driver-card-top .ghost-num {
+    font-size: 3.5rem; font-weight: 900; color: var(--gold);
+    opacity: 0.07; position: absolute; top: 6px; right: 14px;
+    line-height: 1; pointer-events: none;
+  }
+  .driver-card-info { flex: 1; min-width: 0; }
+  .driver-card-name {
+    font-size: 1rem; font-weight: 700; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .driver-card-team {
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .driver-card-nation {
+    font-size: 12px; color: var(--text-muted); margin-top: 1px;
+  }
+  .driver-card-stats {
+    padding: 0 20px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .driver-card-skills {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .skills-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .skill-item {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; font-size: 12px;
+  }
+  .skill-item:last-child { margin-bottom: 0; }
+  .skill-name { flex: 1; color: var(--text-secondary); }
+  .skill-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+  .skill-passive-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 4px;
+    background: rgba(212,168,67,0.12); border: 1px solid var(--border-gold);
+    color: var(--gold); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+  .driver-card-footer {
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: auto;
+  }
+  .overall-score {
+    display: flex; align-items: baseline; gap: 4px;
+  }
+  .overall-score .num {
+    font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
+  }
+  .overall-score .label {
+    font-size: 11px; color: var(--text-muted); font-weight: 500;
+  }
+
+  /* ─── TRACK INFO ─── */
+  .track-info-grid {
+    display: grid; grid-template-columns: 1fr 2fr; gap: 24px;
+    align-items: start;
+  }
+  .track-main {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px; text-align: center;
+  }
+  .track-icon { font-size: 3rem; margin-bottom: 12px; }
+  .track-name {
+    font-size: 1.4rem; font-weight: 700; margin-bottom: 4px;
+  }
+  .track-country { color: var(--text-secondary); font-size: 14px; }
+  .track-type-badge {
+    display: inline-block; margin-top: 12px;
+    padding: 4px 12px; border-radius: 20px;
+    background: rgba(212,168,67,0.1); border: 1px solid var(--border-gold);
+    color: var(--gold); font-size: 12px; font-weight: 600;
+  }
+  .track-chars {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .track-char-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px;
+  }
+  .track-char-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px;
+  }
+  .track-char-value { font-size: 14px; font-weight: 600; }
+  .difficulty-bar {
+    display: flex; gap: 4px; margin-top: 8px;
+  }
+  .diff-pip {
+    width: 18px; height: 6px; border-radius: 3px;
+    background: var(--border);
+  }
+  .diff-pip.filled { background: var(--gold); }
+
+  @media (max-width: 768px) {
+    .analysis-grid { grid-template-columns: 1fr; }
+    .track-info-grid { grid-template-columns: 1fr; }
+    .track-chars { grid-template-columns: 1fr; }
+    .action-bar-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
 </head>
 <body>
 
@@ -18,7 +234,9 @@
       <a href="/" class="active">首頁</a>
       <a href="/race">賽事</a>
       <a href="/cards">卡牌</a>
-      <a href="/profile">戰績</a>
+      <a href="/battle">對戰</a>
+      <a href="/leaderboard">排行榜</a>
+      <a href="/profile">個人</a>
     </div>
     <div id="nav-auth" class="nav-auth"></div>
   </div>
@@ -45,56 +263,52 @@
   </div>
 </section>
 
-<!-- FEATURES -->
-<section class="section">
+<!-- ACTION BAR -->
+<div class="action-bar" id="action-bar" style="display:none">
   <div class="container">
-    <div class="section-header">
-      <h2>為什麼選 PitLane？</h2>
-      <p>我們讓複雜的 F1 策略變得直覺好懂</p>
-    </div>
-    <div class="features">
-      <div class="feature-card">
-        <span class="feature-icon">🃏</span>
-        <h3>真實數據卡牌</h3>
-        <p>每張卡牌的數值都從真實比賽數據計算而來，不是隨便亂編。你手上的 Verstappen 卡，就是他本季的真實實力。</p>
+    <div class="action-bar-inner">
+      <div class="action-bar-left">
+        <div class="action-bar-race" id="action-race-info">
+          <!-- filled by JS -->
+        </div>
+        <div class="action-bar-divider"></div>
+        <div class="action-bar-msg">
+          <strong>你還沒有下注！</strong>現在就預測誰會拿冠軍？
+        </div>
       </div>
-      <div class="feature-card">
-        <span class="feature-icon">🏎</span>
-        <h3>預測比賽結果</h3>
-        <p>用你收集的卡牌組合預測比賽冠軍。分析天氣、賽道特性、車手歷史，做出你的判斷。</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">📊</span>
-        <h3>輸了比贏了更有價值</h3>
-        <p>賽後 AI 解析告訴你為什麼預測錯了——進站太早？輪胎策略失誤？每場比賽都是一堂課。</p>
-      </div>
+      <a href="/race" class="btn btn-gold" style="white-space:nowrap">立即下注 →</a>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CURRENT RACE PREVIEW -->
+<!-- AI 賽前分析預覽 -->
 <section class="section" style="background: var(--bg-secondary);">
   <div class="container">
     <div class="section-header">
-      <h2>即將到來的賽事</h2>
+      <h2>🤖 AI 賽前分析預覽</h2>
+      <p>根據本站賽道、天氣與車手數據，AI 給出的預測參考</p>
     </div>
-    <div id="current-race" class="loading">
-      <div class="spinner"></div>
-      <p>載入賽事資訊中...</p>
+    <div id="ai-analysis">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>AI 分析載入中...</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- TOP DRIVERS PREVIEW -->
+<!-- DRIVER CARDS -->
 <section class="section">
   <div class="container">
     <div class="section-header">
       <h2>本季車手卡牌</h2>
       <p>數值來自真實賽事數據，每站更新</p>
     </div>
-    <div id="drivers-grid" class="card-grid loading">
-      <div class="spinner"></div>
-      <p>載入車手資料中...</p>
+    <div id="drivers-grid" class="card-grid">
+      <div class="loading" style="grid-column:1/-1">
+        <div class="spinner"></div>
+        <p>載入車手資料中...</p>
+      </div>
     </div>
     <div style="text-align:center;margin-top:32px">
       <a href="/cards" class="btn btn-outline">查看全部卡牌 →</a>
@@ -102,39 +316,56 @@
   </div>
 </section>
 
+<!-- TRACK INFO -->
+<section class="section" style="background: var(--bg-secondary);">
+  <div class="container">
+    <div class="section-header">
+      <h2>賽道資訊</h2>
+      <p>了解本站賽道特性，做出更精準的預測</p>
+    </div>
+    <div id="track-info">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>載入賽道資訊中...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
-<section class="section" id="how-it-works" style="background: var(--bg-secondary);">
+<section class="section" id="how-it-works">
   <div class="container">
     <div class="section-header">
       <h2>怎麼玩？</h2>
+      <p>四步驟，從新手到賽車通</p>
     </div>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h4>收集卡牌</h4>
-        <p>註冊即獲得入門卡組。看越多比賽、預測越準，解鎖越稀有的卡牌。</p>
+        <h4>收集車手卡牌</h4>
+        <p>登入即獲得入門卡組。完成預測解鎖稀有卡牌，每張卡的數值都來自真實比賽數據。</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h4>研究數據</h4>
-        <p>看車手數值、天氣預報、賽道歷史。用數據做判斷，不是靠運氣。</p>
+        <h4>研究 AI 分析</h4>
+        <p>AI 分析賽道特性、車手狀態與天氣預報。看懂分析，用數據做判斷，不是靠運氣。</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h4>預測下注</h4>
-        <p>選擇你認為會贏的車手，用虛擬籌碼下注。新手只要選冠軍就好。</p>
+        <h4>押注冠軍</h4>
+        <p>選擇你認為會贏的車手，用 USDClaw (◆) 虛擬幣下注。新手只要選冠軍就好，簡單直覺。</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <h4>學習成長</h4>
-        <p>賽後看 AI 解析，了解為什麼對或錯。累積經驗，解鎖傳奇卡牌。</p>
+        <h4>賽後學習成長</h4>
+        <p>比賽結束後看 AI 解析，了解為什麼對或錯。累積預測準確度，解鎖更強的傳奇卡牌。</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- RARITY SHOWCASE -->
-<section class="section">
+<section class="section" style="background: var(--bg-secondary);">
   <div class="container">
     <div class="section-header">
       <h2>卡牌稀有度</h2>
@@ -172,53 +403,148 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · 使用 USDClaw 虛擬幣 · 與 ClawStockMarket 帳號互通 · 數據來自 OpenF1</p>
+    <p>PitLane — 賽車預測卡牌平台 · 使用 USDClaw (◆) 虛擬幣 · 與 ClawStockMarket 帳號互通 · 數據來自 OpenF1</p>
   </div>
 </footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
-// Load current race
+// ─── ACTION BAR & CURRENT RACE ───
 async function loadCurrentRace() {
-  const el = document.getElementById('current-race');
   try {
     const data = await api('/api/races/current');
-    if (data.season_over) {
-      el.innerHTML = '<p style="color:var(--text-secondary)">本季賽事已結束，敬請期待下一季！</p>';
-      return;
-    }
+    if (data.season_over) return;
+
+    const bar = document.getElementById('action-bar');
+    const raceInfo = document.getElementById('action-race-info');
+
     const date = new Date(data.date);
+    const now = new Date();
+    const diffMs = date - now;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
     const dateStr = date.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' });
-    el.innerHTML = `
-      <div class="race-banner">
-        <div class="race-info">
-          <h3>${data.race_name || 'Next Race'}</h3>
-          <div class="race-meta">
-            <span>📍 ${data.circuit || data.country || ''}</span>
-            <span>🏴 ${data.country || ''}</span>
-            <span>📅 ${dateStr}</span>
-          </div>
-        </div>
-        <a href="/race" class="btn btn-gold">查看詳情 & 預測</a>
+
+    let countdownText = '';
+    if (diffDays > 0) {
+      countdownText = `還有 ${diffDays} 天`;
+    } else if (diffDays === 0) {
+      countdownText = '今天開賽！';
+    } else {
+      countdownText = '賽事進行中';
+    }
+
+    raceInfo.innerHTML = `
+      <div class="action-bar-race-flag">🏎</div>
+      <div>
+        <div class="action-bar-race-name">${data.race_name || data.circuit || '下一站賽事'}</div>
+        <div class="action-bar-race-meta">📅 ${dateStr}${data.country ? ' &nbsp;·&nbsp; ' + data.country : ''}</div>
       </div>
+      <div class="action-bar-countdown">${countdownText}</div>
     `;
+
+    bar.style.display = '';
+
+    // also load track info while we have current race
+    if (data.circuit) loadTrackInfo(data.circuit);
+    // load AI analysis
+    if (data.race_id) loadAIAnalysis(data.race_id);
+
   } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary)">暫時無法載入賽事資訊</p>';
+    // hide action bar if no race
   }
 }
 
-// Load top drivers
+// ─── AI ANALYSIS ───
+async function loadAIAnalysis(raceId) {
+  const el = document.getElementById('ai-analysis');
+  try {
+    const data = await api(`/api/races/${raceId}/analysis`);
+    const topPicks = data.top_picks || [];
+    const darkHorse = data.dark_horse || [];
+
+    if (!topPicks.length && !darkHorse.length) {
+      el.innerHTML = '<p style="color:var(--text-secondary);text-align:center">本站 AI 分析尚未生成</p>';
+      return;
+    }
+
+    function renderPickList(picks, cardClass) {
+      if (!picks.length) return '<p style="color:var(--text-secondary);font-size:13px">暫無資料</p>';
+      return picks.map((p, i) => `
+        <div class="analysis-pick">
+          <div class="analysis-pick-num">${i + 1}</div>
+          <div class="analysis-pick-info">
+            <div class="analysis-pick-name">${p.driver_name || p.name || '車手'}</div>
+            <div class="analysis-pick-reason">${p.reason || p.analysis || ''}</div>
+          </div>
+          ${p.probability != null ? `<div class="analysis-pick-prob">${Math.round(p.probability * 100)}%</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    el.innerHTML = `
+      <div class="analysis-grid">
+        <div class="analysis-card top-picks">
+          <div class="analysis-label">⭐ AI 熱門推薦</div>
+          ${renderPickList(topPicks, 'top-picks')}
+        </div>
+        <div class="analysis-card dark-horse">
+          <div class="analysis-label">🐎 黑馬潛力</div>
+          ${renderPickList(darkHorse, 'dark-horse')}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary);text-align:center">AI 分析暫時無法取得</p>';
+  }
+}
+
+// ─── DRIVER CARDS ───
+function renderStars(rating) {
+  const r = Math.round(Math.min(5, Math.max(0, rating || 0)));
+  return '★'.repeat(r) + '☆'.repeat(5 - r);
+}
+
+function renderSkillsSection(skills) {
+  if (!skills || !skills.length) return '';
+  const passive = skills.find(s => s.type === 'passive' || s.passive);
+  const active = skills.filter(s => s.type !== 'passive' && !s.passive);
+
+  let html = '<div class="driver-card-skills">';
+  html += '<div class="skills-title">技能</div>';
+
+  if (passive) {
+    html += `
+      <div class="skill-item" style="margin-bottom:8px">
+        <span class="skill-passive-badge">被動</span>
+        <span class="skill-name">${passive.name || passive.skill_name || '被動技能'}</span>
+      </div>
+    `;
+  }
+
+  active.forEach(sk => {
+    const rating = sk.level || sk.rating || sk.stars || 3;
+    html += `
+      <div class="skill-item">
+        <span class="skill-name">${sk.name || sk.skill_name || '技能'}</span>
+        <span class="skill-stars">${renderStars(rating)}</span>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  return html;
+}
+
 async function loadDrivers() {
   const el = document.getElementById('drivers-grid');
   try {
     const data = await api('/api/drivers');
-    const drivers = data.drivers?.slice(0, 6) || [];
+    const drivers = (data.drivers || data || []).slice(0, 6);
     if (!drivers.length) {
       el.innerHTML = '<p style="color:var(--text-secondary)">暫無車手資料</p>';
       return;
     }
 
-    // Load cards for top drivers
     const cards = await Promise.all(
       drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
     );
@@ -228,19 +554,44 @@ async function loadDrivers() {
       if (!card) return '';
       const d = drivers[i];
       const s = card.stats || {};
+      const teamColor = card.team_colour || card.team_color || '#d4a843';
+      const headshotUrl = card.headshot_url || d.headshot_url || '';
+      const driverNum = d.number || card.number || '';
+      const rarity = card.rarity || 'silverstone';
+      const overall = s.overall || card.overall || 50;
+      const skills = card.skills || [];
+
       return `
-        <div class="driver-card" onclick="location.href='/cards#${d.driver_id}'">
-          <div class="number">${d.number || ''}</div>
-          <div class="name">${d.name}</div>
-          <div class="team">${card.team || ''} · ${d.nationality || ''}</div>
-          ${renderStatBar('單圈速度', s.qualifying || 50)}
-          ${renderStatBar('輪胎管理', s.tire_management || 50)}
-          ${renderStatBar('雨戰能力', s.wet_weather || 50)}
-          ${renderStatBar('超車能力', s.overtaking || 50)}
-          ${renderStatBar('街道賽', s.street_circuit || 50)}
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-            <span class="rarity-badge rarity-silverstone">Silverstone</span>
-            <span style="color:var(--gold);font-weight:700;font-size:1.2rem">${s.overall || 50}</span>
+        <div class="driver-card-v2">
+          <div class="driver-card-top" style="border-left-color:${teamColor}">
+            <div class="ghost-num">${driverNum}</div>
+            <img src="${headshotUrl}"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+              style="width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0">
+            <div style="display:none;width:60px;height:60px;border-radius:50%;background:var(--bg-secondary);align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--gold);flex-shrink:0">#${driverNum}</div>
+            <div class="driver-card-info">
+              <div class="driver-card-name">${d.name || card.name}</div>
+              <div class="driver-card-team">${card.team || d.team || ''}</div>
+              <div class="driver-card-nation">${d.nationality || card.nationality || ''}</div>
+            </div>
+          </div>
+          <div class="driver-card-stats">
+            ${renderStatBar('單圈速度', s.qualifying || 50)}
+            ${renderStatBar('輪胎管理', s.tire_management || 50)}
+            ${renderStatBar('雨戰能力', s.wet_weather || 50)}
+            ${renderStatBar('超車能力', s.overtaking || 50)}
+            ${renderStatBar('街道賽', s.street_circuit || 50)}
+          </div>
+          ${renderSkillsSection(skills)}
+          <div class="driver-card-footer">
+            <div class="overall-score">
+              <span class="num">${overall}</span>
+              <span class="label">總分</span>
+            </div>
+            <span class="rarity-badge ${rarityClass(rarity)}">${rarityLabel(rarity).split(' ')[0]}</span>
+          </div>
+          <div style="padding:0 16px 16px">
+            <a href="/race?pick=${d.driver_id}" class="btn btn-gold" style="width:100%;justify-content:center">押這個人 →</a>
           </div>
         </div>
       `;
@@ -250,6 +601,69 @@ async function loadDrivers() {
   }
 }
 
+// ─── TRACK INFO ───
+async function loadTrackInfo(circuit) {
+  const el = document.getElementById('track-info');
+  try {
+    const data = await api(`/api/tracks/${circuit}`);
+
+    const diffLevel = Math.min(5, Math.max(1, data.difficulty || 3));
+    const diffPips = Array.from({length: 5}, (_, i) =>
+      `<div class="diff-pip ${i < diffLevel ? 'filled' : ''}"></div>`
+    ).join('');
+
+    const chars = data.characteristics || {};
+    const charKeys = Object.keys(chars).filter(k => typeof chars[k] === 'string' || typeof chars[k] === 'number');
+
+    el.innerHTML = `
+      <div class="track-info-grid">
+        <div class="track-main">
+          <div class="track-icon">🏁</div>
+          <div class="track-name">${data.name || circuit}</div>
+          <div class="track-country">${data.country || ''}</div>
+          ${data.type ? `<div class="track-type-badge">${data.type}</div>` : ''}
+          <div style="margin-top:20px;text-align:left">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:6px">難度</div>
+            <div class="difficulty-bar">${diffPips}</div>
+          </div>
+          ${data.length ? `<div style="margin-top:14px;font-size:13px;color:var(--text-secondary)">全長 ${data.length} km</div>` : ''}
+          ${data.laps ? `<div style="font-size:13px;color:var(--text-secondary)">${data.laps} 圈</div>` : ''}
+        </div>
+        <div class="track-chars">
+          ${charKeys.length ? charKeys.map(k => `
+            <div class="track-char-card">
+              <div class="track-char-label">${k}</div>
+              <div class="track-char-value">${chars[k]}</div>
+            </div>
+          `).join('') : `
+            <div class="track-char-card">
+              <div class="track-char-label">賽道類型</div>
+              <div class="track-char-value">${data.type || '混合型'}</div>
+            </div>
+            <div class="track-char-card">
+              <div class="track-char-label">難度</div>
+              <div class="track-char-value">${diffLevel} / 5</div>
+            </div>
+            ${data.overtaking_opportunities != null ? `
+            <div class="track-char-card">
+              <div class="track-char-label">超車機會</div>
+              <div class="track-char-value">${data.overtaking_opportunities}</div>
+            </div>` : ''}
+            ${data.tire_deg != null ? `
+            <div class="track-char-card">
+              <div class="track-char-label">輪胎磨損</div>
+              <div class="track-char-value">${data.tire_deg}</div>
+            </div>` : ''}
+          `}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary);text-align:center">賽道資訊暫時無法取得</p>';
+  }
+}
+
+// ─── INIT ───
 loadCurrentRace();
 loadDrivers();
 </script>

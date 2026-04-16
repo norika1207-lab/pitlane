@@ -23,6 +23,15 @@ ERGAST_BASE = "https://ergast.com/api/f1"
 BET_MIN = 100
 BET_MAX = 50000
 
+# Fee structure
+FEE_CONFIG = {
+    "system_bet": 0.05,
+    "p2p_maker": 0.01,
+    "p2p_taker": 0.02,
+    "challenge_room": 0.03,
+    "season_bet": 0.04,
+}
+
 # Card rarity tiers
 RARITY = {
     "silverstone": {"name": "銀石 Silverstone", "level": 1, "label": "入門"},

@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PitLane — 對賭競技場</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+/* ─── BATTLE PAGE SPECIFIC ─── */
+.battle-hero {
+  padding: 100px 0 40px;
+  background: linear-gradient(180deg, rgba(212,168,67,0.06) 0%, transparent 70%);
+  text-align: center;
+}
+.battle-hero h1 {
+  font-size: 2.8rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+.battle-hero p { color: var(--text-secondary); font-size: 1rem; }
+
+/* ─── TABS ─── */
+.tab-bar {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+.tab-btn {
+  padding: 14px 32px; background: transparent; border: none;
+  color: var(--text-secondary); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: var(--font);
+  border-bottom: 3px solid transparent; margin-bottom: -1px;
+  transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ─── FORM PANEL ─── */
+.form-panel {
+  background: var(--bg-card); border: 1px solid var(--border-gold);
+  border-radius: var(--radius); padding: 28px; margin-bottom: 28px;
+}
+.form-panel h3 { color: var(--gold); margin-bottom: 20px; font-size: 1.1rem; }
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+}
+.form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { color: var(--text-secondary); font-size: 13px; font-weight: 500; }
+.form-group select,
+.form-group input[type="number"],
+.form-group input[type="text"] {
+  padding: 10px 14px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-size: 14px; font-family: var(--font);
+  transition: border-color 0.2s;
+}
+.form-group select:focus,
+.form-group input:focus { outline: none; border-color: var(--gold); }
+.form-group select option { background: var(--bg-secondary); }
+.form-actions-row {
+  display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px;
+}
+.form-toggle-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0; background: none; border: none;
+  color: var(--gold); font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: var(--font);
+  transition: color 0.2s;
+}
+.form-toggle-btn:hover { color: var(--gold-light); }
+
+/* ─── ORDER LIST ─── */
+.section-title {
+  font-size: 1.1rem; font-weight: 700; margin-bottom: 16px;
+  color: var(--text-primary); display: flex; align-items: center; gap: 10px;
+}
+.section-title .badge {
+  background: rgba(212,168,67,0.15); color: var(--gold);
+  padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+.order-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+.order-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+  transition: all 0.2s;
+}
+.order-card:hover { border-color: var(--border-gold); }
+.order-card .order-creator {
+  font-size: 13px; color: var(--text-secondary); min-width: 90px;
+}
+.order-card .order-prediction {
+  flex: 1; font-weight: 700; font-size: 14px;
+}
+.order-card .order-prediction span { color: var(--gold); }
+.order-card .order-odds {
+  background: rgba(212,168,67,0.1); color: var(--gold);
+  padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 14px;
+  min-width: 60px; text-align: center;
+}
+.order-card .order-amount {
+  color: var(--text-secondary); font-size: 13px; min-width: 100px; text-align: right;
+}
+.order-card .order-actions { min-width: 80px; text-align: right; }
+.order-card.my-order { border-color: rgba(59,130,246,0.3); }
+.order-card.my-order .order-creator { color: var(--blue); }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+}
+.status-open { background: rgba(52,211,153,0.12); color: var(--green); }
+.status-matched { background: rgba(59,130,246,0.12); color: var(--blue); }
+.status-settled { background: rgba(212,168,67,0.12); color: var(--gold); }
+.status-cancelled { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+.empty-state {
+  text-align: center; padding: 48px 0; color: var(--text-secondary); font-size: 14px;
+}
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+
+/* ─── CHALLENGE CARDS ─── */
+.challenge-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; }
+.challenge-row {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+  transition: all 0.2s;
+}
+.challenge-row:hover { border-color: var(--border-gold); }
+.challenge-code {
+  font-family: 'Courier New', monospace; font-weight: 900;
+  color: var(--gold); font-size: 16px; letter-spacing: 0.15em;
+  background: rgba(212,168,67,0.08); padding: 4px 12px; border-radius: 6px;
+  cursor: pointer; min-width: 110px; text-align: center;
+  transition: background 0.2s;
+}
+.challenge-code:hover { background: rgba(212,168,67,0.16); }
+.challenge-info { flex: 1; }
+.challenge-info .ch-race { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+.challenge-info .ch-meta { color: var(--text-secondary); font-size: 12px; }
+
+/* ─── INVITE INPUT ROW ─── */
+.invite-row {
+  display: flex; gap: 10px; align-items: stretch;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+  margin-bottom: 28px;
+}
+.invite-row input {
+  flex: 1; padding: 10px 14px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-size: 15px; font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+.invite-row input:focus { outline: none; border-color: var(--gold); }
+.invite-row input::placeholder { text-transform: none; letter-spacing: normal; font-family: var(--font); color: var(--text-muted); }
+
+/* ─── BATTLE ARENA ─── */
+.battle-arena {
+  background: var(--bg-card); border: 1px solid var(--border-gold);
+  border-radius: var(--radius); padding: 40px 32px;
+  margin-bottom: 28px; overflow: hidden; position: relative;
+  min-height: 240px; display: flex; align-items: center; justify-content: center;
+}
+.battle-arena::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(212,168,67,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.arena-idle {
+  text-align: center; color: var(--text-muted);
+}
+.arena-idle .arena-icon { font-size: 3.5rem; margin-bottom: 12px; opacity: 0.3; }
+.arena-idle p { font-size: 14px; }
+
+.battle-stage {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; width: 100%; position: relative;
+}
+.battle-fighter {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  flex: 1; max-width: 200px;
+}
+.battle-fighter-card {
+  background: var(--bg-secondary); border: 2px solid var(--border);
+  border-radius: var(--radius); padding: 20px; text-align: center;
+  width: 160px;
+  transition: all 0.4s;
+}
+.battle-fighter-card .f-number {
+  font-size: 2.5rem; font-weight: 900; color: var(--gold); opacity: 0.2;
+  margin-bottom: 4px;
+}
+.battle-fighter-card .f-name {
+  font-weight: 700; font-size: 15px; margin-bottom: 2px;
+}
+.battle-fighter-card .f-user {
+  font-size: 11px; color: var(--text-muted);
+}
+.battle-fighter-card.winner {
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(212,168,67,0.35);
+  background: rgba(212,168,67,0.06);
+}
+.battle-fighter-card.loser {
+  opacity: 0.35; filter: grayscale(60%);
+}
+
+/* left card slides in from left */
+.fighter-left .battle-fighter-card {
+  animation: slideInLeft 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+/* right card slides in from right */
+.fighter-right .battle-fighter-card {
+  animation: slideInRight 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-120px); opacity: 0; }
+  to   { transform: translateX(0);      opacity: 1; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(120px);  opacity: 0; }
+  to   { transform: translateX(0);      opacity: 1; }
+}
+
+/* VS center */
+.battle-vs {
+  font-size: 2rem; font-weight: 900; color: var(--gold);
+  letter-spacing: 0.05em; position: relative; padding: 0 24px;
+  flex-shrink: 0;
+  animation: vsPulse 1.4s ease-in-out infinite;
+}
+.battle-vs::before, .battle-vs::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(212,168,67,0.12);
+}
+.battle-vs::before {
+  width: 70px; height: 70px;
+  animation: vsRing 1.4s ease-in-out infinite;
+}
+.battle-vs::after {
+  width: 90px; height: 90px;
+  animation: vsRing 1.4s ease-in-out 0.3s infinite;
+}
+@keyframes vsPulse {
+  0%, 100% { text-shadow: 0 0 12px rgba(212,168,67,0.6); }
+  50%       { text-shadow: 0 0 28px rgba(212,168,67,1), 0 0 50px rgba(212,168,67,0.4); }
+}
+@keyframes vsRing {
+  0%   { opacity: 0.5; transform: translate(-50%,-50%) scale(0.8); }
+  100% { opacity: 0;   transform: translate(-50%,-50%) scale(1.6); }
+}
+
+/* gold sparkle on winner */
+.sparkle-container {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.sparkle {
+  position: absolute; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--gold);
+  animation: sparkleFly 1.2s ease-out forwards;
+}
+@keyframes sparkleFly {
+  0%   { opacity: 1; transform: scale(1) translate(0,0); }
+  100% { opacity: 0; transform: scale(0) var(--tx) var(--ty); }
+}
+.winner-label {
+  font-size: 12px; font-weight: 800; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── CODE SHARE BOX ─── */
+.code-share-box {
+  display: none;
+  background: rgba(212,168,67,0.06); border: 1px solid var(--border-gold);
+  border-radius: var(--radius); padding: 24px; text-align: center;
+  margin-top: 20px;
+}
+.code-share-box.visible { display: block; }
+.code-share-box .big-code {
+  font-family: 'Courier New', monospace; font-size: 2.2rem;
+  font-weight: 900; color: var(--gold); letter-spacing: 0.2em;
+  margin: 12px 0; cursor: pointer;
+}
+.code-share-box p { color: var(--text-secondary); font-size: 13px; margin-bottom: 8px; }
+.code-copied { color: var(--green) !important; font-size: 12px; height: 16px; }
+
+/* ─── NOTIFICATION TOAST ─── */
+.toast {
+  position: fixed; bottom: 32px; right: 32px; z-index: 999;
+  background: var(--bg-card); border: 1px solid var(--border-gold);
+  border-radius: var(--radius-sm); padding: 14px 20px;
+  color: var(--text-primary); font-size: 14px; font-weight: 500;
+  box-shadow: var(--shadow); display: none;
+  animation: toastSlide 0.3s ease;
+}
+.toast.show { display: block; }
+@keyframes toastSlide {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.toast.success { border-color: rgba(52,211,153,0.4); }
+.toast.error   { border-color: rgba(232,54,78,0.4); }
+
+/* ─── RESULT BANNER ─── */
+.result-msg {
+  margin-top: 12px; padding: 14px 18px;
+  border-radius: var(--radius-sm); font-size: 14px;
+}
+.result-msg.ok {
+  background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3);
+  color: var(--green);
+}
+.result-msg.err {
+  background: rgba(232,54,78,0.1); border: 1px solid rgba(232,54,78,0.3);
+  color: var(--red);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr; }
+  .order-card { flex-wrap: wrap; }
+  .battle-stage { flex-direction: column; gap: 16px; }
+  .battle-vs { padding: 8px 0; }
+  .tab-btn { padding: 12px 18px; font-size: 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <div class="nav-links">
+      <a href="/">首頁</a>
+      <a href="/race">賽事</a>
+      <a href="/cards">卡牌</a>
+      <a href="/battle" class="active">對賭</a>
+      <a href="/profile">戰績</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HERO -->
+<div class="battle-hero">
+  <div class="container">
+    <div class="hero-badge">⚔️ 競技對賭 · P2P 市場</div>
+    <h1>對賭競技場</h1>
+    <p>挑戰其他玩家，用預測實力一決高下</p>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<section style="padding-bottom:80px">
+  <div class="container">
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('p2p')">📈 P2P 對賭市場</button>
+      <button class="tab-btn" onclick="switchTab('challenge')">🏁 朋友挑戰</button>
+    </div>
+
+    <!-- ══════════ P2P TAB ══════════ -->
+    <div class="tab-pane active" id="tab-p2p">
+
+      <!-- Open Order Form -->
+      <div style="margin-bottom:20px">
+        <button class="form-toggle-btn" onclick="toggleP2PForm()">
+          <span id="p2p-form-icon">＋</span>
+          <span id="p2p-form-label">開新單</span>
+        </button>
+      </div>
+
+      <div class="form-panel" id="p2p-form" style="display:none">
+        <h3>➕ 開新對賭單</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>選擇賽事</label>
+            <select id="p2p-race">
+              <option value="">載入賽程中...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>預測冠軍</label>
+            <select id="p2p-driver">
+              <option value="">載入車手中...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>你開的賠率（1.1 – 50）</label>
+            <input type="number" id="p2p-odds" value="2.0" min="1.1" max="50" step="0.1" placeholder="例：2.0">
+          </div>
+          <div class="form-group">
+            <label>下注金額（◆ USDClaw）</label>
+            <input type="number" id="p2p-amount" value="500" min="100" placeholder="最少 100">
+          </div>
+        </div>
+        <div id="p2p-create-result"></div>
+        <div class="form-actions-row">
+          <button class="btn btn-outline btn-sm" onclick="toggleP2PForm()">取消</button>
+          <button class="btn btn-gold btn-sm" onclick="createP2POrder()">開單送出</button>
+        </div>
+      </div>
+
+      <!-- Available Orders -->
+      <div class="section-title">
+        市場掛單
+        <span class="badge" id="available-count">0</span>
+      </div>
+      <div class="order-list" id="available-orders">
+        <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+      </div>
+
+      <!-- My Orders -->
+      <div class="section-title" style="margin-top:36px">
+        我的對賭
+        <span class="badge" id="my-orders-count">0</span>
+      </div>
+      <div class="order-list" id="my-orders">
+        <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+      </div>
+
+    </div><!-- /tab-p2p -->
+
+    <!-- ══════════ CHALLENGE TAB ══════════ -->
+    <div class="tab-pane" id="tab-challenge">
+
+      <!-- Create Challenge Form -->
+      <div style="margin-bottom:20px">
+        <button class="form-toggle-btn" onclick="toggleChallengeForm()">
+          <span id="ch-form-icon">＋</span>
+          <span id="ch-form-label">建立挑戰房間</span>
+        </button>
+      </div>
+
+      <div class="form-panel" id="ch-form" style="display:none">
+        <h3>🏁 建立挑戰房間</h3>
+        <div class="form-row three">
+          <div class="form-group">
+            <label>選擇賽事</label>
+            <select id="ch-race">
+              <option value="">載入中...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>你的預測冠軍</label>
+            <select id="ch-driver">
+              <option value="">載入中...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>下注金額（◆ USDClaw）</label>
+            <input type="number" id="ch-amount" value="500" min="100" placeholder="最少 100">
+          </div>
+        </div>
+        <div id="ch-create-result"></div>
+        <div class="form-actions-row">
+          <button class="btn btn-outline btn-sm" onclick="toggleChallengeForm()">取消</button>
+          <button class="btn btn-gold btn-sm" onclick="createChallenge()">產生挑戰碼</button>
+        </div>
+
+        <!-- Generated Code -->
+        <div class="code-share-box" id="code-share-box">
+          <p>挑戰房間已建立！分享邀請碼給朋友：</p>
+          <div class="big-code" id="generated-code" onclick="copyCode()" title="點擊複製">——————</div>
+          <div class="code-copied" id="code-copied-msg"></div>
+          <p style="margin-top:8px">朋友輸入邀請碼接受挑戰後，對賭即刻開始</p>
+        </div>
+      </div>
+
+      <!-- Join by Invite Code -->
+      <div class="section-title">輸入邀請碼加入</div>
+      <div class="invite-row">
+        <input type="text" id="invite-code-input" maxlength="8"
+               placeholder="輸入 8 位邀請碼..."
+               oninput="this.value=this.value.toUpperCase()"
+               onkeydown="if(event.key==='Enter') joinChallenge()">
+        <button class="btn btn-gold" onclick="joinChallenge()">接受挑戰</button>
+      </div>
+      <div id="join-result"></div>
+
+      <!-- Battle Arena -->
+      <div class="section-title" style="margin-top:32px">⚔️ 對戰舞台</div>
+      <div class="battle-arena" id="battle-arena">
+        <div class="sparkle-container" id="sparkle-container"></div>
+        <div class="arena-idle" id="arena-idle">
+          <div class="arena-icon">⚔️</div>
+          <p>建立或接受挑戰後，對戰卡牌將在此飛入</p>
+        </div>
+        <div class="battle-stage" id="battle-stage" style="display:none">
+          <div class="battle-fighter fighter-left" id="fighter-left">
+            <div class="battle-fighter-card" id="left-card">
+              <div class="f-number" id="left-num">#00</div>
+              <div class="f-name" id="left-name">—</div>
+              <div class="f-user" id="left-user">玩家</div>
+            </div>
+            <div id="left-label"></div>
+          </div>
+          <div class="battle-vs" id="battle-vs">VS</div>
+          <div class="battle-fighter fighter-right" id="fighter-right">
+            <div class="battle-fighter-card" id="right-card">
+              <div class="f-number" id="right-num">#00</div>
+              <div class="f-name" id="right-name">—</div>
+              <div class="f-user" id="right-user">對手</div>
+            </div>
+            <div id="right-label"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Challenges -->
+      <div class="section-title" style="margin-top:36px">
+        我的挑戰
+        <span class="badge" id="my-challenges-count">0</span>
+      </div>
+      <div class="challenge-list" id="my-challenges">
+        <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+      </div>
+
+    </div><!-- /tab-challenge -->
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 數據來自 OpenF1 &amp; Ergast</p>
+  </div>
+</footer>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   battle.js — P2P + Challenge logic
+   ═══════════════════════════════════════════ */
+
+let races = [];
+let drivers = [];
+let p2pFormOpen = false;
+let chFormOpen  = false;
+
+// ─── TABS ───
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && name === 'p2p') || (i === 1 && name === 'challenge'));
+  });
+  document.getElementById('tab-p2p').classList.toggle('active', name === 'p2p');
+  document.getElementById('tab-challenge').classList.toggle('active', name === 'challenge');
+}
+
+// ─── FORM TOGGLES ───
+function toggleP2PForm() {
+  p2pFormOpen = !p2pFormOpen;
+  document.getElementById('p2p-form').style.display = p2pFormOpen ? 'block' : 'none';
+  document.getElementById('p2p-form-icon').textContent  = p2pFormOpen ? '✕' : '＋';
+  document.getElementById('p2p-form-label').textContent = p2pFormOpen ? '收起' : '開新單';
+  if (p2pFormOpen) document.getElementById('p2p-create-result').innerHTML = '';
+}
+
+function toggleChallengeForm() {
+  chFormOpen = !chFormOpen;
+  document.getElementById('ch-form').style.display = chFormOpen ? 'block' : 'none';
+  document.getElementById('ch-form-icon').textContent  = chFormOpen ? '✕' : '＋';
+  document.getElementById('ch-form-label').textContent = chFormOpen ? '收起' : '建立挑戰房間';
+  if (chFormOpen) {
+    document.getElementById('ch-create-result').innerHTML = '';
+    document.getElementById('code-share-box').classList.remove('visible');
+  }
+}
+
+// ─── LOAD RACES & DRIVERS ───
+async function loadFormData() {
+  try {
+    const data = await api('/api/races/schedule');
+    races = (data.races || []).filter(r => r.date >= new Date().toISOString().slice(0, 10));
+    const opts = races.length
+      ? races.map(r => `<option value="${r.race_id || r.round}">${r.race_name} (R${r.round})</option>`).join('')
+      : '<option value="">暫無賽程</option>';
+    document.querySelectorAll('#p2p-race, #ch-race').forEach(el => { el.innerHTML = opts; });
+  } catch (e) {
+    document.querySelectorAll('#p2p-race, #ch-race').forEach(el => {
+      el.innerHTML = '<option value="">無法載入賽程</option>';
+    });
+  }
+
+  try {
+    const data = await api('/api/drivers');
+    drivers = data.drivers || [];
+    const opts = drivers.slice(0, 20).map(d =>
+      `<option value="${d.driver_id}">${d.name}</option>`
+    ).join('');
+    document.querySelectorAll('#p2p-driver, #ch-driver').forEach(el => { el.innerHTML = opts; });
+  } catch (e) {
+    document.querySelectorAll('#p2p-driver, #ch-driver').forEach(el => {
+      el.innerHTML = '<option value="">無法載入車手</option>';
+    });
+  }
+}
+
+// ─── P2P: AVAILABLE ORDERS ───
+async function loadAvailableOrders() {
+  const el = document.getElementById('available-orders');
+  try {
+    const data = await api('/api/p2p/available');
+    const orders = data.orders || data || [];
+    document.getElementById('available-count').textContent = orders.length;
+    if (!orders.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>目前市場無掛單，率先開單吧！</p></div>`;
+      return;
+    }
+    el.innerHTML = orders.map(o => orderCardHTML(o, 'available')).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><p>無法載入市場掛單</p></div>`;
+  }
+}
+
+// ─── P2P: MY ORDERS ───
+async function loadMyOrders() {
+  const el = document.getElementById('my-orders');
+  if (!user) {
+    el.innerHTML = `<div class="empty-state"><p>請先登入查看你的對賭單</p></div>`;
+    return;
+  }
+  try {
+    const data = await api('/api/p2p/my');
+    const orders = data.orders || data || [];
+    document.getElementById('my-orders-count').textContent = orders.length;
+    if (!orders.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>你還沒有對賭單，開新單試試！</p></div>`;
+      return;
+    }
+    el.innerHTML = orders.map(o => orderCardHTML(o, 'my')).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><p>無法載入你的對賭單</p></div>`;
+  }
+}
+
+function orderCardHTML(o, type) {
+  const statusMap = {
+    open:      { cls: 'status-open',      label: '開單中' },
+    matched:   { cls: 'status-matched',   label: '已匹配' },
+    settled:   { cls: 'status-settled',   label: '已結算' },
+    cancelled: { cls: 'status-cancelled', label: '已取消' },
+  };
+  const s = statusMap[o.status] || statusMap.open;
+  const isOwn = type === 'my';
+  const canAccept = type === 'available' && o.status === 'open';
+  return `
+    <div class="order-card ${isOwn ? 'my-order' : ''}">
+      <div class="order-creator">${isOwn ? '我' : (o.creator_username || o.creator || '匿名')}</div>
+      <div class="order-prediction">預測 <span>${o.prediction_name || o.prediction || '—'}</span> 奪冠<br>
+        <small style="color:var(--text-muted);font-size:11px">${o.race_name || ''}</small>
+      </div>
+      <div class="order-odds">x${Number(o.odds || 1).toFixed(2)}</div>
+      <div class="order-amount">
+        ◆ ${formatNum(o.amount)}<br>
+        <small style="font-size:11px;color:var(--text-muted)">接單需 ◆${formatNum(Math.floor((o.amount || 0) / (o.odds || 1)))}</small>
+      </div>
+      <div class="order-actions">
+        ${canAccept
+          ? `<button class="btn btn-gold btn-sm" onclick="acceptOrder('${o.order_id || o.id}')">接單</button>`
+          : `<span class="status-badge ${s.cls}">${s.label}</span>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+// ─── P2P: CREATE ORDER ───
+async function createP2POrder() {
+  if (!user) { showModal('login'); return; }
+  const raceVal   = document.getElementById('p2p-race').value;
+  const driverVal = document.getElementById('p2p-driver').value;
+  const oddsVal   = parseFloat(document.getElementById('p2p-odds').value);
+  const amtVal    = parseInt(document.getElementById('p2p-amount').value);
+  const resultEl  = document.getElementById('p2p-create-result');
+
+  if (!raceVal || !driverVal) { resultEl.innerHTML = '<div class="result-msg err">請選擇賽事和車手</div>'; return; }
+  if (!oddsVal || oddsVal < 1.1 || oddsVal > 50) { resultEl.innerHTML = '<div class="result-msg err">賠率需在 1.1 到 50 之間</div>'; return; }
+  if (!amtVal || amtVal < 100) { resultEl.innerHTML = '<div class="result-msg err">最低下注金額 ◆ 100</div>'; return; }
+
+  const raceObj = races.find(r => String(r.race_id || r.round) === String(raceVal));
+  const driverObj = drivers.find(d => String(d.driver_id) === String(driverVal));
+
+  try {
+    const res = await api('/api/p2p/create', {
+      method: 'POST',
+      body: JSON.stringify({
+        race_id: raceVal,
+        race_name: raceObj?.race_name || raceVal,
+        prediction: driverVal,
+        prediction_name: driverObj?.name || driverVal,
+        odds: oddsVal,
+        amount: amtVal,
+      }),
+    });
+    resultEl.innerHTML = `<div class="result-msg ok">✓ 開單成功！等待其他玩家接單。</div>`;
+    toggleP2PForm();
+    showToast('對賭單已掛出，等待接手！', 'success');
+    loadAvailableOrders();
+    loadMyOrders();
+    refreshBalance();
+  } catch (e) {
+    resultEl.innerHTML = `<div class="result-msg err">${e.message}</div>`;
+  }
+}
+
+// ─── P2P: ACCEPT ORDER ───
+async function acceptOrder(orderId) {
+  if (!user) { showModal('login'); return; }
+  try {
+    await api('/api/p2p/accept', {
+      method: 'POST',
+      body: JSON.stringify({ order_id: orderId }),
+    });
+    showToast('接單成功！對賭已確認。', 'success');
+    loadAvailableOrders();
+    loadMyOrders();
+    refreshBalance();
+  } catch (e) {
+    showToast(e.message, 'error');
+  }
+}
+
+// ─── CHALLENGE: CREATE ───
+async function createChallenge() {
+  if (!user) { showModal('login'); return; }
+  const raceVal   = document.getElementById('ch-race').value;
+  const driverVal = document.getElementById('ch-driver').value;
+  const amtVal    = parseInt(document.getElementById('ch-amount').value);
+  const resultEl  = document.getElementById('ch-create-result');
+
+  if (!raceVal || !driverVal) { resultEl.innerHTML = '<div class="result-msg err">請選擇賽事和車手</div>'; return; }
+  if (!amtVal || amtVal < 100) { resultEl.innerHTML = '<div class="result-msg err">最低下注金額 ◆ 100</div>'; return; }
+
+  const raceObj   = races.find(r => String(r.race_id || r.round) === String(raceVal));
+  const driverObj = drivers.find(d => String(d.driver_id) === String(driverVal));
+
+  try {
+    const res = await api('/api/challenge/create', {
+      method: 'POST',
+      body: JSON.stringify({
+        race_id: raceVal,
+        race_name: raceObj?.race_name || raceVal,
+        prediction: driverVal,
+        prediction_name: driverObj?.name || driverVal,
+        amount: amtVal,
+      }),
+    });
+    const code = res.invite_code || res.code || '????????';
+    document.getElementById('generated-code').textContent = code;
+    document.getElementById('code-share-box').classList.add('visible');
+    resultEl.innerHTML = '';
+    showBattleStage({
+      leftName: driverObj?.name || driverVal,
+      leftNum: driverObj?.number || '??',
+      leftUser: user.username,
+      rightName: '?',
+      rightNum: '?',
+      rightUser: '等待對手',
+      winner: null,
+    });
+    loadMyChallenges();
+    refreshBalance();
+  } catch (e) {
+    resultEl.innerHTML = `<div class="result-msg err">${e.message}</div>`;
+  }
+}
+
+function copyCode() {
+  const code = document.getElementById('generated-code').textContent.trim();
+  navigator.clipboard.writeText(code).then(() => {
+    const msg = document.getElementById('code-copied-msg');
+    msg.textContent = '✓ 已複製！';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+  }).catch(() => {});
+}
+
+// ─── CHALLENGE: JOIN ───
+async function joinChallenge() {
+  if (!user) { showModal('login'); return; }
+  const code = document.getElementById('invite-code-input').value.trim().toUpperCase();
+  const resultEl = document.getElementById('join-result');
+  if (code.length < 4) { resultEl.innerHTML = '<div class="result-msg err" style="margin-top:12px">請輸入有效邀請碼</div>'; return; }
+
+  try {
+    const res = await api('/api/challenge/join', {
+      method: 'POST',
+      body: JSON.stringify({ invite_code: code }),
+    });
+    document.getElementById('invite-code-input').value = '';
+    resultEl.innerHTML = `<div class="result-msg ok" style="margin-top:12px">✓ 已加入挑戰！對戰即將開始。</div>`;
+
+    showBattleStage({
+      leftName:  res.creator_prediction_name || res.creator_prediction || '—',
+      leftNum:   res.creator_driver_number || '??',
+      leftUser:  res.creator_username || '對手',
+      rightName: res.joiner_prediction_name || res.joiner_prediction || '—',
+      rightNum:  res.joiner_driver_number || '??',
+      rightUser: user.username,
+      winner: null,
+    });
+    loadMyChallenges();
+    refreshBalance();
+    showToast('成功加入挑戰！', 'success');
+  } catch (e) {
+    resultEl.innerHTML = `<div class="result-msg err" style="margin-top:12px">${e.message}</div>`;
+  }
+}
+
+// ─── CHALLENGE: MY LIST ───
+async function loadMyChallenges() {
+  const el = document.getElementById('my-challenges');
+  if (!user) {
+    el.innerHTML = `<div class="empty-state"><p>請先登入查看你的挑戰</p></div>`;
+    return;
+  }
+  try {
+    const data = await api('/api/challenge/my/list');
+    const challenges = data.challenges || data || [];
+    document.getElementById('my-challenges-count').textContent = challenges.length;
+    if (!challenges.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏁</div><p>你還沒有挑戰記錄，建立或加入一個吧！</p></div>`;
+      return;
+    }
+    el.innerHTML = challenges.map(c => challengeRowHTML(c)).join('');
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><p>無法載入挑戰記錄</p></div>`;
+  }
+}
+
+function challengeRowHTML(c) {
+  const statusMap = {
+    waiting:  { cls: 'status-open',    label: '等待加入' },
+    active:   { cls: 'status-matched', label: '進行中' },
+    settled:  { cls: 'status-settled', label: '已結算' },
+    expired:  { cls: 'status-cancelled', label: '已過期' },
+  };
+  const s = statusMap[c.status] || statusMap.waiting;
+  const isCreator = c.creator_username === (user?.username);
+  const myPrediction = isCreator
+    ? (c.creator_prediction_name || c.creator_prediction)
+    : (c.joiner_prediction_name  || c.joiner_prediction);
+  const vsUser = isCreator
+    ? (c.joiner_username || '等待對手')
+    : (c.creator_username || '對手');
+
+  return `
+    <div class="challenge-row">
+      <div class="challenge-code" onclick="copyChallengeCode('${c.invite_code}')"
+           title="點擊複製邀請碼">${c.invite_code || '——'}</div>
+      <div class="challenge-info">
+        <div class="ch-race">${c.race_name || '未知賽事'}</div>
+        <div class="ch-meta">
+          我押 <strong style="color:var(--gold)">${myPrediction || '—'}</strong>
+          · vs ${vsUser}
+          · ◆ ${formatNum(c.amount)}
+        </div>
+      </div>
+      <span class="status-badge ${s.cls}">${s.label}</span>
+      ${c.status === 'active' || c.status === 'settled'
+        ? `<button class="btn btn-outline btn-sm" onclick="viewBattle('${c.challenge_id || c.id}')">查看對戰</button>`
+        : (c.status === 'waiting' && !c.joiner_username
+            ? `<button class="btn btn-outline btn-sm" onclick="copyChallengeCode('${c.invite_code}')">複製邀請碼</button>`
+            : '')
+      }
+    </div>
+  `;
+}
+
+function copyChallengeCode(code) {
+  if (!code || code === '——') return;
+  navigator.clipboard.writeText(code).then(() => showToast(`邀請碼 ${code} 已複製`, 'success')).catch(() => {});
+}
+
+// ─── VIEW BATTLE ───
+async function viewBattle(challengeId) {
+  try {
+    const c = await api(`/api/challenge/${challengeId}`);
+    showBattleStage({
+      leftName:  c.creator_prediction_name || c.creator_prediction || '—',
+      leftNum:   c.creator_driver_number || '??',
+      leftUser:  c.creator_username || '玩家 1',
+      rightName: c.joiner_prediction_name  || c.joiner_prediction  || '—',
+      rightNum:  c.joiner_driver_number || '??',
+      rightUser: c.joiner_username  || '玩家 2',
+      winner:    c.winner_username || null,
+    });
+    // Switch to challenge tab and scroll to arena
+    switchTab('challenge');
+    document.getElementById('battle-arena').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) {
+    showToast('無法載入對戰資訊', 'error');
+  }
+}
+
+// ─── BATTLE STAGE ANIMATION ───
+function showBattleStage({ leftName, leftNum, leftUser, rightName, rightNum, rightUser, winner }) {
+  document.getElementById('arena-idle').style.display = 'none';
+  const stage = document.getElementById('battle-stage');
+  stage.style.display = 'flex';
+
+  // Reset animation by re-cloning
+  const leftCard  = document.getElementById('left-card');
+  const rightCard = document.getElementById('right-card');
+
+  document.getElementById('left-name').textContent  = leftName;
+  document.getElementById('left-num').textContent   = `#${leftNum}`;
+  document.getElementById('left-user').textContent  = leftUser;
+  document.getElementById('right-name').textContent = rightName === '?' ? '???' : rightName;
+  document.getElementById('right-num').textContent  = rightNum === '?' ? '#??' : `#${rightNum}`;
+  document.getElementById('right-user').textContent = rightUser;
+
+  // Re-trigger animation
+  leftCard.style.animation  = 'none';
+  rightCard.style.animation = 'none';
+  leftCard.offsetHeight; // reflow
+  rightCard.offsetHeight;
+  leftCard.style.animation  = '';
+  rightCard.style.animation = '';
+
+  // Clear old winner styles
+  leftCard.classList.remove('winner', 'loser');
+  rightCard.classList.remove('winner', 'loser');
+  document.getElementById('left-label').innerHTML  = '';
+  document.getElementById('right-label').innerHTML = '';
+
+  if (winner) {
+    setTimeout(() => revealWinner(winner, leftUser, rightUser), 900);
+  }
+}
+
+function revealWinner(winnerUsername, leftUser, rightUser) {
+  const leftCard  = document.getElementById('left-card');
+  const rightCard = document.getElementById('right-card');
+  const leftLabel  = document.getElementById('left-label');
+  const rightLabel = document.getElementById('right-label');
+
+  if (winnerUsername === leftUser) {
+    leftCard.classList.add('winner');
+    rightCard.classList.add('loser');
+    leftLabel.innerHTML  = '<span class="winner-label">🏆 勝利</span>';
+    rightLabel.innerHTML = '<span style="color:var(--text-muted);font-size:12px">落敗</span>';
+    spawnSparkles('left-card');
+  } else if (winnerUsername === rightUser) {
+    rightCard.classList.add('winner');
+    leftCard.classList.add('loser');
+    rightLabel.innerHTML = '<span class="winner-label">🏆 勝利</span>';
+    leftLabel.innerHTML  = '<span style="color:var(--text-muted);font-size:12px">落敗</span>';
+    spawnSparkles('right-card');
+  }
+}
+
+function spawnSparkles(cardId) {
+  const container = document.getElementById('sparkle-container');
+  const card = document.getElementById(cardId);
+  const arena = document.getElementById('battle-arena');
+  const arenaRect = arena.getBoundingClientRect();
+  const cardRect  = card.getBoundingClientRect();
+
+  const cx = cardRect.left - arenaRect.left + cardRect.width / 2;
+  const cy = cardRect.top  - arenaRect.top  + cardRect.height / 2;
+
+  for (let i = 0; i < 22; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'sparkle';
+    const angle = (i / 22) * 2 * Math.PI + (Math.random() * 0.5);
+    const dist  = 60 + Math.random() * 80;
+    const tx = Math.cos(angle) * dist;
+    const ty = Math.sin(angle) * dist;
+    sp.style.cssText = `
+      left:${cx - 3}px; top:${cy - 3}px;
+      --tx:translateX(${tx}px); --ty:translateY(${ty}px);
+      width:${4 + Math.random() * 5}px; height:${4 + Math.random() * 5}px;
+      animation-delay:${Math.random() * 0.3}s;
+      animation-duration:${0.9 + Math.random() * 0.5}s;
+      background: ${Math.random() > 0.5 ? 'var(--gold)' : 'var(--gold-light)'};
+    `;
+    container.appendChild(sp);
+  }
+  // Clean up after animation
+  setTimeout(() => { container.innerHTML = ''; }, 2000);
+}
+
+// ─── TOAST ───
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show${type ? ' ' + type : ''}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3200);
+}
+
+// ─── INIT ───
+async function initPage() {
+  loadFormData();
+  loadAvailableOrders();
+  loadMyOrders();
+  loadMyChallenges();
+}
+
+document.addEventListener('DOMContentLoaded', initPage);
+</script>
+</body>
+</html>

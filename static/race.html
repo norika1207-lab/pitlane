@@ -4,11 +4,440 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PitLane — 賽事預測</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+/* ── PAGE LAYOUT ── */
+.page-body { padding-top: 88px; }
+
+/* ── RACE BANNER V2 ── */
+.race-banner-v2 {
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(212,168,67,0.05) 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.race-banner-v2::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-dark), transparent);
+}
+.race-banner-v2 .banner-top {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
+  flex-wrap: wrap;
+}
+.race-banner-v2 .race-title {
+  font-size: 2rem; font-weight: 900; margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text-primary) 60%, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.race-banner-v2 .race-meta {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  color: var(--text-secondary); font-size: 14px; margin-top: 12px;
+}
+.race-banner-v2 .race-meta span {
+  display: flex; align-items: center; gap: 6px;
+}
+.circuit-type-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 20px;
+  background: rgba(212,168,67,0.12); border: 1px solid var(--border-gold);
+  color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.round-badge {
+  font-size: 2.5rem; font-weight: 900; color: var(--gold);
+  opacity: 0.15; position: absolute; right: 32px; bottom: 20px;
+  line-height: 1;
+}
+
+/* ── INFO GRID ── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .info-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .info-grid { grid-template-columns: 1fr; }
+}
+.info-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+}
+.info-card-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.info-card-title span { color: var(--gold); font-size: 14px; }
+
+/* ── STARS ── */
+.star-row { display: flex; gap: 4px; }
+.star { font-size: 16px; opacity: 0.25; }
+.star.lit { opacity: 1; }
+
+/* ── WEATHER ── */
+.weather-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+}
+.weather-item {
+  text-align: center; padding: 12px 8px;
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+}
+.weather-item .wval {
+  font-size: 1.3rem; font-weight: 700; color: var(--text-primary); display: block;
+}
+.weather-item .wlbl {
+  font-size: 11px; color: var(--text-muted); margin-top: 2px; display: block;
+}
+.rain-yes { color: var(--blue) !important; }
+.rain-no { color: var(--green) !important; }
+
+/* ── AI ANALYSIS ── */
+.ai-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; margin-bottom: 24px;
+}
+.ai-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.ai-title {
+  font-size: 1.1rem; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.ai-source-note {
+  font-size: 11px; color: var(--text-muted);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 4px; padding: 3px 8px;
+}
+.top-picks-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px; margin-bottom: 20px;
+}
+.top-pick-item {
+  background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 12px;
+  border: 1px solid var(--border);
+}
+.top-pick-driver {
+  font-weight: 700; font-size: 14px; margin-bottom: 6px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.confidence-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.confidence-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.dark-horse-card {
+  background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25);
+  border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.ai-factors { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .ai-factors { grid-template-columns: 1fr; } }
+.ai-factor-item {
+  background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 12px 14px;
+  font-size: 13px;
+}
+.ai-factor-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-muted); margin-bottom: 4px;
+}
+.risk-warning {
+  background: rgba(232,54,78,0.08); border: 1px solid rgba(232,54,78,0.25);
+  border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 12px;
+  font-size: 13px; color: var(--red);
+  display: flex; align-items: flex-start; gap: 8px;
+}
+
+/* ── ODDS TABLE ── */
+.odds-table-wrap {
+  overflow-x: auto; margin-top: 4px;
+}
+.odds-table {
+  width: 100%; border-collapse: collapse;
+}
+.odds-table th {
+  text-align: left; padding: 10px 12px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.odds-table td {
+  padding: 11px 12px; font-size: 14px; border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.odds-table tr:last-child td { border-bottom: none; }
+.odds-table tr:hover td { background: rgba(255,255,255,0.02); }
+.odds-driver-tier-fav { color: var(--red); font-weight: 700; }
+.odds-driver-tier-mid { color: var(--blue); font-weight: 600; }
+.odds-driver-tier-long { color: var(--gold); font-weight: 600; }
+.prob-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.prob-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; min-width: 60px; }
+.prob-bar-fill { height: 100%; border-radius: 3px; }
+.prob-bar-fill.tier-fav { background: linear-gradient(90deg, var(--red), #f87171); }
+.prob-bar-fill.tier-mid { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+.prob-bar-fill.tier-long { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.odds-value { color: var(--gold); font-weight: 700; }
+
+/* ── BET PANEL ── */
+.bet-section {
+  background: var(--bg-secondary); padding: 32px 0;
+  margin-bottom: 0;
+}
+.bet-tabs {
+  display: flex; gap: 4px; background: var(--bg-primary);
+  border-radius: var(--radius-sm); padding: 4px; margin-bottom: 24px;
+}
+.bet-tab {
+  flex: 1; padding: 10px 12px; border-radius: 6px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: center; border: none; background: transparent;
+  color: var(--text-secondary); font-family: var(--font);
+  transition: all 0.2s;
+}
+.bet-tab:hover { color: var(--text-primary); }
+.bet-tab.active {
+  background: var(--bg-card); color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.bet-tab .tab-badge {
+  display: inline-block; margin-left: 6px;
+}
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* driver grid for beginner */
+.driver-pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px; margin-bottom: 20px;
+}
+.driver-pick-card {
+  background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 12px;
+  cursor: pointer; transition: all 0.2s; text-align: center;
+  position: relative;
+}
+.driver-pick-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.driver-pick-card.selected {
+  border-color: var(--gold); background: rgba(212,168,67,0.08);
+  box-shadow: 0 0 16px rgba(212,168,67,0.12);
+}
+.driver-pick-card .pick-number {
+  font-size: 1.5rem; font-weight: 900; color: var(--gold); opacity: 0.2;
+  position: absolute; top: 6px; right: 10px; line-height: 1;
+}
+.driver-pick-card .pick-name { font-weight: 700; font-size: 13px; margin-bottom: 2px; }
+.driver-pick-card .pick-team { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+.driver-pick-card .pick-odds { color: var(--gold); font-weight: 700; font-size: 15px; }
+.selected-check {
+  position: absolute; top: 6px; left: 8px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--gold); color: #000;
+  font-size: 11px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+}
+.driver-pick-card.selected .selected-check { opacity: 1; }
+
+/* intermediate tab */
+.mid-section { margin-bottom: 20px; }
+.mid-section-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mid-section-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.podium-slots {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin-bottom: 8px;
+}
+.podium-slot {
+  background: var(--bg-primary); border: 1px dashed var(--border);
+  border-radius: var(--radius-sm); padding: 12px;
+  text-align: center; min-height: 70px;
+  cursor: pointer; transition: all 0.2s;
+}
+.podium-slot:hover { border-color: var(--gold); }
+.podium-slot.filled {
+  border-color: var(--gold); border-style: solid;
+  background: rgba(212,168,67,0.06);
+}
+.podium-slot .slot-pos {
+  font-size: 11px; color: var(--text-muted); font-weight: 700;
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.podium-slot .slot-name { font-size: 13px; font-weight: 700; color: var(--gold); }
+.podium-slot .slot-empty { font-size: 12px; color: var(--text-muted); }
+
+.driver-mini-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 6px;
+  margin-bottom: 16px;
+}
+.driver-mini-btn {
+  padding: 7px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  background: var(--bg-primary); border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer; text-align: center;
+  font-family: var(--font); transition: all 0.15s;
+}
+.driver-mini-btn:hover { border-color: var(--gold); color: var(--text-primary); }
+.driver-mini-btn.selected-p { background: rgba(212,168,67,0.1); border-color: var(--gold); color: var(--gold); }
+
+.fastest-select {
+  width: 100%; padding: 10px 12px; background: var(--bg-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-family: var(--font); font-size: 14px;
+  cursor: pointer;
+}
+.fastest-select:focus { outline: none; border-color: var(--gold); }
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); margin-bottom: 8px;
+}
+.toggle-label { font-size: 14px; font-weight: 500; }
+.toggle-switch {
+  display: flex; gap: 6px;
+}
+.toggle-btn {
+  padding: 5px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: transparent;
+  color: var(--text-muted); font-family: var(--font); transition: all 0.2s;
+}
+.toggle-btn.active-yes { background: rgba(52,211,153,0.15); border-color: var(--green); color: var(--green); }
+.toggle-btn.active-no { background: rgba(232,54,78,0.12); border-color: var(--red); color: var(--red); }
+
+.h2h-grid {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px;
+  align-items: center;
+}
+.h2h-driver-select {
+  width: 100%; padding: 10px 12px; background: var(--bg-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-family: var(--font); font-size: 13px;
+  cursor: pointer;
+}
+.h2h-driver-select:focus { outline: none; border-color: var(--gold); }
+.h2h-vs {
+  font-size: 11px; font-weight: 700; color: var(--text-muted); text-align: center;
+}
+
+/* advanced tab */
+.adv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) { .adv-grid { grid-template-columns: 1fr; } }
+.adv-field label {
+  display: block; font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 6px;
+}
+.adv-select, .adv-number {
+  width: 100%; padding: 10px 12px; background: var(--bg-primary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-family: var(--font); font-size: 14px;
+  cursor: pointer;
+}
+.adv-select:focus, .adv-number:focus { outline: none; border-color: var(--gold); }
+
+/* amount + summary */
+.amount-section {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+}
+.amount-header {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 12px;
+}
+.amount-input-row {
+  display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
+}
+.amount-input-row input {
+  flex: 1; padding: 10px 14px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-primary); font-size: 16px; font-family: var(--font); font-weight: 700;
+}
+.amount-input-row input:focus { outline: none; border-color: var(--gold); }
+.amount-quick { display: flex; gap: 6px; flex-wrap: wrap; }
+.amount-quick button {
+  padding: 6px 13px; border-radius: var(--radius-sm);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer; font-size: 13px; font-weight: 600;
+  transition: all 0.2s; font-family: var(--font);
+}
+.amount-quick button:hover { border-color: var(--gold); color: var(--gold); }
+
+.bet-summary-box {
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+  padding: 14px 16px; margin-top: 14px; font-size: 13px;
+  border: 1px solid rgba(212,168,67,0.15);
+}
+.bet-summary-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 0;
+}
+.bet-summary-row:not(:last-child) { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 4px; }
+.bet-summary-row .slabel { color: var(--text-muted); }
+.bet-summary-row .sval { font-weight: 600; }
+.bet-summary-row.swin .sval { color: var(--green); font-size: 15px; font-weight: 700; }
+.bet-summary-row.sfee .sval { color: var(--text-secondary); }
+
+/* schedule */
+.schedule-section { background: var(--bg-secondary); padding: 48px 0; }
+.schedule-grid { display: grid; gap: 8px; }
+.schedule-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-radius: 8px;
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.schedule-row:hover { border-color: rgba(255,255,255,0.1); }
+.schedule-row.is-next {
+  background: rgba(212,168,67,0.06);
+  border-color: var(--border-gold);
+}
+.schedule-row.is-past { opacity: 0.45; }
+.schedule-round { color: var(--text-muted); font-weight: 700; font-size: 13px; width: 32px; }
+.schedule-name { flex: 1; font-weight: 600; font-size: 14px; }
+.schedule-country { color: var(--text-secondary); font-size: 13px; min-width: 80px; }
+.schedule-date { color: var(--text-muted); font-size: 13px; width: 96px; text-align: right; }
+
+/* result message */
+.bet-result-msg {
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  font-size: 14px; margin-top: 12px;
+}
+.bet-result-msg.success {
+  background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3);
+}
+.bet-result-msg.error {
+  background: rgba(232,54,78,0.08); border: 1px solid rgba(232,54,78,0.3);
+  color: var(--red);
+}
+
+/* section title strip */
+.section-strip {
+  padding: 40px 0 0;
+}
+.section-strip + .info-grid { margin-top: 20px; }
+.strip-title {
+  font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.strip-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+</style>
 </head>
 <body>
 
+<!-- ─── NAV ─── -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
@@ -16,247 +445,973 @@
       <a href="/">首頁</a>
       <a href="/race" class="active">賽事</a>
       <a href="/cards">卡牌</a>
-      <a href="/profile">戰績</a>
+      <a href="/battle">對戰</a>
+      <a href="/leaderboard">排行榜</a>
+      <a href="/profile">個人</a>
     </div>
     <div id="nav-auth" class="nav-auth"></div>
   </div>
 </nav>
 
+<!-- ─── AUTH MODAL ─── -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="auth-modal"></div>
 </div>
 
-<section style="padding-top:100px;padding-bottom:40px">
-  <div class="container">
-    <div id="race-info" class="loading">
-      <div class="spinner"></div>
-      <p>載入賽事資訊中...</p>
-    </div>
-  </div>
-</section>
+<div class="page-body">
 
-<section class="section" style="padding-top:0">
-  <div class="container">
-    <div id="bet-section"></div>
-  </div>
-</section>
-
-<section class="section" style="background:var(--bg-secondary)">
-  <div class="container">
-    <div class="section-header">
-      <h2>賽季賽程表</h2>
+  <!-- ─── RACE BANNER ─── -->
+  <section style="padding: 24px 0 0;">
+    <div class="container">
+      <div id="race-banner" class="loading">
+        <div class="spinner"></div>
+        <p>載入賽事資訊...</p>
+      </div>
     </div>
-    <div id="schedule" class="loading">
-      <div class="spinner"></div>
-    </div>
-  </div>
-</section>
+  </section>
 
+  <!-- ─── TRACK + WEATHER + AI ─── -->
+  <section style="padding: 0 0 8px;">
+    <div class="container">
+      <div class="info-grid" id="info-grid" style="display:none">
+        <!-- Track Card -->
+        <div class="info-card" id="track-card">
+          <div class="info-card-title"><span>🏁</span> 賽道資訊</div>
+          <div class="loading" style="padding:20px 0"><div class="spinner"></div></div>
+        </div>
+        <!-- Weather Card -->
+        <div class="info-card" id="weather-card">
+          <div class="info-card-title"><span>🌤</span> 天氣狀況</div>
+          <div class="loading" style="padding:20px 0"><div class="spinner"></div></div>
+        </div>
+        <!-- Odds Summary Card -->
+        <div class="info-card" id="odds-summary-card">
+          <div class="info-card-title"><span>📊</span> 賠率速覽</div>
+          <div class="loading" style="padding:20px 0"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- AI Analysis full card -->
+      <div id="ai-analysis-card" style="display:none">
+        <!-- filled by JS -->
+      </div>
+
+      <!-- Odds Table -->
+      <div id="odds-table-section" style="display:none">
+        <div class="strip-title">市場賠率</div>
+        <div class="ai-card" style="padding:0;overflow:hidden">
+          <div class="odds-table-wrap">
+            <table class="odds-table" id="odds-table">
+              <thead>
+                <tr>
+                  <th>車手</th>
+                  <th>車隊</th>
+                  <th>勝率</th>
+                  <th></th>
+                  <th style="text-align:right">賠率</th>
+                </tr>
+              </thead>
+              <tbody id="odds-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── BETTING PANEL ─── -->
+  <section class="bet-section">
+    <div class="container">
+      <div class="strip-title" style="margin-bottom:20px">下注預測</div>
+
+      <!-- Tabs -->
+      <div class="bet-tabs">
+        <button class="bet-tab active" onclick="switchTab('beginner')" id="tab-beginner">
+          新手
+          <span class="tab-badge"><span class="rarity-badge rarity-silverstone">Silverstone</span></span>
+        </button>
+        <button class="bet-tab" onclick="switchTab('intermediate')" id="tab-intermediate">
+          中階
+          <span class="tab-badge"><span class="rarity-badge rarity-monza">Monza</span></span>
+        </button>
+        <button class="bet-tab" onclick="switchTab('advanced')" id="tab-advanced">
+          進階
+          <span class="tab-badge"><span class="rarity-badge rarity-suzuka">Suzuka</span></span>
+        </button>
+      </div>
+
+      <!-- BEGINNER TAB -->
+      <div class="tab-pane active" id="pane-beginner">
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">
+          選擇你認為會奪冠的車手，最簡單的預測方式。
+        </p>
+        <div class="driver-pick-grid" id="beginner-driver-grid">
+          <div class="loading" style="grid-column:1/-1;padding:20px 0">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERMEDIATE TAB -->
+      <div class="tab-pane" id="pane-intermediate">
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">
+          預測頒獎台、最快圈速、安全車出場，以及車手對決。
+        </p>
+
+        <div class="mid-section">
+          <div class="mid-section-title">頒獎台預測（選前3）</div>
+          <div class="podium-slots" id="podium-slots">
+            <div class="podium-slot" id="podium-p1" onclick="openPodiumPicker(1)">
+              <div class="slot-pos">🥇 第1名</div>
+              <div class="slot-empty">點擊選擇</div>
+            </div>
+            <div class="podium-slot" id="podium-p2" onclick="openPodiumPicker(2)">
+              <div class="slot-pos">🥈 第2名</div>
+              <div class="slot-empty">點擊選擇</div>
+            </div>
+            <div class="podium-slot" id="podium-p3" onclick="openPodiumPicker(3)">
+              <div class="slot-pos">🥉 第3名</div>
+              <div class="slot-empty">點擊選擇</div>
+            </div>
+          </div>
+          <div class="driver-mini-grid" id="podium-driver-mini"></div>
+        </div>
+
+        <div class="mid-section">
+          <div class="mid-section-title">最快圈速</div>
+          <select class="fastest-select" id="fastest-lap-select" onchange="updateBetSummary()">
+            <option value="">── 選擇車手 ──</option>
+          </select>
+        </div>
+
+        <div class="mid-section">
+          <div class="mid-section-title">安全車出場</div>
+          <div class="toggle-row">
+            <span class="toggle-label">本站是否出現安全車？</span>
+            <div class="toggle-switch">
+              <button class="toggle-btn" id="sc-yes" onclick="setSafetycar('yes')">是</button>
+              <button class="toggle-btn" id="sc-no" onclick="setSafetycar('no')">否</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mid-section">
+          <div class="mid-section-title">車手對決（H2H）</div>
+          <div class="h2h-grid">
+            <select class="h2h-driver-select" id="h2h-a" onchange="updateBetSummary()">
+              <option value="">── 選擇車手 A ──</option>
+            </select>
+            <div class="h2h-vs">VS</div>
+            <select class="h2h-driver-select" id="h2h-b" onchange="updateBetSummary()">
+              <option value="">── 選擇車手 B ──</option>
+            </select>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:6px">預測誰會獲得更高名次</p>
+        </div>
+      </div>
+
+      <!-- ADVANCED TAB -->
+      <div class="tab-pane" id="pane-advanced">
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">
+          進站策略、退賽預測、圈數預測——給資深 F1 玩家的高難度押注。
+        </p>
+        <div class="adv-grid">
+          <div class="adv-field">
+            <label>首位進站車手</label>
+            <select class="adv-select" id="adv-first-pit" onchange="updateBetSummary()">
+              <option value="">── 選擇車手 ──</option>
+            </select>
+          </div>
+          <div class="adv-field">
+            <label>退賽車手預測</label>
+            <select class="adv-select" id="adv-dnf" onchange="updateBetSummary()">
+              <option value="">── 選擇車手 / 無退賽 ──</option>
+              <option value="none">無退賽</option>
+            </select>
+          </div>
+          <div class="adv-field">
+            <label>最多進站次數（全場）</label>
+            <input type="number" class="adv-number" id="adv-pit-count"
+                   placeholder="例：45" min="10" max="120" onchange="updateBetSummary()">
+          </div>
+          <div class="adv-field">
+            <label>冠軍使用策略</label>
+            <select class="adv-select" id="adv-strategy" onchange="updateBetSummary()">
+              <option value="">── 選擇策略 ──</option>
+              <option value="one_stop">一停</option>
+              <option value="two_stop">兩停</option>
+              <option value="three_stop">三停</option>
+              <option value="undercut">偷停策略</option>
+              <option value="overcut">延遲進站</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- AMOUNT + SUMMARY + BUTTON -->
+      <div style="margin-top:24px">
+        <div class="amount-section">
+          <div class="amount-header">下注金額 (USDClaw ◆)</div>
+          <div class="amount-input-row">
+            <input type="number" id="bet-amount-input" value="500" min="100" max="50000"
+                   oninput="betAmount=parseInt(this.value)||500;updateBetSummary()">
+          </div>
+          <div class="amount-quick">
+            <button onclick="setAmount(100)">100</button>
+            <button onclick="setAmount(500)">500</button>
+            <button onclick="setAmount(1000)">1K</button>
+            <button onclick="setAmount(2000)">2K</button>
+            <button onclick="setAmount(5000)">5K</button>
+          </div>
+
+          <div class="bet-summary-box" id="bet-summary-box">
+            <div class="bet-summary-row">
+              <span class="slabel">預測項目</span>
+              <span class="sval" id="sum-selection" style="color:var(--text-muted)">尚未選擇</span>
+            </div>
+            <div class="bet-summary-row">
+              <span class="slabel">賠率</span>
+              <span class="sval odds-value" id="sum-odds">—</span>
+            </div>
+            <div class="bet-summary-row sfee">
+              <span class="slabel">手續費 (5%)</span>
+              <span class="sval" id="sum-fee">—</span>
+            </div>
+            <div class="bet-summary-row swin">
+              <span class="slabel">潛在獎金</span>
+              <span class="sval" id="sum-win">—</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-gold" id="place-bet-btn" style="width:100%;padding:14px;font-size:15px" onclick="placeBet()" disabled>
+          確認下注
+        </button>
+        <div id="bet-result-area"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SEASON SCHEDULE ─── -->
+  <section class="schedule-section">
+    <div class="container">
+      <div class="strip-title">賽季賽程</div>
+      <div id="schedule-grid" class="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- end page-body -->
+
+<!-- ─── FOOTER ─── -->
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 數據來自 OpenF1 & Ergast</p>
+    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 與 ClawStockMarket 帳號互通 · 數據來自 OpenF1 & Ergast</p>
   </div>
 </footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
-let selectedDriver = null;
+/* ═══════════════════════════════════════════
+   race.html v2 — Main betting page script
+   ═══════════════════════════════════════════ */
+
+// ── State ──
 let betAmount = 500;
+let currentTab = 'beginner';
+let currentRace = null;
 let driversData = [];
+let oddsData = [];
+
+// beginner
+let selectedDriver = null;
+
+// intermediate
+let podiumPicks = { 1: null, 2: null, 3: null };
+let activePodiumSlot = null;
+let fastestLapPick = null;
+let safetyCarPick = null;
+
+// ── URL param auto-select ──
+const urlParams = new URLSearchParams(location.search);
+const autoPickId = (urlParams.get('pick') || '').toLowerCase();
+
+// ── Entry point ──
+document.addEventListener('DOMContentLoaded', () => {
+  loadRacePage();
+});
 
 async function loadRacePage() {
-  // Load race info
-  const raceEl = document.getElementById('race-info');
   try {
     const race = await api('/api/races/current');
+    currentRace = race;
+
     if (race.season_over) {
-      raceEl.innerHTML = '<h2>本季賽事已結束</h2>';
+      document.getElementById('race-banner').innerHTML =
+        '<p style="color:var(--text-secondary);text-align:center;padding:40px 0">本季賽事已全數結束，敬請期待下一季！</p>';
       return;
     }
-    const date = new Date(race.date);
-    const dateStr = date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
-    raceEl.innerHTML = `
-      <div class="race-banner">
-        <div class="race-info">
-          <h3 style="font-size:2rem">${race.race_name || 'Next Race'}</h3>
-          <div class="race-meta" style="margin-top:8px">
+
+    renderRaceBanner(race);
+    document.getElementById('info-grid').style.display = 'grid';
+
+    // Parallel data fetch
+    const [trackData, weatherData, aiData, oddsResult] = await Promise.allSettled([
+      api(`/api/tracks/${encodeURIComponent(race.circuit || race.circuit_key || race.session_key)}`),
+      api(`/api/races/weather/${race.session_key}`),
+      api('/api/races/x/analysis'),
+      api('/api/races/x/odds'),
+    ]);
+
+    renderTrackCard(trackData.status === 'fulfilled' ? trackData.value : null);
+    renderWeatherCard(weatherData.status === 'fulfilled' ? weatherData.value : null);
+
+    if (oddsResult.status === 'fulfilled') {
+      oddsData = oddsResult.value.odds || oddsResult.value.drivers || [];
+      renderOddsTable(oddsData);
+      renderOddsSummaryCard(oddsData);
+    } else {
+      document.getElementById('odds-summary-card').querySelector('.loading').innerHTML =
+        '<p style="color:var(--text-muted);font-size:13px">賠率暫不可用</p>';
+    }
+
+    if (aiData.status === 'fulfilled') {
+      renderAIAnalysis(aiData.value);
+    }
+
+    await loadBettingDrivers(race);
+    loadSchedule();
+
+  } catch (e) {
+    document.getElementById('race-banner').innerHTML =
+      `<p style="color:var(--text-secondary);text-align:center;padding:32px 0">無法載入賽事資訊：${e.message}</p>`;
+  }
+}
+
+// ─────────────────────────────────────────────
+// RACE BANNER
+// ─────────────────────────────────────────────
+function renderRaceBanner(race) {
+  const date = new Date(race.date);
+  const dateStr = date.toLocaleDateString('zh-TW', {
+    year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+  });
+  const circuitType = race.circuit_type || '';
+  const typeLabel = {
+    street: '市街賽道', permanent: '永久賽道', mixed: '混合賽道'
+  }[circuitType] || circuitType;
+
+  document.getElementById('race-banner').innerHTML = `
+    <div class="race-banner-v2">
+      <div class="banner-top">
+        <div>
+          <div style="margin-bottom:10px">
+            ${typeLabel ? `<span class="circuit-type-badge">🏁 ${typeLabel}</span>` : ''}
+          </div>
+          <div class="race-title">${race.race_name || '下一站'}</div>
+          <div class="race-meta">
             <span>📍 ${race.circuit || ''}</span>
-            <span>🏴 ${race.country || ''}</span>
+            <span>🌍 ${race.country || ''}</span>
             <span>📅 ${dateStr}</span>
-            <span>🏁 第 ${race.round || '?'} 站</span>
+            <span>🔢 第 ${race.round || '?'} 站</span>
           </div>
         </div>
       </div>
-    `;
-
-    // Load drivers for betting
-    await loadBetPanel(race);
-  } catch (e) {
-    raceEl.innerHTML = '<p style="color:var(--text-secondary)">暫時無法載入賽事</p>';
-  }
-
-  // Load schedule
-  loadSchedule();
+      <div class="round-badge">R${race.round || ''}</div>
+    </div>
+  `;
 }
 
-async function loadBetPanel(race) {
-  const betEl = document.getElementById('bet-section');
-  try {
-    const data = await api('/api/drivers');
-    driversData = data.drivers || [];
+// ─────────────────────────────────────────────
+// TRACK CARD
+// ─────────────────────────────────────────────
+function renderTrackCard(data) {
+  const el = document.getElementById('track-card');
+  if (!data) {
+    el.innerHTML = `<div class="info-card-title"><span>🏁</span> 賽道資訊</div>
+      <p style="color:var(--text-muted);font-size:13px">暫無賽道資料</p>`;
+    return;
+  }
 
-    // Get odds for each driver
-    const cards = await Promise.all(
-      driversData.slice(0, 20).map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
-    );
+  const diff = data.difficulty || 0;
+  const stars = Array.from({ length: 5 }, (_, i) =>
+    `<span class="star${i < diff ? ' lit' : ''}">★</span>`
+  ).join('');
 
-    betEl.innerHTML = `
-      <div class="bet-panel">
-        <h3>🏆 預測冠軍</h3>
-        <p style="color:var(--text-secondary);margin-bottom:20px;font-size:14px">
-          選擇你認為會贏的車手，用 USDClaw 下注
-        </p>
-        <div class="bet-driver-select" id="driver-select">
-          ${driversData.slice(0, 20).map((d, i) => {
-            const card = cards[i];
-            const odds = card?.odds || 5.0;
+  const overtake = data.overtaking_score ?? data.overtaking ?? null;
+
+  const chars = (data.characteristics || data.traits || []).slice(0, 4);
+
+  el.innerHTML = `
+    <div class="info-card-title"><span>🏁</span> 賽道資訊</div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">難度</div>
+      <div class="star-row">${stars}</div>
+    </div>
+    ${overtake !== null ? `
+    <div style="margin-bottom:14px">
+      ${renderStatBar('超車指數', overtake)}
+    </div>` : ''}
+    ${chars.length ? `
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">賽道特色</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${chars.map(c => `<span style="padding:3px 8px;background:rgba(255,255,255,0.05);border-radius:4px;font-size:12px;color:var(--text-secondary)">${c}</span>`).join('')}
+      </div>
+    </div>` : ''}
+    ${data.strategy_recommendation || data.strategy ? `
+    <div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">策略建議</div>
+      <div style="font-size:13px;color:var(--text-secondary)">${data.strategy_recommendation || data.strategy}</div>
+    </div>` : ''}
+  `;
+}
+
+// ─────────────────────────────────────────────
+// WEATHER CARD
+// ─────────────────────────────────────────────
+function renderWeatherCard(data) {
+  const el = document.getElementById('weather-card');
+  if (!data) {
+    el.innerHTML = `<div class="info-card-title"><span>🌤</span> 天氣狀況</div>
+      <p style="color:var(--text-muted);font-size:13px">暫無天氣資料</p>`;
+    return;
+  }
+
+  const airTemp = data.air_temperature ?? data.temp ?? data.temperature;
+  const trackTemp = data.track_temperature ?? data.track_temp;
+  const humidity = data.humidity ?? data.relative_humidity;
+  const rainfall = data.rainfall ?? data.rain ?? data.raining;
+
+  el.innerHTML = `
+    <div class="info-card-title"><span>🌤</span> 天氣狀況</div>
+    <div class="weather-grid">
+      <div class="weather-item">
+        <span class="wval">${airTemp != null ? airTemp + '°' : '—'}</span>
+        <span class="wlbl">氣溫</span>
+      </div>
+      <div class="weather-item">
+        <span class="wval">${trackTemp != null ? trackTemp + '°' : '—'}</span>
+        <span class="wlbl">賽道溫度</span>
+      </div>
+      <div class="weather-item">
+        <span class="wval">${humidity != null ? humidity + '%' : '—'}</span>
+        <span class="wlbl">濕度</span>
+      </div>
+      <div class="weather-item">
+        <span class="wval ${rainfall ? 'rain-yes' : 'rain-no'}">${rainfall ? '🌧 是' : '☀️ 否'}</span>
+        <span class="wlbl">降雨</span>
+      </div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────
+// AI ANALYSIS
+// ─────────────────────────────────────────────
+function renderAIAnalysis(data) {
+  const wrap = document.getElementById('ai-analysis-card');
+  if (!data) { wrap.style.display = 'none'; return; }
+
+  const topPicks = data.top_picks || [];
+  const darkHorse = data.dark_horse || data.dark_horse_pick;
+  const keyFactor = data.key_factor || data.key_factors;
+  const stratPred = data.strategy_prediction;
+  const riskWarn = data.risk_warning;
+  const isFallback = data.source === 'data_fallback';
+
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="ai-card" style="margin-bottom:24px">
+      <div class="ai-card-header">
+        <div class="ai-title">
+          <span>🤖</span> AI 分析
+        </div>
+        ${isFallback ? `<span class="ai-source-note">⚠ 基於歷史數據推估</span>` : ''}
+      </div>
+
+      ${topPicks.length ? `
+      <div style="margin-bottom:18px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px">熱門預測</div>
+        <div class="top-picks-grid">
+          ${topPicks.map(p => {
+            const conf = p.confidence ?? p.probability ?? 50;
+            const confPct = Math.round(conf * (conf <= 1 ? 100 : 1));
             return `
-              <div class="bet-option" data-driver="${d.driver_id}" data-odds="${odds}"
-                   data-race-id="${race.race_id || race.session_key || ''}"
-                   data-race-name="${race.race_name || ''}"
-                   onclick="selectDriver(this)">
-                <div>
-                  <div class="driver-name">${d.name}</div>
-                  <div style="color:var(--text-muted);font-size:12px">${d.points} pts</div>
+              <div class="top-pick-item">
+                <div class="top-pick-driver">
+                  <span>${p.driver || p.name || p.driver_id || ''}</span>
+                  <span style="color:var(--text-muted);font-size:12px">${confPct}%</span>
                 </div>
-                <div class="odds">x${odds}</div>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width:${confPct}%"></div>
+                </div>
+                ${p.reason ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${p.reason}</div>` : ''}
               </div>
             `;
           }).join('')}
         </div>
+      </div>` : ''}
 
-        <div class="bet-amount-row">
-          <input type="number" id="bet-amount" value="500" min="100" max="5000"
-                 placeholder="下注金額" onchange="betAmount=parseInt(this.value)">
-          <div class="bet-quick-amounts">
-            <button onclick="setBetAmount(100)">100</button>
-            <button onclick="setBetAmount(500)">500</button>
-            <button onclick="setBetAmount(1000)">1K</button>
-            <button onclick="setBetAmount(2000)">2K</button>
-            <button onclick="setBetAmount(5000)">5K</button>
+      ${darkHorse ? `
+      <div class="dark-horse-card">
+        <span style="font-size:1.5rem">🐎</span>
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(168,85,247,0.8);margin-bottom:2px">黑馬預測</div>
+          <div style="font-size:14px;font-weight:700">${typeof darkHorse === 'object' ? (darkHorse.driver || darkHorse.name || '') : darkHorse}</div>
+          ${typeof darkHorse === 'object' && darkHorse.reason ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${darkHorse.reason}</div>` : ''}
+        </div>
+      </div>` : ''}
+
+      <div class="ai-factors">
+        ${keyFactor ? `
+        <div class="ai-factor-item">
+          <div class="ai-factor-label">關鍵因素</div>
+          <div style="color:var(--text-secondary)">${Array.isArray(keyFactor) ? keyFactor.join('、') : keyFactor}</div>
+        </div>` : ''}
+        ${stratPred ? `
+        <div class="ai-factor-item">
+          <div class="ai-factor-label">策略預測</div>
+          <div style="color:var(--text-secondary)">${stratPred}</div>
+        </div>` : ''}
+      </div>
+
+      ${riskWarn ? `
+      <div class="risk-warning">
+        <span>⚠</span>
+        <span>${riskWarn}</span>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────
+// ODDS TABLE
+// ─────────────────────────────────────────────
+function getOddsTier(driver, idx, total) {
+  const prob = driver.win_probability ?? driver.probability ?? driver.win_prob ?? 0;
+  if (prob > 20 || idx < Math.ceil(total * 0.2)) return 'fav';
+  if (prob > 5 || idx < Math.ceil(total * 0.5)) return 'mid';
+  return 'long';
+}
+
+function renderOddsTable(drivers) {
+  const section = document.getElementById('odds-table-section');
+  if (!drivers.length) return;
+  section.style.display = 'block';
+
+  const tbody = document.getElementById('odds-tbody');
+  tbody.innerHTML = drivers.map((d, i) => {
+    const tier = getOddsTier(d, i, drivers.length);
+    const prob = Math.round(d.win_probability ?? d.probability ?? d.win_prob ?? 0);
+    const odds = d.odds ?? d.win_odds ?? '—';
+    const name = d.driver_name || d.name || d.driver_id || '';
+    const team = d.team || d.constructor || '';
+
+    return `
+      <tr>
+        <td class="odds-driver-tier-${tier}">${name}</td>
+        <td style="color:var(--text-muted);font-size:13px">${team}</td>
+        <td style="color:var(--text-secondary)">${prob}%</td>
+        <td>
+          <div class="prob-bar-wrap">
+            <div class="prob-bar">
+              <div class="prob-bar-fill tier-${tier}" style="width:${Math.min(prob*3, 100)}%"></div>
+            </div>
+          </div>
+        </td>
+        <td style="text-align:right" class="odds-value">${typeof odds === 'number' ? 'x' + odds.toFixed(1) : odds}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderOddsSummaryCard(drivers) {
+  const el = document.getElementById('odds-summary-card');
+  const top3 = drivers.slice(0, 3);
+  el.innerHTML = `
+    <div class="info-card-title"><span>📊</span> 賠率速覽</div>
+    ${top3.map((d, i) => {
+      const medals = ['🥇','🥈','🥉'];
+      const prob = Math.round(d.win_probability ?? d.probability ?? d.win_prob ?? 0);
+      const odds = d.odds ?? d.win_odds;
+      const name = d.driver_name || d.name || d.driver_id || '';
+      return `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:16px">${medals[i]}</span>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:13px">${name}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${d.team || ''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="odds-value" style="font-size:14px">${typeof odds === 'number' ? 'x' + odds.toFixed(1) : (odds || '—')}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${prob}%</div>
           </div>
         </div>
+      `;
+    }).join('')}
+    ${drivers.length > 3 ? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;text-align:right">+${drivers.length - 3} 位車手 ↓</div>` : ''}
+  `;
+}
 
-        <div id="bet-summary" style="margin-bottom:16px;font-size:14px;color:var(--text-secondary)">
-          請先選擇一位車手
-        </div>
+// ─────────────────────────────────────────────
+// BETTING PANEL — driver loading
+// ─────────────────────────────────────────────
+async function loadBettingDrivers(race) {
+  try {
+    const data = await api('/api/drivers');
+    driversData = data.drivers || [];
 
-        <button class="btn btn-gold" id="place-bet-btn" onclick="placeBet()" disabled>
-          確認預測
-        </button>
-        <div id="bet-result" style="margin-top:12px"></div>
-      </div>
-    `;
+    const driverOddsMap = {};
+    oddsData.forEach(d => {
+      const id = d.driver_id || d.id || d.driver_name || d.name;
+      if (id) driverOddsMap[id.toLowerCase()] = d;
+    });
+
+    renderBeginnerGrid(race, driverOddsMap);
+    populateDropdowns();
+
+    // auto-pick from URL
+    if (autoPickId) {
+      const match = driversData.find(d =>
+        d.driver_id?.toLowerCase() === autoPickId ||
+        d.name?.toLowerCase().includes(autoPickId)
+      );
+      if (match) {
+        const card = document.querySelector(`.driver-pick-card[data-driver="${match.driver_id}"]`);
+        if (card) selectBeginnerDriver(card);
+      }
+    }
   } catch (e) {
-    betEl.innerHTML = '<p style="color:var(--text-secondary)">無法載入下注面板</p>';
+    document.getElementById('beginner-driver-grid').innerHTML =
+      '<p style="color:var(--text-muted);font-size:13px">無法載入車手列表</p>';
   }
 }
 
-function selectDriver(el) {
-  document.querySelectorAll('.bet-option').forEach(o => o.classList.remove('selected'));
+function renderBeginnerGrid(race, driverOddsMap) {
+  const grid = document.getElementById('beginner-driver-grid');
+  if (!driversData.length) {
+    grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px">暫無車手資料</p>';
+    return;
+  }
+
+  grid.innerHTML = driversData.slice(0, 20).map(d => {
+    const od = driverOddsMap[d.driver_id?.toLowerCase()] ||
+               driverOddsMap[d.name?.toLowerCase()] || {};
+    const odds = od.odds ?? od.win_odds ?? 5.0;
+    const raceId = race.race_id || race.session_key || '';
+    const raceName = race.race_name || '';
+    const number = d.number || '';
+
+    return `
+      <div class="driver-pick-card" data-driver="${d.driver_id}"
+           data-name="${d.name}" data-odds="${odds}"
+           data-race-id="${raceId}" data-race-name="${raceName}"
+           onclick="selectBeginnerDriver(this)">
+        <div class="selected-check">✓</div>
+        <div class="pick-number">${number}</div>
+        <div class="pick-name">${d.name}</div>
+        <div class="pick-team">${d.team || d.constructor || ''}</div>
+        <div class="pick-odds">x${Number(odds).toFixed(1)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function populateDropdowns() {
+  const options = driversData.slice(0, 20).map(d =>
+    `<option value="${d.driver_id}">${d.name}</option>`
+  ).join('');
+  const blankOption = '<option value="">── 選擇車手 ──</option>';
+
+  ['fastest-lap-select', 'h2h-a', 'h2h-b', 'adv-first-pit', 'adv-dnf'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const extra = id === 'adv-dnf' ? '<option value="none">無退賽</option>' : '';
+      el.innerHTML = blankOption + extra + options;
+    }
+  });
+
+  // Podium mini-grid
+  const miniGrid = document.getElementById('podium-driver-mini');
+  if (miniGrid) {
+    miniGrid.innerHTML = driversData.slice(0, 20).map(d => `
+      <button class="driver-mini-btn" data-driver="${d.driver_id}" data-name="${d.name}"
+              onclick="pickPodiumDriver('${d.driver_id}', '${d.name.replace(/'/g,"\\'")}')">
+        ${d.name}
+      </button>
+    `).join('');
+  }
+}
+
+// ─────────────────────────────────────────────
+// BEGINNER SELECTION
+// ─────────────────────────────────────────────
+function selectBeginnerDriver(el) {
+  document.querySelectorAll('.driver-pick-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   selectedDriver = {
     id: el.dataset.driver,
-    odds: parseFloat(el.dataset.odds),
+    name: el.dataset.name,
+    odds: parseFloat(el.dataset.odds) || 5.0,
     raceId: el.dataset.raceId,
     raceName: el.dataset.raceName,
-    name: el.querySelector('.driver-name').textContent,
   };
-  const amt = parseInt(document.getElementById('bet-amount').value) || 500;
-  document.getElementById('bet-summary').innerHTML = `
-    <span style="color:var(--text-primary)">預測 <strong style="color:var(--gold)">${selectedDriver.name}</strong> 奪冠</span>
-    · 賠率 <strong>x${selectedDriver.odds}</strong>
-    · 預計回報 <strong style="color:var(--green)">◆ ${Math.floor(amt * selectedDriver.odds).toLocaleString()}</strong>
+  updateBetSummary();
+}
+
+// ─────────────────────────────────────────────
+// INTERMEDIATE HELPERS
+// ─────────────────────────────────────────────
+function openPodiumPicker(slot) {
+  activePodiumSlot = slot;
+  // highlight mini-buttons
+  document.querySelectorAll('.driver-mini-btn').forEach(b => {
+    b.classList.toggle('selected-p',
+      Object.values(podiumPicks).includes(b.dataset.driver) && podiumPicks[slot] === b.dataset.driver
+    );
+  });
+}
+
+function pickPodiumDriver(driverId, name) {
+  if (!activePodiumSlot) activePodiumSlot = 1;
+
+  // Remove this driver from other slots
+  for (const s of [1,2,3]) {
+    if (podiumPicks[s] === driverId && s !== activePodiumSlot) {
+      podiumPicks[s] = null;
+      renderPodiumSlot(s, null);
+    }
+  }
+
+  podiumPicks[activePodiumSlot] = driverId;
+  renderPodiumSlot(activePodiumSlot, name);
+
+  // highlight
+  document.querySelectorAll('.driver-mini-btn').forEach(b => {
+    const used = Object.values(podiumPicks).includes(b.dataset.driver);
+    b.classList.toggle('selected-p', used);
+  });
+
+  // advance slot
+  const nextSlot = [1,2,3].find(s => !podiumPicks[s]);
+  activePodiumSlot = nextSlot || null;
+
+  updateBetSummary();
+}
+
+function renderPodiumSlot(slot, name) {
+  const el = document.getElementById(`podium-p${slot}`);
+  const icons = {1:'🥇',2:'🥈',3:'🥉'};
+  const labels = {1:'第1名',2:'第2名',3:'第3名'};
+  el.classList.toggle('filled', !!name);
+  el.innerHTML = `
+    <div class="slot-pos">${icons[slot]} ${labels[slot]}</div>
+    ${name ? `<div class="slot-name">${name}</div>` : '<div class="slot-empty">點擊選擇</div>'}
   `;
-  document.getElementById('place-bet-btn').disabled = false;
 }
 
-function setBetAmount(val) {
-  document.getElementById('bet-amount').value = val;
-  betAmount = val;
-  if (selectedDriver) selectDriver(document.querySelector('.bet-option.selected'));
+function setSafetycar(val) {
+  safetyCarPick = val;
+  document.getElementById('sc-yes').className = 'toggle-btn' + (val === 'yes' ? ' active-yes' : '');
+  document.getElementById('sc-no').className = 'toggle-btn' + (val === 'no' ? ' active-no' : '');
+  updateBetSummary();
 }
 
+// ─────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  ['beginner','intermediate','advanced'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`pane-${t}`).classList.toggle('active', t === tab);
+  });
+  updateBetSummary();
+}
+
+// ─────────────────────────────────────────────
+// AMOUNT
+// ─────────────────────────────────────────────
+function setAmount(v) {
+  betAmount = v;
+  document.getElementById('bet-amount-input').value = v;
+  updateBetSummary();
+}
+
+// ─────────────────────────────────────────────
+// BET SUMMARY
+// ─────────────────────────────────────────────
+function updateBetSummary() {
+  const amt = parseInt(document.getElementById('bet-amount-input').value) || 500;
+  betAmount = amt;
+
+  let label = '尚未選擇';
+  let odds = null;
+  let valid = false;
+
+  if (currentTab === 'beginner' && selectedDriver) {
+    label = `冠軍：${selectedDriver.name}`;
+    odds = selectedDriver.odds;
+    valid = true;
+  } else if (currentTab === 'intermediate') {
+    const parts = [];
+    if (podiumPicks[1] && podiumPicks[2] && podiumPicks[3]) {
+      const names = [1,2,3].map(s => {
+        const d = driversData.find(x => x.driver_id === podiumPicks[s]);
+        return d ? d.name : podiumPicks[s];
+      });
+      parts.push(`頒獎台：${names.join(' / ')}`);
+      odds = 15.0;
+    }
+    if (document.getElementById('fastest-lap-select')?.value) {
+      const fl = driversData.find(d => d.driver_id === document.getElementById('fastest-lap-select').value);
+      if (fl) parts.push(`最快圈：${fl.name}`);
+      if (!odds) odds = 8.0;
+    }
+    if (safetyCarPick) {
+      parts.push(`安全車：${safetyCarPick === 'yes' ? '是' : '否'}`);
+      if (!odds) odds = 1.8;
+    }
+    if (document.getElementById('h2h-a')?.value && document.getElementById('h2h-b')?.value) {
+      const a = driversData.find(d => d.driver_id === document.getElementById('h2h-a').value);
+      const b = driversData.find(d => d.driver_id === document.getElementById('h2h-b').value);
+      if (a && b) parts.push(`H2H：${a.name} 勝 ${b.name}`);
+      if (!odds) odds = 1.9;
+    }
+    if (parts.length) { label = parts.join(' · '); valid = true; }
+    else label = '請至少完成一項預測';
+  } else if (currentTab === 'advanced') {
+    const firstPit = document.getElementById('adv-first-pit')?.value;
+    const dnf = document.getElementById('adv-dnf')?.value;
+    const pitCount = document.getElementById('adv-pit-count')?.value;
+    const strat = document.getElementById('adv-strategy')?.value;
+    const parts = [];
+    if (firstPit) { const d = driversData.find(x => x.driver_id === firstPit); parts.push(`首位進站：${d?.name || firstPit}`); }
+    if (dnf) parts.push(`退賽：${dnf === 'none' ? '無' : (driversData.find(x => x.driver_id === dnf)?.name || dnf)}`);
+    if (pitCount) parts.push(`進站次數：${pitCount}`);
+    if (strat) parts.push({ one_stop:'一停', two_stop:'兩停', three_stop:'三停', undercut:'偷停策略', overcut:'延遲進站' }[strat] || strat);
+    if (parts.length) { label = parts.join(' · '); odds = 25.0; valid = true; }
+    else label = '請至少完成一項預測';
+  }
+
+  document.getElementById('sum-selection').textContent = label;
+  document.getElementById('sum-selection').style.color = valid ? 'var(--text-primary)' : 'var(--text-muted)';
+
+  if (odds && valid) {
+    const fee = Math.floor(amt * 0.05);
+    const win = Math.floor(amt * odds);
+    document.getElementById('sum-odds').textContent = `x${Number(odds).toFixed(1)}`;
+    document.getElementById('sum-fee').textContent = `◆ ${fee.toLocaleString()}`;
+    document.getElementById('sum-win').textContent = `◆ ${win.toLocaleString()}`;
+    document.getElementById('place-bet-btn').disabled = false;
+  } else {
+    document.getElementById('sum-odds').textContent = '—';
+    document.getElementById('sum-fee').textContent = '—';
+    document.getElementById('sum-win').textContent = '—';
+    document.getElementById('place-bet-btn').disabled = true;
+  }
+}
+
+// ─────────────────────────────────────────────
+// PLACE BET
+// ─────────────────────────────────────────────
 async function placeBet() {
   if (!user) { showModal('login'); return; }
-  if (!selectedDriver) return;
-  const amt = parseInt(document.getElementById('bet-amount').value) || 500;
-  const resultEl = document.getElementById('bet-result');
+  const resultEl = document.getElementById('bet-result-area');
+  const btn = document.getElementById('place-bet-btn');
+  btn.disabled = true;
+  btn.textContent = '處理中...';
 
   try {
-    const res = await api('/api/bets', {
-      method: 'POST',
-      body: JSON.stringify({
-        race_id: selectedDriver.raceId,
-        race_name: selectedDriver.raceName,
-        bet_type: 'winner',
-        prediction: selectedDriver.id,
-        amount: amt,
-      }),
-    });
+    let payload = {
+      amount: betAmount,
+      race_id: currentRace?.race_id || currentRace?.session_key || '',
+      race_name: currentRace?.race_name || '',
+    };
+
+    if (currentTab === 'beginner' && selectedDriver) {
+      payload.bet_type = 'winner';
+      payload.prediction = selectedDriver.id;
+    } else if (currentTab === 'intermediate') {
+      payload.bet_type = 'intermediate';
+      payload.prediction = {
+        podium: podiumPicks,
+        fastest_lap: document.getElementById('fastest-lap-select')?.value || null,
+        safety_car: safetyCarPick,
+        h2h_a: document.getElementById('h2h-a')?.value || null,
+        h2h_b: document.getElementById('h2h-b')?.value || null,
+      };
+    } else if (currentTab === 'advanced') {
+      payload.bet_type = 'advanced';
+      payload.prediction = {
+        first_pit: document.getElementById('adv-first-pit')?.value || null,
+        dnf: document.getElementById('adv-dnf')?.value || null,
+        pit_count: document.getElementById('adv-pit-count')?.value || null,
+        strategy: document.getElementById('adv-strategy')?.value || null,
+      };
+    }
+
+    const res = await api('/api/bets', { method: 'POST', body: JSON.stringify(payload) });
+
     resultEl.innerHTML = `
-      <div style="padding:16px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:8px">
+      <div class="bet-result-msg success">
         <strong style="color:var(--green)">✓ 預測成功！</strong><br>
-        <span style="font-size:14px;color:var(--text-secondary)">
-          下注 ◆${res.amount} · 賠率 x${res.odds} · 潛在回報 ◆${res.potential_win?.toLocaleString()}
-          <br>剩餘 USDClaw ◆${res.remaining_balance?.toLocaleString()}
+        <span style="color:var(--text-secondary)">
+          下注 ◆${(res.amount || betAmount).toLocaleString()} · 賠率 x${res.odds || '?'} · 潛在獎金 ◆${(res.potential_win || 0).toLocaleString()}
+          <br>剩餘 USDClaw ◆${(res.remaining_balance || 0).toLocaleString()}
         </span>
       </div>
     `;
-    // Update coins display
-    user.coins = res.remaining_balance;
-    localStorage.setItem('pitlane_user', JSON.stringify(user));
-    updateAuthUI();
-    document.getElementById('place-bet-btn').disabled = true;
+
+    if (res.remaining_balance != null) {
+      user.balance = res.remaining_balance;
+      localStorage.setItem('pitlane_user', JSON.stringify(user));
+      updateAuthUI();
+    }
   } catch (e) {
-    resultEl.innerHTML = `<div style="color:var(--red)">${e.message}</div>`;
+    resultEl.innerHTML = `<div class="bet-result-msg error">${e.message}</div>`;
+    btn.disabled = false;
   }
+  btn.textContent = '確認下注';
 }
 
+// ─────────────────────────────────────────────
+// SCHEDULE
+// ─────────────────────────────────────────────
 async function loadSchedule() {
-  const el = document.getElementById('schedule');
+  const el = document.getElementById('schedule-grid');
   try {
     const data = await api('/api/races/schedule');
     const races = data.races || [];
-    if (!races.length) { el.innerHTML = '<p>暫無賽程資料</p>'; return; }
+    if (!races.length) { el.innerHTML = '<p style="color:var(--text-muted)">暫無賽程資料</p>'; return; }
 
     const today = new Date().toISOString().slice(0, 10);
-    el.innerHTML = `
-      <div style="display:grid;gap:8px">
-        ${races.map(r => {
-          const isPast = r.date < today;
-          const isNext = !isPast && races.find(x => x.date >= today)?.round === r.round;
-          return `
-            <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;
-                        background:${isNext ? 'rgba(212,168,67,0.08)' : 'var(--bg-card)'};
-                        border:1px solid ${isNext ? 'var(--border-gold)' : 'var(--border)'};
-                        border-radius:8px;opacity:${isPast ? '0.5' : '1'}">
-              <span style="color:var(--text-muted);font-weight:700;width:30px">R${r.round}</span>
-              <span style="flex:1;font-weight:${isNext ? '700' : '500'}">${r.race_name}</span>
-              <span style="color:var(--text-secondary);font-size:13px">${r.country}</span>
-              <span style="color:var(--text-muted);font-size:13px;width:100px;text-align:right">${r.date}</span>
-              ${isNext ? '<span class="rarity-badge rarity-monaco" style="font-size:10px">NEXT</span>' : ''}
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
+    const nextRace = races.find(r => r.date >= today);
+
+    el.className = 'schedule-grid';
+    el.innerHTML = races.map(r => {
+      const isPast = r.date < today;
+      const isNext = nextRace && r.round === nextRace.round;
+      const date = new Date(r.date + 'T00:00:00');
+      const dateStr = date.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' });
+
+      return `
+        <div class="schedule-row${isNext ? ' is-next' : ''}${isPast ? ' is-past' : ''}">
+          <span class="schedule-round">R${r.round}</span>
+          <span class="schedule-name">${r.race_name || r.name || ''}</span>
+          <span class="schedule-country">${r.country || ''}</span>
+          <span class="schedule-date">${dateStr}</span>
+          ${isNext ? '<span class="rarity-badge rarity-monaco" style="font-size:10px;padding:2px 8px">NEXT</span>' : ''}
+          ${isPast ? '<span style="font-size:11px;color:var(--text-muted)">已結束</span>' : ''}
+        </div>
+      `;
+    }).join('');
   } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入賽程</p>';
+    el.innerHTML = '<p style="color:var(--text-muted)">無法載入賽程</p>';
   }
 }
-
-loadRacePage();
 </script>
 </body>
 </html>

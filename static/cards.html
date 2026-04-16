@@ -4,11 +4,259 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PitLane — 卡牌收藏</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+/* ─── CARDS PAGE EXTRAS ─── */
+.page-hero {
+  padding: 100px 0 48px;
+  background: linear-gradient(180deg, rgba(212,168,67,0.05) 0%, transparent 70%);
+  text-align: center;
+}
+.page-hero h1 {
+  font-size: 2.2rem; font-weight: 900; margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text-primary) 40%, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.page-hero p { color: var(--text-secondary); font-size: 1rem; }
+
+/* Tab nav */
+.tab-nav {
+  display: flex; gap: 4px;
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 4px;
+  margin: 32px auto 0; max-width: 480px;
+}
+.tab-btn {
+  flex: 1; padding: 10px 16px; border-radius: 8px;
+  border: none; cursor: pointer; font-size: 14px; font-weight: 600;
+  font-family: var(--font); color: var(--text-secondary);
+  background: transparent; transition: all 0.2s;
+}
+.tab-btn.active {
+  background: var(--bg-card); color: var(--gold);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.tab-btn:hover:not(.active) { color: var(--text-primary); }
+
+/* Section tabs */
+.tab-section { display: none; }
+.tab-section.active { display: block; }
+
+/* ─── DRIVER CARD V2 ─── */
+.driver-card-v2 {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: all 0.3s; position: relative;
+}
+.driver-card-v2:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(212,168,67,0.1);
+}
+.driver-card-top {
+  border-left: 4px solid var(--gold); /* overridden per card via inline style */
+  padding: 20px 20px 0;
+  cursor: pointer;
+}
+.driver-card-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+}
+.driver-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+  border: 2px solid var(--border);
+  background: var(--bg-secondary);
+}
+.driver-avatar-fallback {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(212,168,67,0.1); border: 2px solid var(--border-gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 900; color: var(--gold);
+  flex-shrink: 0;
+}
+.driver-identity { flex: 1; min-width: 0; }
+.driver-identity .name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.driver-identity .team { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+.driver-identity .nationality { font-size: 0.78rem; color: var(--text-muted); }
+.driver-ovr {
+  text-align: right; flex-shrink: 0;
+}
+.driver-ovr .score {
+  font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
+}
+.driver-ovr .score-label {
+  font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+.driver-stats { padding: 0 20px 12px; }
+
+/* Skills area */
+.driver-skills {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.skill-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.skill-passive {
+  background: rgba(59,130,246,0.15); color: #60a5fa;
+  border: 1px solid rgba(59,130,246,0.25);
+}
+.skill-active {
+  background: rgba(212,168,67,0.12); color: var(--gold);
+  border: 1px solid var(--border-gold);
+}
+.skill-stars { color: var(--gold); font-size: 10px; letter-spacing: 1px; }
+
+/* Card footer: pick button */
+.driver-card-footer {
+  padding: 12px 20px 16px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.driver-card-footer .meta { font-size: 11px; color: var(--text-muted); }
+
+/* AI Analysis expand */
+.analysis-toggle {
+  padding: 8px 20px 0; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  transition: color 0.2s; user-select: none;
+}
+.analysis-toggle:hover { color: var(--gold); }
+.analysis-toggle .arrow {
+  font-size: 10px; transition: transform 0.2s;
+}
+.analysis-toggle.open .arrow { transform: rotate(180deg); }
+.analysis-body {
+  display: none; padding: 12px 20px 16px;
+  animation: fadeSlideIn 0.3s ease;
+}
+.analysis-body.open { display: block; }
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.analysis-box {
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+  padding: 14px 16px; font-size: 13px; color: var(--text-secondary);
+  line-height: 1.7; border: 1px solid var(--border);
+}
+.analysis-box.loading-analysis {
+  display: flex; align-items: center; gap: 10px; color: var(--text-muted);
+}
+.analysis-box.loading-analysis .spinner { width: 18px; height: 18px; border-width: 2px; margin: 0; }
+
+/* ─── CONSTRUCTOR CARD ─── */
+.constructor-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; transition: all 0.3s;
+}
+.constructor-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(212,168,67,0.1);
+}
+.constructor-card-top {
+  border-left: 4px solid var(--gold);
+  padding: 20px;
+}
+.constructor-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 16px;
+}
+.constructor-identity .name { font-size: 1.1rem; font-weight: 700; }
+.constructor-identity .nationality { font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px; }
+.constructor-ovr .score {
+  font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; text-align: right;
+}
+.constructor-ovr .score-label { font-size: 10px; color: var(--text-muted); text-align: right; text-transform: uppercase; }
+
+.pitstop-section {
+  margin: 14px 20px 16px;
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+}
+.pitstop-section .pitstop-title {
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
+}
+.pitstop-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.pitstop-stat { text-align: center; }
+.pitstop-stat .ps-val {
+  font-size: 1.1rem; font-weight: 700; color: var(--text-primary); line-height: 1;
+}
+.pitstop-stat .ps-val.good { color: var(--green); }
+.pitstop-stat .ps-val.warn { color: var(--gold); }
+.pitstop-stat .ps-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* ─── TRACK CARD ─── */
+.track-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px; transition: all 0.3s;
+}
+.track-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(212,168,67,0.1);
+}
+.track-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 14px;
+}
+.track-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+.track-type-badge {
+  padding: 3px 10px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.track-type-street    { background: rgba(248,113,113,0.15); color: #f87171; }
+.track-type-high_speed { background: rgba(52,211,153,0.15); color: #34d399; }
+.track-type-technical  { background: rgba(168,85,247,0.15); color: #a855f7; }
+
+.track-difficulty {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+}
+.track-difficulty .diff-label { font-size: 12px; color: var(--text-secondary); width: 54px; flex-shrink: 0; }
+.diff-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
+.diff-stars .empty { color: var(--text-muted); }
+.diff-num { font-size: 12px; color: var(--text-muted); }
+
+.track-tags {
+  display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0;
+}
+.track-tag {
+  padding: 2px 8px; border-radius: 3px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  font-size: 11px; color: var(--text-secondary);
+}
+
+.track-strategy {
+  margin-top: 12px; padding: 10px 12px;
+  background: rgba(212,168,67,0.06); border: 1px solid var(--border-gold);
+  border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary);
+  line-height: 1.6;
+}
+.track-strategy strong { color: var(--gold); }
+
+/* ─── SECTION DIVIDERS ─── */
+.section-alt { background: var(--bg-secondary); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .tab-nav { max-width: 100%; margin: 24px 0 0; }
+  .pitstop-grid { grid-template-columns: repeat(3,1fr); gap: 4px; }
+}
+</style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
     <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
@@ -16,143 +264,414 @@
       <a href="/">首頁</a>
       <a href="/race">賽事</a>
       <a href="/cards" class="active">卡牌</a>
-      <a href="/profile">戰績</a>
+      <a href="/battle">對戰</a>
+      <a href="/leaderboard">排行榜</a>
+      <a href="/profile">個人</a>
     </div>
     <div id="nav-auth" class="nav-auth"></div>
   </div>
 </nav>
 
+<!-- AUTH MODAL -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal" id="auth-modal"></div>
 </div>
 
-<!-- Driver Cards -->
-<section style="padding-top:100px" class="section">
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="container">
+    <h1>卡牌收藏庫</h1>
+    <p>車手、車隊、賽道——全套 F1 數據卡牌，每站實時更新</p>
+    <!-- Tab nav -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('drivers', this)">車手卡牌</button>
+      <button class="tab-btn" onclick="switchTab('constructors', this)">車隊卡牌</button>
+      <button class="tab-btn" onclick="switchTab('tracks', this)">賽道卡牌</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ DRIVER CARDS ══════════════════════ -->
+<section id="tab-drivers" class="tab-section active section">
   <div class="container">
     <div class="section-header">
       <h2>車手卡牌</h2>
-      <p>數值由真實 F1 賽事數據計算，每站更新</p>
+      <p>數值由真實 F1 賽事數據計算，包含技能與 AI 深度分析</p>
     </div>
-    <div id="all-drivers" class="card-grid loading">
-      <div class="spinner"></div>
-      <p>載入中...</p>
+    <div id="all-drivers" class="card-grid">
+      <div class="loading" style="grid-column:1/-1">
+        <div class="spinner"></div>
+        <p>載入車手資料中...</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Constructor Cards -->
-<section class="section" style="background:var(--bg-secondary)">
+<!-- ══════════════════════ CONSTRUCTOR CARDS ══════════════════════ -->
+<section id="tab-constructors" class="tab-section section section-alt">
   <div class="container">
     <div class="section-header">
       <h2>車隊卡牌</h2>
-      <p>車隊整體實力評估</p>
+      <p>車隊整體實力評估，含進站數據分析</p>
     </div>
-    <div id="all-constructors" class="card-grid loading">
-      <div class="spinner"></div>
-      <p>載入中...</p>
+    <div id="all-constructors" class="card-grid">
+      <div class="loading" style="grid-column:1/-1">
+        <div class="spinner"></div>
+        <p>載入車隊資料中...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ TRACK CARDS ══════════════════════ -->
+<section id="tab-tracks" class="tab-section section">
+  <div class="container">
+    <div class="section-header">
+      <h2>賽道卡牌</h2>
+      <p>每條賽道的特性、難度與策略建議</p>
+    </div>
+    <div id="all-tracks" class="card-grid">
+      <div class="loading" style="grid-column:1/-1">
+        <div class="spinner"></div>
+        <p>載入賽道資料中...</p>
+      </div>
     </div>
   </div>
 </section>
 
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · 數據來自 OpenF1 & Ergast</p>
+    <p>PitLane — 賽車預測卡牌平台 · 數據來自 OpenF1 &amp; Ergast · AI 分析每站更新</p>
   </div>
 </footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
+// ═══════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════
+const tabLoaded = { drivers: false, constructors: false, tracks: false };
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+
+  if (!tabLoaded[name]) {
+    tabLoaded[name] = true;
+    if (name === 'drivers')      loadAllDriverCards();
+    if (name === 'constructors') loadConstructorCards();
+    if (name === 'tracks')       loadTrackCards();
+  }
+}
+
+// ═══════════════════════════════════════════
+//  DRIVER CARDS
+// ═══════════════════════════════════════════
 async function loadAllDriverCards() {
   const el = document.getElementById('all-drivers');
   try {
     const data = await api('/api/drivers');
     const drivers = data.drivers || [];
+    if (!drivers.length) {
+      el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">暫無車手資料</p>';
+      return;
+    }
+
     const cards = await Promise.all(
       drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
     );
 
-    el.className = 'card-grid';
     el.innerHTML = cards.map((card, i) => {
       if (!card) return '';
       const d = drivers[i];
       const s = card.stats || {};
+      const teamColor = card.team_colour || 'd4a843';
+      const color = teamColor.startsWith('#') ? teamColor : '#' + teamColor;
+      const skills = card.skills || {};
+      const passiveSkill = skills.passive || null;
+      const activeSkills  = skills.active  || [];
+      const imgUrl = card.headshot_url || `/api/drivers/${d.driver_id}/headshot`;
+
       return `
-        <div class="driver-card" id="${d.driver_id}">
-          <div class="number">${d.number || ''}</div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-              <div class="name">${d.name}</div>
-              <div class="team">${card.team || ''} · ${d.nationality || ''}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="color:var(--gold);font-size:2rem;font-weight:900;line-height:1">${s.overall || 50}</div>
-              <div style="color:var(--text-muted);font-size:11px">OVR</div>
+        <div class="driver-card-v2" id="${d.driver_id}">
+          <!-- TOP: clickable card body -->
+          <div class="driver-card-top" style="border-left-color:${color}"
+               onclick="toggleAnalysis('${d.driver_id}')">
+            <div class="driver-card-header">
+              <img
+                class="driver-avatar"
+                src="${imgUrl}"
+                alt="${d.name}"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+              />
+              <div class="driver-avatar-fallback" style="display:none">${d.number || '?'}</div>
+              <div class="driver-identity">
+                <div class="name">${d.name}</div>
+                <div class="team">${card.team || ''}</div>
+                <div class="nationality">${d.nationality || ''}</div>
+              </div>
+              <div class="driver-ovr">
+                <div class="score">${s.overall || 50}</div>
+                <div class="score-label">OVR</div>
+              </div>
             </div>
           </div>
-          ${renderStatBar('單圈速度', s.qualifying || 50)}
-          ${renderStatBar('輪胎管理', s.tire_management || 50)}
-          ${renderStatBar('雨戰能力', s.wet_weather || 50)}
-          ${renderStatBar('超車能力', s.overtaking || 50)}
-          ${renderStatBar('街道賽', s.street_circuit || 50)}
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-            <span class="rarity-badge rarity-silverstone">Silverstone</span>
-            <div style="font-size:12px;color:var(--text-muted)">
-              ${s.wins || 0}勝 · ${s.podiums || 0}頒獎台 · ${s.races || 0}場
+
+          <!-- STATS -->
+          <div class="driver-stats">
+            ${renderStatBar('單圈速度', s.qualifying      || 50)}
+            ${renderStatBar('輪胎管理', s.tire_management || 50)}
+            ${renderStatBar('雨戰能力', s.wet_weather     || 50)}
+            ${renderStatBar('超車能力', s.overtaking      || 50)}
+            ${renderStatBar('街道賽',   s.street_circuit  || 50)}
+          </div>
+
+          <!-- SKILLS -->
+          ${passiveSkill || activeSkills.length ? `
+          <div class="driver-skills">
+            ${passiveSkill ? `<span class="skill-badge skill-passive">⚡ ${passiveSkill}</span>` : ''}
+            ${activeSkills.map(sk => `
+              <span class="skill-badge skill-active">
+                <span class="skill-stars">${'★'.repeat(sk.stars || 1)}</span>
+                ${sk.name || sk}
+              </span>
+            `).join('')}
+          </div>` : ''}
+
+          <!-- FOOTER: bet button + record -->
+          <div class="driver-card-footer">
+            <div class="meta">
+              ${s.wins || 0} 勝 · ${s.podiums || 0} 頒獎台 · ${s.races || 0} 場
+            </div>
+            <a href="/race?pick=${d.driver_id}" class="btn btn-gold btn-sm">押這個人</a>
+          </div>
+
+          <!-- AI ANALYSIS TOGGLE -->
+          <div class="analysis-toggle" id="toggle-${d.driver_id}"
+               onclick="toggleAnalysis('${d.driver_id}')">
+            <span class="arrow">▾</span>
+            <span>AI 深度分析</span>
+          </div>
+          <div class="analysis-body" id="analysis-${d.driver_id}">
+            <div class="analysis-box loading-analysis" id="analysis-content-${d.driver_id}">
+              <div class="spinner"></div>
+              <span>AI 分析載入中...</span>
             </div>
           </div>
         </div>
       `;
     }).join('');
+
   } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入車手卡牌</p>';
+    el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">無法載入車手卡牌</p>';
   }
+}
+
+// Track which analyses have been loaded
+const analysisLoaded = {};
+
+async function toggleAnalysis(driverId) {
+  const toggle = document.getElementById(`toggle-${driverId}`);
+  const body   = document.getElementById(`analysis-${driverId}`);
+  if (!toggle || !body) return;
+
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+
+  if (!isOpen && !analysisLoaded[driverId]) {
+    analysisLoaded[driverId] = true;
+    try {
+      const data = await api(`/api/drivers/${driverId}/analysis`);
+      const contentEl = document.getElementById(`analysis-content-${driverId}`);
+      if (contentEl) {
+        contentEl.className = 'analysis-box';
+        contentEl.innerHTML = data.analysis || data.text || '目前無分析資料。';
+      }
+    } catch (e) {
+      const contentEl = document.getElementById(`analysis-content-${driverId}`);
+      if (contentEl) {
+        contentEl.className = 'analysis-box';
+        contentEl.textContent = '無法載入 AI 分析，請稍後再試。';
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+//  CONSTRUCTOR CARDS
+// ═══════════════════════════════════════════
+let pitStats = null;
+
+async function loadPitStats() {
+  if (pitStats !== null) return pitStats;
+  try {
+    const data = await api('/api/pit-stats');
+    pitStats = data;
+  } catch (e) {
+    pitStats = {};
+  }
+  return pitStats;
 }
 
 async function loadConstructorCards() {
   const el = document.getElementById('all-constructors');
   try {
-    const data = await api('/api/constructors');
-    const constructors = data.constructors || [];
+    const [cData, pit] = await Promise.all([
+      api('/api/constructors'),
+      loadPitStats(),
+    ]);
+
+    const constructors = cData.constructors || [];
+    if (!constructors.length) {
+      el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">暫無車隊資料</p>';
+      return;
+    }
+
     const cards = await Promise.all(
       constructors.map(c => api(`/api/constructors/${c.constructor_id}/card`).catch(() => null))
     );
 
-    el.className = 'card-grid';
     el.innerHTML = cards.map((card, i) => {
       if (!card) return '';
       const c = constructors[i];
       const s = card.stats || {};
-      return `
-        <div class="driver-card">
-          <div class="number">#${c.position}</div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-              <div class="name">${c.name}</div>
-              <div class="team">${c.nationality || ''} · ${c.points} pts</div>
+      const teamColor = card.team_colour || c.team_colour || 'd4a843';
+      const color = teamColor.startsWith('#') ? teamColor : '#' + teamColor;
+
+      // Pit stop data: try team-specific key, then overall
+      const ps = (pit && pit[c.constructor_id]) || (pit && pit[c.name]) || null;
+      const avgTime    = ps?.avg_time       ?? ps?.average_time      ?? null;
+      const fastest    = ps?.fastest        ?? ps?.fastest_stop      ?? null;
+      const errorRate  = ps?.error_rate     ?? null;
+      const reliability = ps?.reliability   ?? null;
+
+      const pitBlock = `
+        <div class="pitstop-section">
+          <div class="pitstop-title">進站數據</div>
+          <div class="pitstop-grid">
+            <div class="pitstop-stat">
+              <div class="ps-val ${avgTime && avgTime < 2.5 ? 'good' : 'warn'}">${avgTime != null ? avgTime.toFixed(2) + 's' : '—'}</div>
+              <div class="ps-label">平均進站</div>
             </div>
-            <div style="text-align:right">
-              <div style="color:var(--gold);font-size:2rem;font-weight:900;line-height:1">${s.overall || 50}</div>
-              <div style="color:var(--text-muted);font-size:11px">OVR</div>
+            <div class="pitstop-stat">
+              <div class="ps-val good">${fastest != null ? fastest.toFixed(2) + 's' : '—'}</div>
+              <div class="ps-label">最快進站</div>
             </div>
-          </div>
-          ${renderStatBar('賽車速度', s.car_speed || 50)}
-          ${renderStatBar('進站效率', s.pit_efficiency || 50)}
-          ${renderStatBar('策略評分', s.strategy || 50)}
-          ${renderStatBar('賽道適性', s.track_adaptability || 50)}
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-            <span class="rarity-badge rarity-silverstone">Silverstone</span>
-            <div style="font-size:12px;color:var(--text-muted)">${c.wins || 0}勝 · P${s.championship_position || '?'}</div>
+            <div class="pitstop-stat">
+              <div class="ps-val ${errorRate != null && errorRate < 0.05 ? 'good' : 'warn'}">${reliability != null ? Math.round(reliability * 100) + '%' : (errorRate != null ? Math.round((1 - errorRate) * 100) + '%' : '—')}</div>
+              <div class="ps-label">可靠度</div>
+            </div>
           </div>
         </div>
       `;
+
+      return `
+        <div class="constructor-card">
+          <div class="constructor-card-top" style="border-left-color:${color}">
+            <div class="constructor-header">
+              <div class="constructor-identity">
+                <div class="name">${c.name}</div>
+                <div class="nationality">${c.nationality || ''} · ${c.points || 0} pts · P${c.position || '?'}</div>
+              </div>
+              <div class="constructor-ovr">
+                <div class="score">${s.overall || 50}</div>
+                <div class="score-label">OVR</div>
+              </div>
+            </div>
+            ${renderStatBar('賽車速度', s.car_speed          || 50)}
+            ${renderStatBar('進站效率', s.pit_efficiency     || 50)}
+            ${renderStatBar('策略評分', s.strategy           || 50)}
+            ${renderStatBar('賽道適性', s.track_adaptability || 50)}
+          </div>
+          ${pitBlock}
+        </div>
+      `;
     }).join('');
+
   } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入車隊卡牌</p>';
+    el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">無法載入車隊卡牌</p>';
   }
 }
 
-loadAllDriverCards();
-loadConstructorCards();
+// ═══════════════════════════════════════════
+//  TRACK CARDS
+// ═══════════════════════════════════════════
+function renderDifficultyStars(val) {
+  const n = Math.round(Math.min(10, Math.max(0, val || 0)));
+  let stars = '';
+  for (let i = 1; i <= 10; i++) {
+    stars += `<span class="${i <= n ? '' : 'empty'}">★</span>`;
+  }
+  return `<span class="diff-stars">${stars}</span><span class="diff-num">${n}/10</span>`;
+}
+
+function trackTypeLabel(type) {
+  const map = { street: '街道賽', high_speed: '高速賽道', technical: '技術賽道' };
+  return map[type] || type || '未知';
+}
+
+function trackTypeBadge(type) {
+  return `<span class="track-type-badge track-type-${type || 'technical'}">${trackTypeLabel(type)}</span>`;
+}
+
+async function loadTrackCards() {
+  const el = document.getElementById('all-tracks');
+  try {
+    const data = await api('/api/tracks');
+    const tracks = data.tracks || data || [];
+
+    if (!Array.isArray(tracks) || !tracks.length) {
+      el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">暫無賽道資料</p>';
+      return;
+    }
+
+    el.innerHTML = tracks.map(t => {
+      const characteristics = t.characteristics || t.tags || [];
+      const strategy = t.strategy_recommendation || t.strategy || '';
+      const overtaking = t.overtaking_score ?? t.overtaking ?? 50;
+
+      return `
+        <div class="track-card">
+          <div class="track-header">
+            <div class="track-name">${t.name_zh || t.name || '未知賽道'}</div>
+            ${trackTypeBadge(t.type || t.circuit_type)}
+          </div>
+
+          <div class="track-difficulty">
+            <span class="diff-label">難度</span>
+            ${renderDifficultyStars(t.difficulty)}
+          </div>
+
+          ${renderStatBar('超車指數', overtaking)}
+
+          ${characteristics.length ? `
+          <div class="track-tags">
+            ${characteristics.map(ch => `<span class="track-tag">${ch}</span>`).join('')}
+          </div>` : ''}
+
+          ${strategy ? `
+          <div class="track-strategy">
+            <strong>策略建議：</strong>${strategy}
+          </div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+  } catch (e) {
+    el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">無法載入賽道卡牌</p>';
+  }
+}
+
+// ═══════════════════════════════════════════
+//  INIT — load first tab immediately
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  tabLoaded.drivers = true;
+  loadAllDriverCards();
+});
 </script>
 </body>
 </html>
