@@ -34,10 +34,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 /* CAROUSEL */
 .carousel-section{padding:20px 0 8px;border-bottom:1px solid #1a1a1a;}
 .carousel-label{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;color:#666;margin-bottom:12px;}
-.carousel-wrap{position:relative;width:100%;height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.carousel-track{display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%;}
-.dcard{width:180px;height:280px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.5s cubic-bezier(.25,.8,.25,1);position:absolute;left:50%;top:50%;overflow:hidden;}
-.dcard.active{width:250px;height:370px;border-color:#e8ff00;z-index:10;}
+.carousel-wrap{position:relative;width:100%;height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:1000px;}
+.carousel-track{display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%;transform-style:preserve-3d;}
+.dcard{width:170px;height:260px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.55s cubic-bezier(.34,1.56,.64,1);position:absolute;left:50%;top:50%;overflow:hidden;}
+.dcard.active{width:260px;height:380px;border-color:#e8ff00;z-index:10;}
 .dc-stripe{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.08;pointer-events:none;}
 .dc-num{position:absolute;top:8px;right:10px;font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;opacity:0.08;color:#fff;line-height:1;}
 .dc-avatar{width:56px;height:56px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:24px;margin:16px 0 8px 16px;position:relative;z-index:2;}
@@ -606,38 +606,27 @@ const CDRIVERS = [
 ];
 
 let ccur = 0;
+let cardsBuilt = false;
 
-function crender(){
+// Build all card DOMs once, then only update positions on slide
+function cbuild() {
   const track = document.getElementById('ctrack');
-  const dots  = document.getElementById('cdots');
+  const dots = document.getElementById('cdots');
   track.innerHTML = '';
-  dots.innerHTML  = '';
+  dots.innerHTML = '';
   const total = CDRIVERS.length;
-  if(!total) return;
+  if (!total) return;
 
-  // Show 5 cards centered around ccur
-  for(let offset = -2; offset <= 2; offset++) {
-    const i = ((ccur + offset) % total + total) % total;
-    const d = CDRIVERS[i];
-    const isCenter = offset === 0;
-    const absOff = Math.abs(offset);
-
-    // Position: center card at 0, others offset left/right
-    const tx = offset * 200;  // horizontal spacing
-    const scale = isCenter ? 1 : (absOff === 1 ? 0.85 : 0.7);
-    const opacity = isCenter ? 1 : (absOff === 1 ? 0.6 : 0.25);
-    const zIdx = 10 - absOff;
-    const rotY = offset * -5;
-
+  CDRIVERS.forEach((d, i) => {
     const card = document.createElement('div');
-    card.className = 'dcard' + (isCenter ? ' active' : '');
-    card.style.cssText = `transform:translate(-50%,-50%) translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${zIdx};`;
-    if(!isCenter) card.onclick = () => { ccur=i; crender(); };
+    card.className = 'dcard';
+    card.dataset.idx = i;
+    card.onclick = () => { if (i !== ccur) { ccur = i; cslide(); } };
     card.innerHTML = `
       <div class="dc-stripe" style="background:linear-gradient(135deg,${d.color},transparent)"></div>
       <div class="dc-num">${d.num}</div>
       <div class="dc-avatar" style="border-color:${d.color};background:${d.color}22;overflow:hidden">
-        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span style=font-size:${isCenter?28:22}px>${d.num}</span>'">` : `<span style="font-size:${isCenter?'28px':'22px'}">${d.num}</span>`}
+        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.innerHTML='<span style=font-size:22px>${d.num}</span>'">` : `<span style="font-size:22px">${d.num}</span>`}
       </div>
       <div class="dc-name">${d.name}</div>
       <div class="dc-team" style="color:${d.color}">${d.team}</div>
@@ -649,9 +638,8 @@ function crender(){
         <span class="dc-rarity" style="background:${d.rBg};color:${d.rColor};border:1px solid ${d.rBorder}">${d.rarity}</span>
         <span class="dc-ovr" style="color:${d.color}">${d.ovr}</span>
       </div>
-      ${isCenter?`
       <div class="dc-hover">
-        <div class="dh-title">本站數據 · 吉達</div>
+        <div class="dh-title">本站數據</div>
         <div class="dh-row"><span class="dh-l">勝率預測</span><span class="dh-v hi">${d.win_rate}%</span></div>
         <div class="dh-row"><span class="dh-l">市場賠率</span><span class="dh-v hi">${d.odds}x</span></div>
         <div class="dh-row"><span class="dh-l">賽季積分</span><span class="dh-v">${d.points} pts</span></div>
@@ -662,27 +650,77 @@ function crender(){
         </div>
         ${d.carImg?`<div style="text-align:center;margin:4px 0"><img src="${d.carImg}" style="width:90%;max-height:40px;object-fit:contain;opacity:0.8;filter:drop-shadow(0 1px 4px ${d.color}33)"></div>`:''}
         <button class="dbet" style="background:${d.color};color:${d.color==='#e8ff00'?'#000':'#fff'}" onclick="event.stopPropagation();location.href='/race?pick=${d.driver_id||''}'">押 ${d.name} →</button>
-      </div>`:''}
+      </div>
     `;
     track.appendChild(card);
-  }
 
-  // Dots for all drivers
-  for(let i = 0; i < total; i++) {
     const dot = document.createElement('div');
-    dot.className = 'cdot'+(i===ccur?' active':'');
-    dot.onclick = () => { ccur=i; crender(); };
+    dot.className = 'cdot';
+    dot.dataset.idx = i;
+    dot.onclick = () => { ccur = i; cslide(); };
     dots.appendChild(dot);
-  }
+  });
+
+  cardsBuilt = true;
+  cslide();
 }
 
-function cmove(dir){
-  ccur = (ccur+dir+CDRIVERS.length)%CDRIVERS.length;
-  crender();
+// Only update positions — CSS transition handles the animation
+function cslide() {
+  const total = CDRIVERS.length;
+  if (!total) return;
+  const cards = document.querySelectorAll('#ctrack .dcard');
+  const dots = document.querySelectorAll('#cdots .cdot');
+
+  cards.forEach(card => {
+    const i = parseInt(card.dataset.idx);
+    // Calculate shortest circular offset from ccur
+    let offset = i - ccur;
+    if (offset > total / 2) offset -= total;
+    if (offset < -total / 2) offset += total;
+
+    const absOff = Math.abs(offset);
+    const isCenter = offset === 0;
+
+    if (absOff > 3) {
+      card.style.cssText = 'transform:translate(-50%,-50%) translateX(0) scale(0.4);opacity:0;z-index:0;pointer-events:none;';
+      card.classList.remove('active');
+      return;
+    }
+
+    // macOS Dock style: smooth size falloff
+    const tx = offset * 190;
+    const scale = Math.max(0.55, 1 - absOff * 0.18);
+    const opacity = Math.max(0.15, 1 - absOff * 0.3);
+    const zIdx = 10 - absOff;
+    const rotY = offset * -3;
+    const ty = absOff * 8; // slight vertical push down for non-center
+
+    card.style.cssText = `transform:translate(-50%,-50%) translateX(${tx}px) translateY(${ty}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${zIdx};pointer-events:${absOff <= 3 ? 'auto' : 'none'};`;
+
+    if (isCenter) {
+      card.classList.add('active');
+    } else {
+      card.classList.remove('active');
+    }
+  });
+
+  // Update dots
+  dots.forEach(dot => {
+    const i = parseInt(dot.dataset.idx);
+    dot.className = 'cdot' + (i === ccur ? ' active' : '');
+  });
+}
+
+function crender() { if (!cardsBuilt && CDRIVERS.length) cbuild(); else cslide(); }
+
+function cmove(dir) {
+  ccur = (ccur + dir + CDRIVERS.length) % CDRIVERS.length;
+  cslide();
 }
 
 crender();
-setInterval(()=>{ cmove(1); }, 4000);
+setInterval(() => { cmove(1); }, 4000);
 
 // Load real data
 loadPage();
