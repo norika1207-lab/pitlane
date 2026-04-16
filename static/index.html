@@ -5,9 +5,200 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PitLane — 賽車預測卡牌平台</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
 <style>
+  /* ─── CARD CAROUSEL ─── */
+  .carousel-wrap {
+    position: relative;
+    margin-top: 48px;
+    padding: 0 60px;
+    user-select: none;
+  }
+  .carousel-stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 420px;
+    position: relative;
+    perspective: 1200px;
+  }
+  .carousel-card {
+    position: absolute;
+    width: 280px;
+    background: #141414;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+    transform-style: preserve-3d;
+  }
+  .carousel-card .cc-team-stripe {
+    position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 8px 0 0 8px;
+  }
+  .carousel-card .cc-top {
+    padding: 20px 20px 0 28px;
+    display: flex; align-items: center; gap: 14px;
+    position: relative;
+  }
+  .carousel-card .cc-ghost {
+    position: absolute; top: 8px; right: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 4rem; font-weight: 900;
+    color: rgba(232,255,0,0.05);
+    line-height: 1; pointer-events: none;
+  }
+  .carousel-card .cc-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    object-fit: cover; border: 2px solid rgba(255,255,255,0.08);
+    background: #1a1a1a; flex-shrink: 0;
+  }
+  .carousel-card .cc-avatar-fb {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(232,255,0,0.08);
+    border: 2px solid rgba(232,255,0,0.2);
+    display: none; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.6rem; font-weight: 800; color: #e8ff00;
+    flex-shrink: 0;
+  }
+  .carousel-card .cc-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.15rem; font-weight: 700; color: #e8e8e8;
+    line-height: 1.2;
+  }
+  .carousel-card .cc-team {
+    font-size: 0.75rem; color: #777; margin-top: 2px;
+  }
+
+  /* Stats panel — only visible on center card */
+  .carousel-card .cc-stats {
+    padding: 16px 28px 0;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    opacity: 0; max-height: 0;
+    transition: opacity 0.4s, max-height 0.4s;
+    overflow: hidden;
+  }
+  .carousel-card.is-center .cc-stats {
+    opacity: 1; max-height: 200px;
+  }
+  .cc-stat-item {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .cc-stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; color: #555;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .cc-stat-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem; font-weight: 700; color: #e8ff00;
+  }
+
+  /* Skills row */
+  .carousel-card .cc-skills {
+    padding: 10px 28px 0;
+    display: flex; flex-wrap: wrap; gap: 4px;
+    opacity: 0; max-height: 0;
+    transition: opacity 0.4s 0.1s, max-height 0.4s;
+    overflow: hidden;
+  }
+  .carousel-card.is-center .cc-skills {
+    opacity: 1; max-height: 100px;
+  }
+  .cc-skill-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 3px;
+    background: rgba(232,255,0,0.06);
+    border: 1px solid rgba(232,255,0,0.15);
+    color: #e8ff00; text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .cc-skill-tag.passive {
+    background: rgba(0,176,255,0.08);
+    border-color: rgba(0,176,255,0.2);
+    color: #00b0ff;
+  }
+
+  /* Footer */
+  .carousel-card .cc-footer {
+    padding: 14px 28px 18px;
+    display: flex; justify-content: space-between;
+    align-items: center;
+  }
+  .cc-ovr {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2.2rem; font-weight: 900;
+    color: #e8ff00; line-height: 1;
+  }
+  .cc-ovr-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem; color: #444;
+    text-transform: uppercase; letter-spacing: 0.12em;
+  }
+  .cc-bet-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 7px 16px; border-radius: 4px;
+    background: #e8ff00; color: #0d0d0d;
+    border: none; cursor: pointer;
+    transition: all 0.15s;
+    opacity: 0; transform: translateY(4px);
+  }
+  .carousel-card.is-center .cc-bet-btn {
+    opacity: 1; transform: translateY(0);
+    transition-delay: 0.15s;
+  }
+  .cc-bet-btn:hover {
+    box-shadow: 0 0 16px rgba(232,255,0,0.35);
+  }
+
+  /* Arrows */
+  .carousel-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    z-index: 10; width: 44px; height: 44px;
+    border-radius: 50%; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(20,20,20,0.8);
+    color: #e8ff00; font-size: 1.6rem;
+    cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: all 0.15s; backdrop-filter: blur(4px);
+    font-family: sans-serif; line-height: 1;
+  }
+  .carousel-prev { left: 0; }
+  .carousel-next { right: 0; }
+  .carousel-arrow:hover {
+    background: rgba(232,255,0,0.1);
+    border-color: rgba(232,255,0,0.3);
+    box-shadow: 0 0 12px rgba(232,255,0,0.15);
+  }
+
+  /* Dots */
+  .carousel-dots {
+    display: flex; gap: 6px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .carousel-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #333; border: none; cursor: pointer;
+    transition: all 0.3s; padding: 0;
+  }
+  .carousel-dot.active {
+    background: #e8ff00;
+    box-shadow: 0 0 8px rgba(232,255,0,0.4);
+    width: 24px; border-radius: 4px;
+  }
+
   /* ─── ACTION BAR ─── */
   .action-bar {
     background: var(--bg-secondary);
@@ -274,6 +465,15 @@
       <button class="btn btn-gold" onclick="user ? location.href='/race' : showModal('login')">開始預測</button>
       <button class="btn btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
     </div>
+
+    <!-- CARD CAROUSEL -->
+    <div class="carousel-wrap">
+      <button class="carousel-arrow carousel-prev" onclick="carouselPrev()">&#8249;</button>
+      <div class="carousel-stage" id="carousel-stage"></div>
+      <button class="carousel-arrow carousel-next" onclick="carouselNext()">&#8250;</button>
+      <div class="carousel-dots" id="carousel-dots"></div>
+    </div>
+
   </div>
 </section>
 
@@ -702,6 +902,170 @@ async function loadTrackInfo(circuit) {
   }
 }
 
+// ─── CARD CAROUSEL ───
+let carouselCards = [];
+let carouselIdx = 0;
+let carouselTimer = null;
+
+async function loadCarousel() {
+  const stage = document.getElementById('carousel-stage');
+  if (!stage) return;
+  try {
+    const data = await api('/api/drivers');
+    const drivers = (data.drivers || []).slice(0, 10);
+    if (!drivers.length) return;
+
+    // Fetch cards in parallel
+    const cards = await Promise.all(
+      drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
+    );
+
+    carouselCards = drivers.map((d, i) => {
+      const card = cards[i];
+      const s = card?.stats || {};
+      const sk = card?.skills || {};
+      return {
+        id: d.driver_id,
+        name: d.name || '',
+        number: d.number || '',
+        team: card?.team || d.team || '',
+        teamColour: card?.team_colour || d.team_colour || 'e8ff00',
+        headshot: card?.headshot_url || d.headshot_url || '',
+        overall: s.overall || 50,
+        odds: card?.odds || 5.0,
+        winProb: card?.odds ? Math.round(1 / card.odds * 100) : 20,
+        points: d.points || s.season_points || 0,
+        qualifying: s.qualifying || 50,
+        tireMgmt: s.tire_management || 50,
+        wetWeather: s.wet_weather || 50,
+        overtaking: s.overtaking || 50,
+        passive: sk.passive?.name || '',
+        skills: (sk.skills || []).map(x => `${x.name} ${'★'.repeat(x.stars)}${'☆'.repeat(3 - x.stars)}`),
+      };
+    });
+
+    renderCarousel();
+    startCarouselAuto();
+  } catch (e) {
+    // silent fail
+  }
+}
+
+function renderCarousel() {
+  const stage = document.getElementById('carousel-stage');
+  const dotsEl = document.getElementById('carousel-dots');
+  if (!stage || !carouselCards.length) return;
+
+  const total = carouselCards.length;
+  const visible = Math.min(total, 5); // show up to 5 cards
+  const half = Math.floor(visible / 2);
+
+  let html = '';
+  for (let offset = -half; offset <= half; offset++) {
+    const idx = ((carouselIdx + offset) % total + total) % total;
+    const c = carouselCards[idx];
+    const isCenter = offset === 0;
+    const absOff = Math.abs(offset);
+
+    // Transform: center=full size, others shrink/translate/dim
+    const tx = offset * 220;
+    const scale = isCenter ? 1 : Math.max(0.7, 1 - absOff * 0.15);
+    const opacity = isCenter ? 1 : Math.max(0.3, 1 - absOff * 0.3);
+    const z = 10 - absOff;
+    const rotY = offset * -4;
+
+    html += `
+      <div class="carousel-card ${isCenter ? 'is-center' : ''}"
+           style="transform:translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg);
+                  opacity:${opacity}; z-index:${z};
+                  ${isCenter ? 'box-shadow:0 8px 40px rgba(232,255,0,0.08),0 0 0 1px rgba(232,255,0,0.1);' : ''}"
+           ${isCenter ? `onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()"` : `onclick="carouselGo(${idx})"`}>
+        <div class="cc-team-stripe" style="background:#${c.teamColour}"></div>
+        <div class="cc-top">
+          <span class="cc-ghost">${c.number}</span>
+          <img class="cc-avatar" src="${c.headshot}" alt="${c.name}"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="cc-avatar-fb">#${c.number}</div>
+          <div>
+            <div class="cc-name">${c.name}</div>
+            <div class="cc-team">${c.team}</div>
+          </div>
+        </div>
+        <div class="cc-stats">
+          <div class="cc-stat-item">
+            <span class="cc-stat-label">Win Prob</span>
+            <span class="cc-stat-val">${c.winProb}%</span>
+          </div>
+          <div class="cc-stat-item">
+            <span class="cc-stat-label">Odds</span>
+            <span class="cc-stat-val">x${c.odds}</span>
+          </div>
+          <div class="cc-stat-item">
+            <span class="cc-stat-label">Qualifying</span>
+            <span class="cc-stat-val">${c.qualifying}</span>
+          </div>
+          <div class="cc-stat-item">
+            <span class="cc-stat-label">Tyre Mgmt</span>
+            <span class="cc-stat-val">${c.tireMgmt}</span>
+          </div>
+          <div class="cc-stat-item">
+            <span class="cc-stat-label">Wet Race</span>
+            <span class="cc-stat-val">${c.wetWeather}</span>
+          </div>
+          <div class="cc-stat-item">
+            <span class="cc-stat-label">Overtake</span>
+            <span class="cc-stat-val">${c.overtaking}</span>
+          </div>
+        </div>
+        <div class="cc-skills">
+          ${c.passive ? `<span class="cc-skill-tag passive">${c.passive}</span>` : ''}
+          ${c.skills.slice(0, 2).map(s => `<span class="cc-skill-tag">${s}</span>`).join('')}
+        </div>
+        <div class="cc-footer">
+          <div>
+            <div class="cc-ovr">${c.overall}</div>
+            <div class="cc-ovr-label">Overall</div>
+          </div>
+          <button class="cc-bet-btn" onclick="event.stopPropagation();location.href='/race?pick=${c.id}'">押這個人 →</button>
+        </div>
+      </div>`;
+  }
+
+  stage.innerHTML = html;
+
+  // Dots
+  dotsEl.innerHTML = carouselCards.map((_, i) =>
+    `<button class="carousel-dot ${i === carouselIdx ? 'active' : ''}" onclick="carouselGo(${i})"></button>`
+  ).join('');
+}
+
+function carouselNext() {
+  carouselIdx = (carouselIdx + 1) % carouselCards.length;
+  renderCarousel();
+}
+function carouselPrev() {
+  carouselIdx = (carouselIdx - 1 + carouselCards.length) % carouselCards.length;
+  renderCarousel();
+}
+function carouselGo(idx) {
+  carouselIdx = idx;
+  renderCarousel();
+  restartCarouselAuto();
+}
+function startCarouselAuto() {
+  carouselTimer = setInterval(carouselNext, 4000);
+}
+function pauseCarousel() {
+  clearInterval(carouselTimer);
+}
+function resumeCarousel() {
+  startCarouselAuto();
+}
+function restartCarouselAuto() {
+  clearInterval(carouselTimer);
+  startCarouselAuto();
+}
+
 // ─── HUD INFO BAR ───
 async function loadHudBar() {
   try {
@@ -748,6 +1112,7 @@ function raceLightsAnim() {
 loadCurrentRace();
 loadDrivers();
 loadHudBar();
+loadCarousel();
 setTimeout(raceLightsAnim, 1000);
 </script>
 </body>
