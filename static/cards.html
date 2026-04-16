@@ -32,6 +32,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 .tier-pill{padding:6px 14px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;border:1px solid;}
 .tier-pill.active{color:#000;}
 
+/* 排序按鈕 */
+.sort-btn{padding:5px 12px;border-radius:6px;border:1px solid #2a2a2a;background:#111;color:#888;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;letter-spacing:0.04em;}
+.sort-btn:hover{border-color:#555;color:#ccc;}
+.sort-btn.active{border-color:#e8ff00;color:#e8ff00;background:#1a1a00;}
+
 /* 卡牌網格 */
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:20px;}
 
@@ -144,12 +149,25 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
   </div>
 
   <div class="tier-bar">
-    <div class="tier-pill" style="background:#1a1a22;color:#888;border-color:#333" onclick="filterTier('all',this)">全部</div>
-    <div class="tier-pill active" style="background:#2a2a35;color:#ccc;border-color:#444" onclick="filterTier('silverstone',this)">銀石 · 入門</div>
+    <div class="tier-pill active" style="background:#1a1a22;color:#888;border-color:#333" onclick="filterTier('all',this)">全部</div>
+    <div class="tier-pill" style="background:#2a2a35;color:#ccc;border-color:#444" onclick="filterTier('silverstone',this)">銀石 · 入門</div>
     <div class="tier-pill" style="background:#0a1628;color:#6ab0ff;border-color:#1a3a6a" onclick="filterTier('monza',this)">蒙扎 · 進階</div>
     <div class="tier-pill" style="background:#0a0a18;color:#AFA9EC;border-color:#534AB7" onclick="filterTier('suzuka',this)">鈴鹿 · 稀有</div>
     <div class="tier-pill" style="background:#060810;color:#00ccff;border-color:#00b8ff" onclick="filterTier('spa',this)">Spa · 超稀有</div>
     <div class="tier-pill" style="background:#0a0800;color:#c9a84c;border-color:#c9a84c" onclick="filterTier('monaco',this)">摩納哥 · 傳奇</div>
+  </div>
+
+  <!-- 排序列 -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#555;letter-spacing:0.1em">排序</span>
+    <button class="sort-btn active" onclick="sortCards('ovr',this)">綜合 ▼</button>
+    <button class="sort-btn" onclick="sortCards('win',this)">勝率</button>
+    <button class="sort-btn" onclick="sortCards('odds',this)">賠率</button>
+    <button class="sort-btn" onclick="sortCards('q',this)">單圈速度</button>
+    <button class="sort-btn" onclick="sortCards('t',this)">輪胎管理</button>
+    <button class="sort-btn" onclick="sortCards('w',this)">雨戰</button>
+    <button class="sort-btn" onclick="sortCards('o',this)">超車能力</button>
+    <button class="sort-btn" onclick="sortCards('team',this)">車隊</button>
   </div>
 
   <div class="cards-grid" id="cardsGrid"></div>
@@ -158,6 +176,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 <script src="/static/assets/js/app.js"></script>
 <script>
 let DRIVERS = [];
+let currentSort = 'ovr';
+let sortAsc = false; // false = 高到低（預設）
+let currentTierFilter = 'all';
 
 // Load real drivers from API
 async function loadDrivers() {
@@ -394,20 +415,60 @@ function buildCard(d) {
     </div>`;
 }
 
-function renderCards(tierFilter='all'){
+function renderCards(){
   const grid = document.getElementById('cardsGrid');
-  const filtered = tierFilter==='all'?DRIVERS:DRIVERS.filter(d=>d.tier===tierFilter);
-  grid.innerHTML = filtered.map(buildCard).join('');
+  let list = currentTierFilter === 'all' ? [...DRIVERS] : DRIVERS.filter(d => d.tier === currentTierFilter);
+
+  // Sort
+  if (currentSort === 'team') {
+    list.sort((a, b) => sortAsc ? a.team.localeCompare(b.team) : b.team.localeCompare(a.team));
+  } else if (currentSort === 'odds') {
+    // odds: lower = better, so default desc means low odds first
+    list.sort((a, b) => sortAsc ? parseFloat(b.odds) - parseFloat(a.odds) : parseFloat(a.odds) - parseFloat(b.odds));
+  } else {
+    const key = {ovr:'ovr', win:'win', q:'q', t:'t', w:'w', o:'o'}[currentSort];
+    if (key) {
+      list.sort((a, b) => {
+        const va = key.length === 1 ? (a.stats[key] || 0) : (a[key] || 0);
+        const vb = key.length === 1 ? (b.stats[key] || 0) : (b[key] || 0);
+        return sortAsc ? va - vb : vb - va;
+      });
+    }
+  }
+
+  grid.innerHTML = list.map(buildCard).join('');
 }
 
 function filterTier(tier, btn){
-  document.querySelectorAll('.tier-pill').forEach(p=>{
+  document.querySelectorAll('.tier-pill').forEach(p => {
     p.classList.remove('active');
-    p.style.opacity='0.6';
+    p.style.opacity = '0.6';
   });
   btn.classList.add('active');
-  btn.style.opacity='1';
-  renderCards(tier);
+  btn.style.opacity = '1';
+  currentTierFilter = tier;
+  renderCards();
+}
+
+function sortCards(key, btn) {
+  // If clicking same sort, toggle direction
+  if (currentSort === key) {
+    sortAsc = !sortAsc;
+  } else {
+    currentSort = key;
+    sortAsc = false; // default: high to low
+  }
+
+  // Update button labels
+  document.querySelectorAll('.sort-btn').forEach(b => {
+    b.classList.remove('active');
+    // Remove arrows from text
+    b.textContent = b.textContent.replace(/ [▲▼]/g, '');
+  });
+  btn.classList.add('active');
+  btn.textContent = btn.textContent.replace(/ [▲▼]/g, '') + (sortAsc ? ' ▲' : ' ▼');
+
+  renderCards();
 }
 
 renderCards();
