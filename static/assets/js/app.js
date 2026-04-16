@@ -133,7 +133,7 @@ function renderStatBar(label, value) {
   return `
     <div class="stat-row">
       <span class="stat-label">${label}</span>
-      <div class="stat-bar">
+      <div class="stat-bar telemetry-line">
         <div class="stat-bar-fill ${statBarClass(value)}" style="width:${value}%"></div>
       </div>
       <span class="stat-value">${value}</span>
