@@ -34,10 +34,12 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 /* CAROUSEL */
 .carousel-section{padding:20px 0 8px;border-bottom:1px solid #1a1a1a;}
 .carousel-label{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;color:#666;margin-bottom:12px;}
-.carousel-wrap{position:relative;width:100%;height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden;perspective:1000px;}
-.carousel-track{display:flex;align-items:center;justify-content:center;position:relative;width:100%;height:100%;transform-style:preserve-3d;}
-.dcard{width:170px;height:260px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.55s cubic-bezier(.34,1.56,.64,1);position:absolute;left:50%;top:50%;overflow:hidden;}
-.dcard.active{width:260px;height:380px;border-color:#e8ff00;z-index:10;}
+.carousel-wrap{position:relative;width:100%;height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.carousel-track{display:flex;align-items:center;gap:16px;transition:transform 0.6s cubic-bezier(.25,.8,.25,1);}
+.dcard{width:180px;height:280px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;transition:all 0.5s cubic-bezier(.25,.8,.25,1);flex-shrink:0;position:relative;overflow:hidden;}
+.dcard.active{width:250px;height:370px;border-color:#e8ff00;z-index:10;}
+.dcard.side{opacity:0.55;transform:scale(0.88);}
+.dcard.far{opacity:0.25;transform:scale(0.75);}
 .dc-stripe{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.08;pointer-events:none;}
 .dc-num{position:absolute;top:8px;right:10px;font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;opacity:0.08;color:#fff;line-height:1;}
 .dc-avatar{width:56px;height:56px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:24px;margin:16px 0 8px 16px;position:relative;z-index:2;}
@@ -606,10 +608,8 @@ const CDRIVERS = [
 ];
 
 let ccur = 0;
-let cardsBuilt = false;
 
-// Build all card DOMs once, then only update positions on slide
-function cbuild() {
+function crender() {
   const track = document.getElementById('ctrack');
   const dots = document.getElementById('cdots');
   track.innerHTML = '';
@@ -618,15 +618,21 @@ function cbuild() {
   if (!total) return;
 
   CDRIVERS.forEach((d, i) => {
+    const diff = i - ccur;
+    let cls = 'dcard';
+    if (diff === 0) cls += ' active';
+    else if (Math.abs(diff) === 1) cls += ' side';
+    else cls += ' far';
+
     const card = document.createElement('div');
-    card.className = 'dcard';
-    card.dataset.idx = i;
-    card.onclick = () => { if (i !== ccur) { ccur = i; cslide(); } };
+    card.className = cls;
+    card.onclick = () => { if (i !== ccur) { ccur = i; crender(); } };
+    const isCenter = diff === 0;
     card.innerHTML = `
       <div class="dc-stripe" style="background:linear-gradient(135deg,${d.color},transparent)"></div>
       <div class="dc-num">${d.num}</div>
       <div class="dc-avatar" style="border-color:${d.color};background:${d.color}22;overflow:hidden">
-        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.innerHTML='<span style=font-size:22px>${d.num}</span>'">` : `<span style="font-size:22px">${d.num}</span>`}
+        ${d.headshot ? `<img src="${d.headshot}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='<span style=font-size:22px>${d.num}</span>'">` : `<span style="font-size:22px">${d.num}</span>`}
       </div>
       <div class="dc-name">${d.name}</div>
       <div class="dc-team" style="color:${d.color}">${d.team}</div>
@@ -638,6 +644,7 @@ function cbuild() {
         <span class="dc-rarity" style="background:${d.rBg};color:${d.rColor};border:1px solid ${d.rBorder}">${d.rarity}</span>
         <span class="dc-ovr" style="color:${d.color}">${d.ovr}</span>
       </div>
+      ${isCenter ? `
       <div class="dc-hover">
         <div class="dh-title">本站數據</div>
         <div class="dh-row"><span class="dh-l">勝率預測</span><span class="dh-v hi">${d.win_rate}%</span></div>
@@ -646,72 +653,30 @@ function cbuild() {
         <div style="margin-top:6px">
           <div class="dh-title" style="margin-bottom:4px">技能</div>
           <div class="dskill"><span class="dsk-n">${d.passive}</span><span class="dsk-s">被動</span></div>
-          ${d.skills.map(s=>`<div class="dskill"><span class="dsk-n">${s.n}</span><span class="dsk-s">${s.s}</span></div>`).join('')}
+          ${d.skills.map(s => `<div class="dskill"><span class="dsk-n">${s.n}</span><span class="dsk-s">${s.s}</span></div>`).join('')}
         </div>
-        ${d.carImg?`<div style="text-align:center;margin:4px 0"><img src="${d.carImg}" style="width:90%;max-height:40px;object-fit:contain;opacity:0.8;filter:drop-shadow(0 1px 4px ${d.color}33)"></div>`:''}
-        <button class="dbet" style="background:${d.color};color:${d.color==='#e8ff00'?'#000':'#fff'}" onclick="event.stopPropagation();location.href='/race?pick=${d.driver_id||''}'">押 ${d.name} →</button>
-      </div>
+        ${d.carImg ? `<div style="text-align:center;margin:4px 0"><img src="${d.carImg}" style="width:90%;max-height:40px;object-fit:contain;opacity:0.8;filter:drop-shadow(0 1px 4px ${d.color}33)"></div>` : ''}
+        <button class="dbet" style="background:${d.color};color:${d.color === '#e8ff00' ? '#000' : '#fff'}" onclick="event.stopPropagation();location.href='/race?pick=${d.driver_id || ''}'">押 ${d.name} →</button>
+      </div>` : ''}
     `;
     track.appendChild(card);
 
     const dot = document.createElement('div');
-    dot.className = 'cdot';
-    dot.dataset.idx = i;
-    dot.onclick = () => { ccur = i; cslide(); };
+    dot.className = 'cdot' + (i === ccur ? ' active' : '');
+    dot.onclick = () => { ccur = i; crender(); };
     dots.appendChild(dot);
   });
 
-  cardsBuilt = true;
-  cslide();
+  // Slide the whole track so ccur is centered
+  const cardW = ccur === 0 ? 0 : 196; // card width + gap
+  const activeExtra = 35; // (250-180)/2
+  const offset = -(ccur * cardW) + (ccur > 0 ? -activeExtra : 0);
+  track.style.transform = `translateX(${offset}px)`;
 }
-
-// Only update positions — CSS transition handles the animation
-function cslide() {
-  const total = CDRIVERS.length;
-  if (!total) return;
-  const cards = document.querySelectorAll('#ctrack .dcard');
-  const dots = document.querySelectorAll('#cdots .cdot');
-  const half = Math.floor(total / 2);
-
-  cards.forEach(card => {
-    const i = parseInt(card.dataset.idx);
-    // Circular offset: always wraps, never leaves a gap
-    let offset = i - ccur;
-    if (offset > half) offset -= total;
-    if (offset < -half) offset += total;
-
-    const absOff = Math.abs(offset);
-    const isCenter = offset === 0;
-
-    // ALL cards get positioned — no hiding. Far cards just go to edges.
-    const tx = offset * 190;
-    const scale = Math.max(0.45, 1 - absOff * 0.14);
-    const opacity = Math.max(0.08, 1 - absOff * 0.25);
-    const zIdx = 10 - absOff;
-    const rotY = offset * -3;
-    const ty = Math.min(absOff * 6, 24);
-
-    card.style.cssText = `transform:translate(-50%,-50%) translateX(${tx}px) translateY(${ty}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${zIdx};pointer-events:${absOff <= half ? 'auto' : 'none'};`;
-
-    if (isCenter) {
-      card.classList.add('active');
-    } else {
-      card.classList.remove('active');
-    }
-  });
-
-  // Update dots
-  dots.forEach(dot => {
-    const i = parseInt(dot.dataset.idx);
-    dot.className = 'cdot' + (i === ccur ? ' active' : '');
-  });
-}
-
-function crender() { if (!cardsBuilt && CDRIVERS.length) cbuild(); else cslide(); }
 
 function cmove(dir) {
   ccur = (ccur + dir + CDRIVERS.length) % CDRIVERS.length;
-  cslide();
+  crender();
 }
 
 crender();
