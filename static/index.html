@@ -564,7 +564,7 @@ async function loadPage() {
         carImg: getCarImage(card?.team||d.team||''),
       });
     });
-    ccur = Math.floor(CDRIVERS.length / 2);  // start from middle
+    ccur = 0;  // 從第一張開始，在中間最大
     crender();
 
     // Update top bet panel
