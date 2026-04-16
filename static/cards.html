@@ -4,683 +4,413 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PitLane — 卡牌收藏</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/assets/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ─── CARDS PAGE EXTRAS ─── */
-.page-hero {
-  padding: 100px 0 48px;
-  background: linear-gradient(180deg, rgba(212,168,67,0.05) 0%, transparent 70%);
-  text-align: center;
-}
-.page-hero h1 {
-  font-size: 2.2rem; font-weight: 900; margin-bottom: 8px;
-  background: linear-gradient(135deg, var(--text-primary) 40%, var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.page-hero p { color: var(--text-secondary); font-size: 1rem; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#060608;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height:100vh;}
 
-/* Tab nav */
-.tab-nav {
-  display: flex; gap: 4px;
-  background: var(--bg-secondary); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 4px;
-  margin: 32px auto 0; max-width: 480px;
-}
-.tab-btn {
-  flex: 1; padding: 10px 16px; border-radius: 8px;
-  border: none; cursor: pointer; font-size: 14px; font-weight: 600;
-  font-family: var(--font); color: var(--text-secondary);
-  background: transparent; transition: all 0.2s;
-}
-.tab-btn.active {
-  background: var(--bg-card); color: var(--gold);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-.tab-btn:hover:not(.active) { color: var(--text-primary); }
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:#e8ff00;}
+.nav-links{display:flex;gap:20px;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;letter-spacing:0.05em;}
+.nav-links a:hover{color:#fff;}
+.nav-links a.active{color:#e8ff00;}
+.nav-actions{display:flex;gap:8px;}
+.btn-login{padding:7px 16px;border-radius:8px;border:1px solid #333;background:transparent;color:#ccc;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-register{padding:7px 16px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
-/* Section tabs */
-.tab-section { display: none; }
-.tab-section.active { display: block; }
+.main{max-width:1200px;margin:0 auto;padding:24px 20px;}
 
-/* ─── DRIVER CARD V2 ─── */
-.driver-card-v2 {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden;
-  transition: all 0.3s; position: relative;
-}
-.driver-card-v2:hover {
-  border-color: var(--border-gold);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(212,168,67,0.1);
-}
-.driver-card-top {
-  border-left: 4px solid var(--gold); /* overridden per card via inline style */
-  padding: 20px 20px 0;
-  cursor: pointer;
-}
-.driver-card-header {
-  display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
-}
-.driver-avatar {
-  width: 60px; height: 60px; border-radius: 50%;
-  object-fit: cover; flex-shrink: 0;
-  border: 2px solid var(--border);
-  background: var(--bg-secondary);
-}
-.driver-avatar-fallback {
-  width: 60px; height: 60px; border-radius: 50%;
-  background: rgba(212,168,67,0.1); border: 2px solid var(--border-gold);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem; font-weight: 900; color: var(--gold);
-  flex-shrink: 0;
-}
-.driver-identity { flex: 1; min-width: 0; }
-.driver-identity .name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.driver-identity .team { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
-.driver-identity .nationality { font-size: 0.78rem; color: var(--text-muted); }
-.driver-ovr {
-  text-align: right; flex-shrink: 0;
-}
-.driver-ovr .score {
-  font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
-  font-family: var(--font-hud);
-  animation: dataFlicker 8s infinite;
-}
-.driver-ovr .score-label {
-  font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
-  font-family: var(--font-hud);
-}
+/* 頁面標題 */
+.page-header{margin-bottom:24px;}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#fff;}
+.page-sub{font-size:13px;color:#888;margin-top:4px;}
 
-.driver-stats { padding: 0 20px 12px; }
+/* 等級說明列 */
+.tier-bar{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.tier-pill{padding:6px 14px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:all 0.2s;border:1px solid;}
+.tier-pill.active{color:#000;}
 
-/* Skills area */
-.driver-skills {
-  padding: 12px 20px; border-top: 1px solid var(--border);
-  display: flex; flex-wrap: wrap; gap: 6px;
-}
-.skill-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border-radius: 20px;
-  font-size: 11px; font-weight: 600;
-}
-.skill-passive {
-  background: rgba(59,130,246,0.15); color: #60a5fa;
-  border: 1px solid rgba(59,130,246,0.25);
-}
-.skill-active {
-  background: rgba(212,168,67,0.12); color: var(--gold);
-  border: 1px solid var(--border-gold);
-}
-.skill-stars { color: var(--gold); font-size: 10px; letter-spacing: 1px; }
+/* 卡牌網格 */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:20px;}
 
-/* Card footer: pick button */
-.driver-card-footer {
-  padding: 12px 20px 16px; border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.driver-card-footer .meta { font-size: 11px; color: var(--text-muted); }
+/* ── 共用卡片基礎 ── */
+.card{border-radius:16px;overflow:visible;position:relative;cursor:pointer;transition:transform 0.3s cubic-bezier(.25,.8,.25,1);}
+.card:hover{transform:translateY(-12px) scale(1.04);}
+.card-inner{border-radius:16px;overflow:hidden;position:relative;width:100%;height:290px;}
+.c-num{position:absolute;top:6px;right:10px;font-size:55px;font-weight:900;line-height:1;z-index:2;pointer-events:none;font-family:'Barlow Condensed',sans-serif;}
+.c-rarity{position:absolute;top:10px;left:12px;font-size:8px;font-weight:900;letter-spacing:0.12em;z-index:10;font-family:'Barlow Condensed',sans-serif;}
+.c-art{height:105px;display:flex;align-items:center;justify-content:center;position:relative;z-index:5;}
+.c-emoji{font-size:52px;}
+.c-info{padding:0 12px;position:relative;z-index:5;}
+.c-name{font-size:20px;font-weight:900;color:#fff;line-height:1;font-family:'Barlow Condensed',sans-serif;}
+.c-team{font-size:8px;letter-spacing:0.06em;margin-top:1px;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;}
+.c-stats{display:flex;flex-direction:column;gap:4px;}
+.c-stat{display:flex;align-items:center;gap:5px;}
+.c-sl{font-size:8px;color:#888;width:24px;letter-spacing:0.05em;font-family:'Barlow Condensed',sans-serif;}
+.c-sb{flex:1;height:3px;background:#0a0a14;border-radius:2px;overflow:hidden;}
+.c-sf{height:100%;border-radius:2px;}
+.c-sv{font-size:8px;font-weight:700;width:14px;text-align:right;font-family:'Barlow Condensed',sans-serif;}
+.c-divider{margin:8px 12px 0;height:1px;}
+.c-bottom{padding:8px 12px 10px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;position:relative;z-index:5;}
+.c-wn{font-size:14px;font-weight:900;line-height:1;font-family:'Barlow Condensed',sans-serif;}
+.c-wl{font-size:6px;color:#555;letter-spacing:0.08em;margin-top:2px;font-family:'Barlow Condensed',sans-serif;}
+.c-ov{font-size:24px;font-weight:900;line-height:1;text-align:center;font-family:'Barlow Condensed',sans-serif;}
+.c-ol{font-size:6px;color:#555;letter-spacing:0.08em;text-align:center;margin-top:2px;font-family:'Barlow Condensed',sans-serif;}
+.c-od{font-size:14px;font-weight:900;line-height:1;text-align:right;font-family:'Barlow Condensed',sans-serif;}
+.c-odl{font-size:6px;color:#555;letter-spacing:0.08em;text-align:right;margin-top:2px;font-family:'Barlow Condensed',sans-serif;}
 
-/* AI Analysis expand */
-.analysis-toggle {
-  padding: 8px 20px 0; cursor: pointer;
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--text-secondary);
-  border-top: 1px solid var(--border);
-  transition: color 0.2s; user-select: none;
-}
-.analysis-toggle:hover { color: var(--gold); }
-.analysis-toggle .arrow {
-  font-size: 10px; transition: transform 0.2s;
-}
-.analysis-toggle.open .arrow { transform: rotate(180deg); }
-.analysis-body {
-  display: none; padding: 12px 20px 16px;
-  animation: fadeSlideIn 0.3s ease;
-}
-.analysis-body.open { display: block; }
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.analysis-box {
-  background: var(--bg-secondary); border-radius: var(--radius-sm);
-  padding: 14px 16px; font-size: 13px; color: var(--text-secondary);
-  line-height: 1.7; border: 1px solid var(--border);
-}
-.analysis-box.loading-analysis {
-  display: flex; align-items: center; gap: 10px; color: var(--text-muted);
-}
-.analysis-box.loading-analysis .spinner { width: 18px; height: 18px; border-width: 2px; margin: 0; }
+/* ── 1. SILVERSTONE ── */
+.silverstone .card-inner{background:linear-gradient(160deg,#131318 0%,#0e0e14 60%,#111116 100%);border:1px solid #2a2a35;}
+.silverstone .s-top-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.15) 30%,rgba(255,255,255,0.25) 50%,rgba(255,255,255,0.15) 70%,transparent 100%);z-index:10;}
+.silverstone .s-corner{position:absolute;top:0;right:0;width:60px;height:60px;background:radial-gradient(ellipse at top right,rgba(255,255,255,0.06) 0%,transparent 70%);z-index:3;}
+.silverstone .s-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.04) 50%,transparent 65%);animation:sweep 7s ease-in-out infinite;z-index:4;}
+.silverstone .s-accent{position:absolute;left:0;top:20%;bottom:20%;width:2px;background:linear-gradient(to bottom,transparent,var(--team-color),transparent);z-index:10;}
 
-/* ─── CONSTRUCTOR CARD ─── */
-.constructor-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden; transition: all 0.3s;
-}
-.constructor-card:hover {
-  border-color: var(--border-gold);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(212,168,67,0.1);
-}
-.constructor-card-top {
-  border-left: 4px solid var(--gold);
-  padding: 20px;
-}
-.constructor-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 16px;
-}
-.constructor-identity .name { font-size: 1.1rem; font-weight: 700; }
-.constructor-identity .nationality { font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px; }
-.constructor-ovr .score {
-  font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1; text-align: right;
-}
-.constructor-ovr .score-label { font-size: 10px; color: var(--text-muted); text-align: right; text-transform: uppercase; }
+/* ── 2. MONZA ── */
+.monza .card-inner{background:linear-gradient(160deg,#0a1020 0%,#0c1628 60%,#0a1020 100%);border:1px solid #1a3a6a;}
+.monza .m-top{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#3671C6 30%,#6ab0ff 50%,#3671C6 70%,transparent);z-index:10;}
+.monza .m-glow{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:100px;height:60px;background:radial-gradient(ellipse,rgba(54,113,198,0.25) 0%,transparent 70%);z-index:3;}
+.monza .m-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(54,113,198,0.06) 50%,transparent 65%);animation:sweep 5s ease-in-out infinite;z-index:4;}
+.monza .m-accent{position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,#3671C6 30%,#6ab0ff 50%,#3671C6 70%,transparent);z-index:10;}
 
-.pitstop-section {
-  margin: 14px 20px 16px;
-  padding: 12px 14px; border-radius: var(--radius-sm);
-  background: var(--bg-secondary); border: 1px solid var(--border);
-}
-.pitstop-section .pitstop-title {
-  font-size: 11px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;
-}
-.pitstop-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-}
-.pitstop-stat { text-align: center; }
-.pitstop-stat .ps-val {
-  font-size: 1.1rem; font-weight: 700; color: var(--text-primary); line-height: 1;
-}
-.pitstop-stat .ps-val.good { color: var(--green); }
-.pitstop-stat .ps-val.warn { color: var(--gold); }
-.pitstop-stat .ps-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+/* ── 3. SUZUKA ── */
+.suzuka .card-inner{background:#0a0a18;border:2px solid #534AB7;}
+.suzuka .sz-diamond{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(127,119,221,0.07) 0px,rgba(127,119,221,0.07) 1px,transparent 1px,transparent 9px),repeating-linear-gradient(-45deg,rgba(127,119,221,0.07) 0px,rgba(127,119,221,0.07) 1px,transparent 1px,transparent 9px);z-index:2;}
+.suzuka .sz-topglow{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:110px;height:55px;background:radial-gradient(ellipse,rgba(127,119,221,0.35) 0%,transparent 70%);animation:tg 2.5s ease-in-out infinite;z-index:3;}
+.suzuka .sz-outer{position:absolute;inset:-2px;border-radius:18px;box-shadow:0 0 15px rgba(127,119,221,0.4),0 0 30px rgba(127,119,221,0.15);pointer-events:none;z-index:0;}
+.suzuka .sz-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(127,119,221,0.06) 50%,transparent 65%);animation:sweep 4s ease-in-out infinite;z-index:4;}
+.suzuka .sz-sl{position:absolute;top:0;left:0;width:2px;height:100%;background:linear-gradient(to bottom,transparent,#7F77DD 30%,#AFA9EC 50%,#7F77DD 70%,transparent);animation:sl 2s ease-in-out infinite;z-index:10;}
+.suzuka .sz-sr{position:absolute;top:0;right:0;width:2px;height:100%;background:linear-gradient(to bottom,transparent,#7F77DD 30%,#AFA9EC 50%,#7F77DD 70%,transparent);animation:sl 2s ease-in-out infinite 1s;z-index:10;}
 
-/* ─── TRACK CARD ─── */
-.track-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px; transition: all 0.3s;
-}
-.track-card:hover {
-  border-color: var(--border-gold);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(212,168,67,0.1);
-}
-.track-header {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 14px;
-}
-.track-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
-.track-type-badge {
-  padding: 3px 10px; border-radius: 4px;
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-}
-.track-type-street    { background: rgba(248,113,113,0.15); color: #f87171; }
-.track-type-high_speed { background: rgba(52,211,153,0.15); color: #34d399; }
-.track-type-technical  { background: rgba(168,85,247,0.15); color: #a855f7; }
+/* ── 4. SPA ── */
+.spa .card-inner{background:#060810;border:2px solid #00b8ff;}
+.spa .sp-rainbow{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,0,128,0.07) 0%,rgba(255,200,0,0.09) 20%,rgba(0,255,128,0.07) 40%,rgba(0,150,255,0.09) 60%,rgba(180,0,255,0.07) 80%,rgba(255,0,128,0.05) 100%);animation:rb 3s linear infinite;mix-blend-mode:screen;z-index:2;}
+.spa .sp-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(0,180,255,0.05) 0px,rgba(0,180,255,0.05) 1px,transparent 1px,transparent 14px),repeating-linear-gradient(90deg,rgba(0,180,255,0.05) 0px,rgba(0,180,255,0.05) 1px,transparent 1px,transparent 14px);z-index:3;}
+.spa .sp-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(0,200,255,0.08) 48%,rgba(255,255,255,0.05) 52%,transparent 70%);animation:sweep 2.5s ease-in-out infinite;z-index:4;}
+.spa .sp-top{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff0080,#ff8800,#ffff00,#00ff80,#00b8ff,#8800ff,#ff0080);animation:rb 2s linear infinite;z-index:10;}
+.spa .sp-bot{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8800ff,#00b8ff,#00ff80,#ffff00,#ff8800,#ff0080,#8800ff);animation:rb 2s linear infinite;z-index:10;}
+.spa .sp-sl{position:absolute;top:0;left:0;width:2px;height:100%;background:linear-gradient(to bottom,#ff0080,#ffff00,#00ff80,#00b8ff,#8800ff);animation:rb 3s linear infinite;z-index:10;}
+.spa .sp-sr{position:absolute;top:0;right:0;width:2px;height:100%;background:linear-gradient(to bottom,#8800ff,#00b8ff,#00ff80,#ffff00,#ff0080);animation:rb 3s linear infinite;z-index:10;}
+.spa .sp-outer{position:absolute;inset:-3px;border-radius:19px;box-shadow:0 0 20px rgba(0,180,255,0.5),0 0 40px rgba(0,180,255,0.2);pointer-events:none;z-index:0;}
 
-.track-difficulty {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
-}
-.track-difficulty .diff-label { font-size: 12px; color: var(--text-secondary); width: 54px; flex-shrink: 0; }
-.diff-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
-.diff-stars .empty { color: var(--text-muted); }
-.diff-num { font-size: 12px; color: var(--text-muted); }
+/* ── 5. MONACO ── */
+.monaco .card-inner{background:#050400;border:2px solid #c9a84c;}
+.monaco .mc-diamond{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(201,168,76,0.09) 0px,rgba(201,168,76,0.09) 1px,transparent 1px,transparent 7px),repeating-linear-gradient(-45deg,rgba(201,168,76,0.09) 0px,rgba(201,168,76,0.09) 1px,transparent 1px,transparent 7px);z-index:2;}
+.monaco .mc-rotate{position:absolute;inset:-60%;background:conic-gradient(transparent 0deg,rgba(201,168,76,0.12) 40deg,rgba(255,220,100,0.06) 80deg,transparent 120deg,rgba(201,168,76,0.10) 200deg,transparent 250deg,rgba(201,168,76,0.12) 320deg,transparent 360deg);animation:spin 6s linear infinite;z-index:3;}
+.monaco .mc-rainbow{position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,50,0,0) 0%,rgba(255,150,0,0.06) 20%,rgba(255,220,0,0.10) 35%,rgba(100,255,100,0.06) 50%,rgba(0,200,255,0.08) 65%,rgba(150,0,255,0.06) 80%,transparent 100%);animation:rb 4s linear infinite;mix-blend-mode:screen;z-index:4;}
+.monaco .mc-sweep{position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.06) 48%,rgba(201,168,76,0.08) 52%,transparent 70%);animation:sweep 2s ease-in-out infinite;z-index:5;}
+.monaco .mc-check-top{position:absolute;top:0;left:0;right:0;height:5px;background:repeating-linear-gradient(90deg,#c9a84c 0px,#c9a84c 9px,#050400 9px,#050400 18px);opacity:0.9;z-index:10;}
+.monaco .mc-check-bot{position:absolute;bottom:0;left:0;right:0;height:5px;background:repeating-linear-gradient(90deg,#050400 0px,#050400 9px,#c9a84c 9px,#c9a84c 18px);opacity:0.9;z-index:10;}
+.monaco .mc-outer{position:absolute;inset:-4px;border-radius:20px;box-shadow:0 0 25px rgba(201,168,76,0.6),0 0 50px rgba(201,168,76,0.3),0 0 80px rgba(201,168,76,0.1);pointer-events:none;z-index:0;}
+.monaco .mc-sl{position:absolute;top:0;left:0;width:2px;height:100%;background:linear-gradient(to bottom,transparent,#c9a84c 30%,#fff 50%,#c9a84c 70%,transparent);animation:sl 1.8s ease-in-out infinite;z-index:10;}
+.monaco .mc-sr{position:absolute;top:0;right:0;width:2px;height:100%;background:linear-gradient(to bottom,transparent,#c9a84c 30%,#fff 50%,#c9a84c 70%,transparent);animation:sl 1.8s ease-in-out infinite 0.9s;z-index:10;}
+.monaco .mc-topglow{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:130px;height:70px;background:radial-gradient(ellipse,rgba(201,168,76,0.4) 0%,transparent 70%);animation:tg 2s ease-in-out infinite;z-index:3;}
+.monaco .mc-p{position:absolute;width:2px;height:2px;border-radius:50%;background:#c9a84c;animation:pk 3s ease-in-out infinite;z-index:8;}
+.monaco .mc-crown{position:absolute;top:4px;left:0;right:0;display:flex;justify-content:center;z-index:20;}
 
-.track-tags {
-  display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0;
-}
-.track-tag {
-  padding: 2px 8px; border-radius: 3px;
-  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-  font-size: 11px; color: var(--text-secondary);
-}
-
-.track-strategy {
-  margin-top: 12px; padding: 10px 12px;
-  background: rgba(212,168,67,0.06); border: 1px solid var(--border-gold);
-  border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary);
-  line-height: 1.6;
-}
-.track-strategy strong { color: var(--gold); }
-
-/* ─── SECTION DIVIDERS ─── */
-.section-alt { background: var(--bg-secondary); }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 768px) {
-  .tab-nav { max-width: 100%; margin: 24px 0 0; }
-  .pitstop-grid { grid-template-columns: repeat(3,1fr); gap: 4px; }
-}
+/* 動畫 */
+@keyframes sweep{0%,100%{transform:translateX(-200%)}50%{transform:translateX(300%)}}
+@keyframes tg{0%,100%{opacity:0.5}50%{opacity:1}}
+@keyframes sl{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes rb{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pk{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
-    <div class="nav-links">
-      <a href="/">首頁</a>
-      <a href="/race">賽事</a>
-      <a href="/cards" class="active">卡牌</a>
-      <a href="/battle">對戰</a>
-      <a href="/leaderboard">排行榜</a>
-      <a href="/profile">個人</a>
-    </div>
-    <div id="nav-auth" class="nav-auth"></div>
+<nav>
+  <div class="nav-logo"><div class="logo-dot"></div>PITLANE</div>
+  <div class="nav-links">
+    <a href="/">首頁</a>
+    <a href="/race">賽事</a>
+    <a href="/cards" class="active">卡牌</a>
+    <a href="/battle">對戰</a>
+    <a href="/leaderboard">排行榜</a>
+    <a href="/profile">個人</a>
+  </div>
+  <div class="nav-actions" id="nav-auth">
+    <button class="btn-login" onclick="location.href='/'">登入</button>
   </div>
 </nav>
 
-<!-- AUTH MODAL -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="auth-modal"></div>
+<div class="main">
+  <div class="page-header">
+    <div class="page-title">本季車手卡牌</div>
+    <div class="page-sub">數值來自真實賽事數據 · 每站更新 · 解鎖更高等級卡面</div>
+  </div>
+
+  <div class="tier-bar">
+    <div class="tier-pill" style="background:#1a1a22;color:#888;border-color:#333" onclick="filterTier('all',this)">全部</div>
+    <div class="tier-pill active" style="background:#2a2a35;color:#ccc;border-color:#444" onclick="filterTier('silverstone',this)">銀石 · 入門</div>
+    <div class="tier-pill" style="background:#0a1628;color:#6ab0ff;border-color:#1a3a6a" onclick="filterTier('monza',this)">蒙扎 · 進階</div>
+    <div class="tier-pill" style="background:#0a0a18;color:#AFA9EC;border-color:#534AB7" onclick="filterTier('suzuka',this)">鈴鹿 · 稀有</div>
+    <div class="tier-pill" style="background:#060810;color:#00ccff;border-color:#00b8ff" onclick="filterTier('spa',this)">Spa · 超稀有</div>
+    <div class="tier-pill" style="background:#0a0800;color:#c9a84c;border-color:#c9a84c" onclick="filterTier('monaco',this)">摩納哥 · 傳奇</div>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid"></div>
 </div>
-
-<!-- PAGE HERO -->
-<div class="page-hero">
-  <div class="container">
-    <h1>卡牌收藏庫</h1>
-    <p>車手、車隊、賽道——全套 F1 數據卡牌，每站實時更新</p>
-    <!-- Tab nav -->
-    <div class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab('drivers', this)">車手卡牌</button>
-      <button class="tab-btn" onclick="switchTab('constructors', this)">車隊卡牌</button>
-      <button class="tab-btn" onclick="switchTab('tracks', this)">賽道卡牌</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ DRIVER CARDS ══════════════════════ -->
-<section id="tab-drivers" class="tab-section active section">
-  <div class="container">
-    <div class="section-header">
-      <h2>車手卡牌</h2>
-      <p>數值由真實 F1 賽事數據計算，包含技能與 AI 深度分析</p>
-    </div>
-    <div id="all-drivers" class="card-grid">
-      <div class="loading" style="grid-column:1/-1">
-        <div class="spinner"></div>
-        <p>載入車手資料中...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════ CONSTRUCTOR CARDS ══════════════════════ -->
-<section id="tab-constructors" class="tab-section section section-alt">
-  <div class="container">
-    <div class="section-header">
-      <h2>車隊卡牌</h2>
-      <p>車隊整體實力評估，含進站數據分析</p>
-    </div>
-    <div id="all-constructors" class="card-grid">
-      <div class="loading" style="grid-column:1/-1">
-        <div class="spinner"></div>
-        <p>載入車隊資料中...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════ TRACK CARDS ══════════════════════ -->
-<section id="tab-tracks" class="tab-section section">
-  <div class="container">
-    <div class="section-header">
-      <h2>賽道卡牌</h2>
-      <p>每條賽道的特性、難度與策略建議</p>
-    </div>
-    <div id="all-tracks" class="card-grid">
-      <div class="loading" style="grid-column:1/-1">
-        <div class="spinner"></div>
-        <p>載入賽道資料中...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer class="footer">
-  <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · 數據來自 OpenF1 &amp; Ergast · AI 分析每站更新</p>
-  </div>
-</footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
-// ═══════════════════════════════════════════
-//  TAB SWITCHING
-// ═══════════════════════════════════════════
-const tabLoaded = { drivers: false, constructors: false, tracks: false };
+let DRIVERS = [];
 
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-
-  if (!tabLoaded[name]) {
-    tabLoaded[name] = true;
-    if (name === 'drivers')      loadAllDriverCards();
-    if (name === 'constructors') loadConstructorCards();
-    if (name === 'tracks')       loadTrackCards();
-  }
-}
-
-// ═══════════════════════════════════════════
-//  DRIVER CARDS
-// ═══════════════════════════════════════════
-async function loadAllDriverCards() {
-  const el = document.getElementById('all-drivers');
+// Load real drivers from API
+async function loadDrivers() {
   try {
     const data = await api('/api/drivers');
     const drivers = data.drivers || [];
-    if (!drivers.length) {
-      el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">暫無車手資料</p>';
-      return;
-    }
+    const cards = await Promise.all(drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null)));
+    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
 
-    const cards = await Promise.all(
-      drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
-    );
+    DRIVERS = drivers.map((d, i) => {
+      const card = cards[i];
+      const s = card?.stats || {};
+      const ovr = s.overall || 50;
+      const color = teamColors[card?.team || d.team] || '#888';
+      const odds = card?.odds || 10.0;
+      const win = odds ? Math.round(1 / odds * 100) : 5;
 
-    el.innerHTML = cards.map((card, i) => {
-      if (!card) return '';
-      const d = drivers[i];
-      const s = card.stats || {};
-      const teamColor = card.team_colour || 'd4a843';
-      const color = teamColor.startsWith('#') ? teamColor : '#' + teamColor;
-      const skills = card.skills || {};
-      const passiveSkill = skills.passive || null;
-      const activeSkills  = skills.active  || [];
-      const imgUrl = card.headshot_url || `/api/drivers/${d.driver_id}/headshot`;
+      // Assign tier based on OVR
+      let tier = 'silverstone';
+      if (ovr >= 88) tier = 'monaco';
+      else if (ovr >= 83) tier = 'spa';
+      else if (ovr >= 78) tier = 'suzuka';
+      else if (ovr >= 72) tier = 'monza';
 
-      return `
-        <div class="card-3d"><div class="card-3d-inner driver-card-v2" id="${d.driver_id}">
-          <!-- TOP: clickable card body -->
-          <div class="driver-card-top" style="border-left-color:${color}"
-               onclick="toggleAnalysis('${d.driver_id}')">
-            <div class="driver-card-header">
-              <img
-                class="driver-avatar"
-                src="${imgUrl}"
-                alt="${d.name}"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
-              />
-              <div class="driver-avatar-fallback" style="display:none">${d.number || '?'}</div>
-              <div class="driver-identity">
-                <div class="name">${d.name}</div>
-                <div class="team">${card.team || ''}</div>
-                <div class="nationality">${d.nationality || ''}</div>
-              </div>
-              <div class="driver-ovr">
-                <div class="score">${s.overall || 50}</div>
-                <div class="score-label">OVR</div>
-              </div>
-            </div>
-          </div>
+      const headshot = card?.headshot_url || d.headshot_url || '';
 
-          <!-- STATS -->
-          <div class="driver-stats">
-            ${renderStatBar('單圈速度', s.qualifying      || 50)}
-            ${renderStatBar('輪胎管理', s.tire_management || 50)}
-            ${renderStatBar('雨戰能力', s.wet_weather     || 50)}
-            ${renderStatBar('超車能力', s.overtaking      || 50)}
-            ${renderStatBar('街道賽',   s.street_circuit  || 50)}
-          </div>
+      return {
+        num: d.number || '?',
+        name: d.name?.split(' ').pop() || '?',
+        fullName: d.name || '?',
+        team: card?.team || d.team || '',
+        color, emoji: '🏎', tier,
+        headshot,
+        stats: {q: s.qualifying||50, t: s.tire_management||50, w: s.wet_weather||50, o: s.overtaking||50},
+        ovr, win, odds: Number(odds).toFixed(1),
+        driver_id: d.driver_id,
+      };
+    });
 
-          <!-- SKILLS -->
-          ${passiveSkill || activeSkills.length ? `
-          <div class="driver-skills">
-            ${passiveSkill ? `<span class="skill-badge skill-passive">⚡ ${passiveSkill}</span>` : ''}
-            ${activeSkills.map(sk => `
-              <span class="skill-badge skill-active">
-                <span class="skill-stars">${'★'.repeat(sk.stars || 1)}</span>
-                ${sk.name || sk}
-              </span>
-            `).join('')}
-          </div>` : ''}
-
-          <!-- CAR IMAGE -->
-          <div style="padding:4px 20px 8px;text-align:center">
-            <img src="${getCarImage(card.team || d.team || '')}" alt="car"
-                 style="width:100%;max-height:50px;object-fit:contain;opacity:0.7;filter:drop-shadow(0 2px 6px rgba(232,255,0,0.1))">
-          </div>
-
-          <!-- FOOTER: bet button + record -->
-          <div class="driver-card-footer">
-            <div class="meta">
-              ${s.wins || 0} 勝 · ${s.podiums || 0} 頒獎台 · ${s.races || 0} 場
-            </div>
-            <a href="/race?pick=${d.driver_id}" class="btn btn-gold btn-sm">押這個人</a>
-          </div>
-
-          <!-- AI ANALYSIS TOGGLE -->
-          <div class="analysis-toggle" id="toggle-${d.driver_id}"
-               onclick="toggleAnalysis('${d.driver_id}')">
-            <span class="arrow">▾</span>
-            <span>AI 深度分析</span>
-          </div>
-          <div class="analysis-body" id="analysis-${d.driver_id}">
-            <div class="analysis-box loading-analysis" id="analysis-content-${d.driver_id}">
-              <div class="spinner"></div>
-              <span>AI 分析載入中...</span>
-            </div>
-          </div>
-        </div></div>
-      `;
-    }).join('');
-
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">無法載入車手卡牌</p>';
+    renderCards();
+  } catch(e) {
+    document.getElementById('cardsGrid').innerHTML = '<p style="color:#888;text-align:center;padding:40px">載入中...</p>';
   }
 }
+loadDrivers();
 
-// Track which analyses have been loaded
-const analysisLoaded = {};
+const TIER_CONFIG = {
+  silverstone:{
+    label:'SILVERSTONE',
+    statColor:'linear-gradient(90deg,#555,#888)',
+    svColor:'#aaa',
+    teamColor:(c)=>c,
+    ovrColor:'#ccc',
+    winColor:'#44dd88',
+    oddsColor:'#ccdd00',
+    divider:'linear-gradient(90deg,transparent,#2a2a35,transparent)',
+  },
+  monza:{
+    label:'MONZA',
+    statColor:'linear-gradient(90deg,#1a4a9a,#6ab0ff)',
+    svColor:'#6ab0ff',
+    teamColor:()=>'#4a8acc',
+    ovrColor:'#6ab0ff',
+    winColor:'#00cc66',
+    oddsColor:'#ddee00',
+    divider:'linear-gradient(90deg,transparent,#1a3a6a,transparent)',
+    ovrShadow:'0 0 10px rgba(54,113,198,0.6)',
+  },
+  suzuka:{
+    label:'SUZUKA',
+    statColor:'linear-gradient(90deg,#534AB7,#AFA9EC)',
+    svColor:'#AFA9EC',
+    teamColor:()=>'#8a84cc',
+    ovrColor:'#AFA9EC',
+    winColor:'#00ff88',
+    oddsColor:'#eeff00',
+    divider:'linear-gradient(90deg,transparent,rgba(127,119,221,0.4),transparent)',
+    ovrShadow:'0 0 12px rgba(127,119,221,0.8)',
+  },
+  spa:{
+    label:'SPA',
+    statColor:'linear-gradient(90deg,#0044aa,#00ccff,#8800ff)',
+    svColor:'#00ccff',
+    teamColor:()=>'#0099cc',
+    ovrColor:'#00ccff',
+    winColor:'#00ff88',
+    oddsColor:'#ffee00',
+    divider:'linear-gradient(90deg,transparent,rgba(0,180,255,0.4),transparent)',
+    ovrShadow:'0 0 15px rgba(0,200,255,1),0 0 30px rgba(0,200,255,0.5)',
+  },
+  monaco:{
+    label:'MONACO',
+    statColor:'linear-gradient(90deg,#a07830,#c9a84c,#f0d070,#c9a84c)',
+    svColor:'#c9a84c',
+    teamColor:()=>'#c9a84c',
+    ovrColor:'#c9a84c',
+    winColor:'#00ff88',
+    oddsColor:'#ffff00',
+    divider:'linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent)',
+    ovrShadow:'0 0 20px rgba(201,168,76,1),0 0 40px rgba(201,168,76,0.5)',
+  },
+};
 
-async function toggleAnalysis(driverId) {
-  const toggle = document.getElementById(`toggle-${driverId}`);
-  const body   = document.getElementById(`analysis-${driverId}`);
-  if (!toggle || !body) return;
+function buildCard(d) {
+  const t = TIER_CONFIG[d.tier];
+  const emojiFilter = {
+    silverstone:`drop-shadow(0 4px 10px ${d.color}40)`,
+    monza:`drop-shadow(0 0 10px ${d.color}99)`,
+    suzuka:`drop-shadow(0 0 14px rgba(127,119,221,0.9))`,
+    spa:`drop-shadow(0 0 16px rgba(0,200,255,1))`,
+    monaco:`drop-shadow(0 0 20px rgba(201,168,76,1)) drop-shadow(0 0 40px rgba(255,200,100,0.6))`,
+  }[d.tier];
 
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  toggle.classList.toggle('open', !isOpen);
+  const extras = {
+    silverstone:`
+      <div class="s-top-line"></div>
+      <div class="s-corner"></div>
+      <div class="s-sweep"></div>
+      <div class="s-accent" style="--team-color:${d.color}"></div>`,
+    monza:`
+      <div class="m-top"></div>
+      <div class="m-glow"></div>
+      <div class="m-sweep"></div>
+      <div class="m-accent"></div>`,
+    suzuka:`
+      <div class="sz-outer"></div>
+      <div class="sz-diamond"></div>
+      <div class="sz-topglow"></div>
+      <div class="sz-sweep"></div>
+      <div class="sz-sl"></div>
+      <div class="sz-sr"></div>`,
+    spa:`
+      <div class="sp-outer"></div>
+      <div class="sp-rainbow"></div>
+      <div class="sp-grid"></div>
+      <div class="sp-sweep"></div>
+      <div class="sp-top"></div>
+      <div class="sp-bot"></div>
+      <div class="sp-sl"></div>
+      <div class="sp-sr"></div>`,
+    monaco:`
+      <div class="mc-outer"></div>
+      <div class="mc-diamond"></div>
+      <div class="mc-rotate"></div>
+      <div class="mc-rainbow"></div>
+      <div class="mc-sweep"></div>
+      <div class="mc-check-top"></div>
+      <div class="mc-check-bot"></div>
+      <div class="mc-sl"></div>
+      <div class="mc-sr"></div>
+      <div class="mc-topglow"></div>
+      <div class="mc-p" style="top:15%;left:10%;animation-delay:0s"></div>
+      <div class="mc-p" style="top:28%;right:12%;animation-delay:0.7s"></div>
+      <div class="mc-p" style="top:50%;left:7%;animation-delay:1.4s"></div>
+      <div class="mc-p" style="top:70%;right:9%;animation-delay:0.4s"></div>
+      <div class="mc-crown">
+        <svg width="130" height="22" viewBox="0 0 130 22">
+          <path d="M5 20 C10 14,14 16,18 12 C22 8,24 12,28 10 C32 8,34 12,38 10 C42 8,44 14,48 12 C50 11,52 12,55 10" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.85"/>
+          <path d="M75 10 C78 12,80 11,82 12 C86 14,88 8,92 10 C96 12,98 8,102 10 C106 12,108 8,112 10 C116 12,118 16,122 12 C126 8,128 14,125 20" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.85"/>
+          <circle cx="18" cy="12" r="1.5" fill="#c9a84c" opacity="0.8"/>
+          <circle cx="28" cy="10" r="1.5" fill="#c9a84c" opacity="0.8"/>
+          <circle cx="38" cy="10" r="1.5" fill="#c9a84c" opacity="0.8"/>
+          <circle cx="92" cy="10" r="1.5" fill="#c9a84c" opacity="0.8"/>
+          <circle cx="102" cy="10" r="1.5" fill="#c9a84c" opacity="0.8"/>
+          <circle cx="112" cy="10" r="1.5" fill="#c9a84c" opacity="0.8"/>
+          <polygon points="65,2 60,10 55,7 57,14 65,12 73,14 75,7 70,10" fill="#c9a84c" opacity="0.9"/>
+          <circle cx="65" cy="2" r="2" fill="#fff" opacity="0.9"/>
+        </svg>
+      </div>`,
+  }[d.tier];
 
-  if (!isOpen && !analysisLoaded[driverId]) {
-    analysisLoaded[driverId] = true;
-    try {
-      const data = await api(`/api/drivers/${driverId}/analysis`);
-      const contentEl = document.getElementById(`analysis-content-${driverId}`);
-      if (contentEl) {
-        contentEl.className = 'analysis-box';
-        contentEl.innerHTML = data.analysis || data.text || '目前無分析資料。';
-      }
-    } catch (e) {
-      const contentEl = document.getElementById(`analysis-content-${driverId}`);
-      if (contentEl) {
-        contentEl.className = 'analysis-box';
-        contentEl.textContent = '無法載入 AI 分析，請稍後再試。';
-      }
-    }
-  }
-}
+  const monacoArtStyle = d.tier==='monaco'?`margin-top:18px;`:'';
+  const monacoFlag = d.tier==='monaco'?`
+    <div style="display:flex;justify-content:center;margin-bottom:5px;position:relative;z-index:10;">
+      <svg width="80" height="6" viewBox="0 0 80 6">
+        <rect x="0" y="0" width="8" height="6" fill="#c9a84c" opacity="0.8"/><rect x="8" y="0" width="8" height="6" fill="#050400"/>
+        <rect x="16" y="0" width="8" height="6" fill="#c9a84c" opacity="0.8"/><rect x="24" y="0" width="8" height="6" fill="#050400"/>
+        <rect x="32" y="0" width="8" height="6" fill="#c9a84c" opacity="0.8"/><rect x="40" y="0" width="8" height="6" fill="#050400"/>
+        <rect x="48" y="0" width="8" height="6" fill="#c9a84c" opacity="0.8"/><rect x="56" y="0" width="8" height="6" fill="#050400"/>
+        <rect x="64" y="0" width="8" height="6" fill="#c9a84c" opacity="0.8"/><rect x="72" y="0" width="8" height="6" fill="#050400"/>
+      </svg>
+    </div>`:'';
 
-// ═══════════════════════════════════════════
-//  CONSTRUCTOR CARDS
-// ═══════════════════════════════════════════
-let pitStats = null;
+  const emojiAnim = d.tier==='monaco'?`animation:float 3s ease-in-out infinite;`:'';
+  const glowCircle = ['suzuka','spa','monaco'].includes(d.tier)?`
+    <div style="position:absolute;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,${{
+      suzuka:'rgba(127,119,221,0.2)',spa:'rgba(0,200,255,0.2)',monaco:'rgba(201,168,76,0.3)'
+    }[d.tier]} 0%,transparent 70%);animation:tg 2s ease-in-out infinite;"></div>`:'';
 
-async function loadPitStats() {
-  if (pitStats !== null) return pitStats;
-  try {
-    const data = await api('/api/pit-stats');
-    pitStats = data;
-  } catch (e) {
-    pitStats = {};
-  }
-  return pitStats;
-}
+  const ovrStyle = `color:${t.ovrColor};${t.ovrShadow?`text-shadow:${t.ovrShadow};`:''}${d.tier==='monaco'?'font-size:28px;':''}`;
+  const rarityTop = d.tier==='monaco'?'top:24px;':'';
 
-async function loadConstructorCards() {
-  const el = document.getElementById('all-constructors');
-  try {
-    const [cData, pit] = await Promise.all([
-      api('/api/constructors'),
-      loadPitStats(),
-    ]);
-
-    const constructors = cData.constructors || [];
-    if (!constructors.length) {
-      el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">暫無車隊資料</p>';
-      return;
-    }
-
-    const cards = await Promise.all(
-      constructors.map(c => api(`/api/constructors/${c.constructor_id}/card`).catch(() => null))
-    );
-
-    el.innerHTML = cards.map((card, i) => {
-      if (!card) return '';
-      const c = constructors[i];
-      const s = card.stats || {};
-      const teamColor = card.team_colour || c.team_colour || 'd4a843';
-      const color = teamColor.startsWith('#') ? teamColor : '#' + teamColor;
-
-      // Pit stop data: try team-specific key, then overall
-      const ps = (pit && pit[c.constructor_id]) || (pit && pit[c.name]) || null;
-      const avgTime    = ps?.avg_time       ?? ps?.average_time      ?? null;
-      const fastest    = ps?.fastest        ?? ps?.fastest_stop      ?? null;
-      const errorRate  = ps?.error_rate     ?? null;
-      const reliability = ps?.reliability   ?? null;
-
-      const pitBlock = `
-        <div class="pitstop-section">
-          <div class="pitstop-title">進站數據</div>
-          <div class="pitstop-grid">
-            <div class="pitstop-stat">
-              <div class="ps-val ${avgTime && avgTime < 2.5 ? 'good' : 'warn'}">${avgTime != null ? avgTime.toFixed(2) + 's' : '—'}</div>
-              <div class="ps-label">平均進站</div>
-            </div>
-            <div class="pitstop-stat">
-              <div class="ps-val good">${fastest != null ? fastest.toFixed(2) + 's' : '—'}</div>
-              <div class="ps-label">最快進站</div>
-            </div>
-            <div class="pitstop-stat">
-              <div class="ps-val ${errorRate != null && errorRate < 0.05 ? 'good' : 'warn'}">${reliability != null ? Math.round(reliability * 100) + '%' : (errorRate != null ? Math.round((1 - errorRate) * 100) + '%' : '—')}</div>
-              <div class="ps-label">可靠度</div>
-            </div>
+  return `
+    <div class="card ${d.tier}" data-tier="${d.tier}">
+      <div class="card-inner">
+        ${extras}
+        <span class="c-rarity" style="${rarityTop}color:${t.ovrColor};${d.tier==='monaco'?'text-shadow:0 0 10px rgba(201,168,76,1);':''}">${t.label}</span>
+        <span class="c-num" style="color:${d.color}0a;">${d.num}</span>
+        <div class="c-art" style="z-index:5;${monacoArtStyle}">
+          ${glowCircle}
+          ${d.headshot ? `<img src="${d.headshot}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid ${d.color};filter:${emojiFilter};${emojiAnim}" onerror="this.outerHTML='<span class=c-emoji style=filter:${emojiFilter}>${d.emoji}</span>'">` : `<span class="c-emoji" style="filter:${emojiFilter};${emojiAnim}">${d.emoji}</span>`}
+        </div>
+        ${monacoFlag}
+        <div class="c-info">
+          <div class="c-name" style="${d.tier==='monaco'?'text-shadow:0 0 20px rgba(201,168,76,0.7);':''}">${d.name}</div>
+          <div class="c-team" style="color:${t.teamColor(d.color)}">${d.team}</div>
+          <div class="c-stats">
+            ${['SPD','TYR','WET','OVT'].map((sl,i)=>{
+              const vals = [d.stats.q,d.stats.t,d.stats.w,d.stats.o];
+              return `<div class="c-stat">
+                <span class="c-sl" style="${d.tier==='monaco'||d.tier==='spa'||d.tier==='suzuka'?`color:${t.ovrColor};`:''}">${sl}</span>
+                <div class="c-sb"><div class="c-sf" style="width:${vals[i]}%;background:${t.statColor};${d.tier!=='silverstone'?`box-shadow:0 0 4px ${t.ovrColor}44;`:''}"></div></div>
+                <span class="c-sv" style="color:${t.svColor}">${vals[i]}</span>
+              </div>`;
+            }).join('')}
           </div>
         </div>
-      `;
-
-      return `
-        <div class="constructor-card">
-          <div class="constructor-card-top" style="border-left-color:${color}">
-            <div class="constructor-header">
-              <div class="constructor-identity">
-                <div class="name">${c.name}</div>
-                <div class="nationality">${c.nationality || ''} · ${c.points || 0} pts · P${c.position || '?'}</div>
-              </div>
-              <div class="constructor-ovr">
-                <div class="score">${s.overall || 50}</div>
-                <div class="score-label">OVR</div>
-              </div>
-            </div>
-            ${renderStatBar('賽車速度', s.car_speed          || 50)}
-            ${renderStatBar('進站效率', s.pit_efficiency     || 50)}
-            ${renderStatBar('策略評分', s.strategy           || 50)}
-            ${renderStatBar('賽道適性', s.track_adaptability || 50)}
+        <div class="c-divider" style="background:${t.divider};"></div>
+        <div class="c-bottom">
+          <div>
+            <div class="c-wn" style="color:${t.winColor};${d.tier==='monaco'?'text-shadow:0 0 12px rgba(0,255,136,1);':''}">${d.win}%</div>
+            <div class="c-wl">WIN</div>
           </div>
-          ${pitBlock}
+          <div>
+            <div class="c-ov" style="${ovrStyle}">${d.ovr}</div>
+            <div class="c-ol">OVR</div>
+          </div>
+          <div>
+            <div class="c-od" style="color:${t.oddsColor};${d.tier==='monaco'?'text-shadow:0 0 12px rgba(255,255,0,1);':''}">${d.odds}x</div>
+            <div class="c-odl">ODDS</div>
+          </div>
         </div>
-      `;
-    }).join('');
-
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">無法載入車隊卡牌</p>';
-  }
+      </div>
+    </div>`;
 }
 
-// ═══════════════════════════════════════════
-//  TRACK CARDS
-// ═══════════════════════════════════════════
-function renderDifficultyStars(val) {
-  const n = Math.round(Math.min(10, Math.max(0, val || 0)));
-  let stars = '';
-  for (let i = 1; i <= 10; i++) {
-    stars += `<span class="${i <= n ? '' : 'empty'}">★</span>`;
-  }
-  return `<span class="diff-stars">${stars}</span><span class="diff-num">${n}/10</span>`;
+function renderCards(tierFilter='all'){
+  const grid = document.getElementById('cardsGrid');
+  const filtered = tierFilter==='all'?DRIVERS:DRIVERS.filter(d=>d.tier===tierFilter);
+  grid.innerHTML = filtered.map(buildCard).join('');
 }
 
-function trackTypeLabel(type) {
-  const map = { street: '街道賽', high_speed: '高速賽道', technical: '技術賽道' };
-  return map[type] || type || '未知';
+function filterTier(tier, btn){
+  document.querySelectorAll('.tier-pill').forEach(p=>{
+    p.classList.remove('active');
+    p.style.opacity='0.6';
+  });
+  btn.classList.add('active');
+  btn.style.opacity='1';
+  renderCards(tier);
 }
 
-function trackTypeBadge(type) {
-  return `<span class="track-type-badge track-type-${type || 'technical'}">${trackTypeLabel(type)}</span>`;
-}
-
-async function loadTrackCards() {
-  const el = document.getElementById('all-tracks');
-  try {
-    const data = await api('/api/tracks');
-    const tracks = data.tracks || data || [];
-
-    if (!Array.isArray(tracks) || !tracks.length) {
-      el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">暫無賽道資料</p>';
-      return;
-    }
-
-    el.innerHTML = tracks.map(t => {
-      const characteristics = t.characteristics || t.tags || [];
-      const strategy = t.strategy_recommendation || t.strategy || '';
-      const overtaking = t.overtaking_score ?? t.overtaking ?? 50;
-
-      return `
-        <div class="track-card">
-          <div class="track-header">
-            <div class="track-name">${t.name_zh || t.name || '未知賽道'}</div>
-            ${trackTypeBadge(t.type || t.circuit_type)}
-          </div>
-
-          <div class="track-difficulty">
-            <span class="diff-label">難度</span>
-            ${renderDifficultyStars(t.difficulty)}
-          </div>
-
-          ${renderStatBar('超車指數', overtaking)}
-
-          ${characteristics.length ? `
-          <div class="track-tags">
-            ${characteristics.map(ch => `<span class="track-tag">${ch}</span>`).join('')}
-          </div>` : ''}
-
-          ${strategy ? `
-          <div class="track-strategy">
-            <strong>策略建議：</strong>${strategy}
-          </div>` : ''}
-        </div>
-      `;
-    }).join('');
-
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary);grid-column:1/-1">無法載入賽道卡牌</p>';
-  }
-}
-
-// ═══════════════════════════════════════════
-//  INIT — load first tab immediately
-// ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  tabLoaded.drivers = true;
-  loadAllDriverCards();
-});
+renderCards();
 </script>
 </body>
 </html>
