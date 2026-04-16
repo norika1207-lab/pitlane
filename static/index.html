@@ -214,21 +214,58 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
     <a href="/battle">對戰</a><a href="/leaderboard">排行榜</a><a href="/profile">個人</a>
   </div>
   <div class="nav-actions" id="nav-auth">
-    <button class="btn-login" onclick="showLoginModal()">登入</button>
+    <button class="btn-login" onclick="showLoginModal('login')">登入</button>
+    <button class="btn-register" onclick="showLoginModal('register')">加入</button>
   </div>
 </nav>
 
-<!-- LOGIN MODAL -->
-<div id="login-overlay" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center">
-  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:28px;max-width:380px;width:90%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;text-align:center;margin-bottom:16px;color:#e8ff00">登入 PitLane</div>
-    <div style="font-size:11px;color:#888;text-align:center;margin-bottom:16px">使用 ClawStockMarket 交易所帳號</div>
-    <input id="lg-user" type="text" placeholder="帳號 / Email" style="width:100%;padding:10px 12px;background:#111;border:1px solid #333;border-radius:6px;color:#eee;font-size:14px;margin-bottom:10px">
-    <input id="lg-pass" type="password" placeholder="密碼" style="width:100%;padding:10px 12px;background:#111;border:1px solid #333;border-radius:6px;color:#eee;font-size:14px;margin-bottom:6px">
-    <div id="lg-err" style="color:#ff4444;font-size:11px;margin-bottom:10px"></div>
-    <div style="display:flex;gap:8px">
-      <button onclick="closeLoginModal()" style="flex:1;padding:10px;border-radius:6px;border:1px solid #333;background:transparent;color:#aaa;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700">取消</button>
-      <button onclick="doLogin()" style="flex:1;padding:10px;border-radius:6px;border:none;background:#e8ff00;color:#000;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700">登入</button>
+<!-- AUTH MODAL (login + register) -->
+<div id="login-overlay" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.82);display:none;align-items:center;justify-content:center" onclick="if(event.target===this)closeLoginModal()">
+  <div style="background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:28px 28px 24px;max-width:400px;width:92%;position:relative">
+
+    <!-- Top bar -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff">
+        <span style="color:#e8ff00">PITLANE</span> &mdash; <span id="modal-mode-label">登入</span>
+      </div>
+      <button onclick="closeLoginModal()" style="background:none;border:none;color:#555;font-size:20px;cursor:pointer;line-height:1">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;margin-bottom:20px;background:#0d0d0d;border-radius:8px;padding:4px">
+      <button id="tab-login" onclick="switchAuthTab('login')"
+        style="flex:1;padding:8px;border-radius:6px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s">登入</button>
+      <button id="tab-register" onclick="switchAuthTab('register')"
+        style="flex:1;padding:8px;border-radius:6px;border:none;background:transparent;color:#666;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s">新帳號</button>
+    </div>
+
+    <!-- Subtitle -->
+    <div style="font-size:11px;color:#555;text-align:center;margin-bottom:16px">
+      使用 ClawStockMarket 交易所帳號 · USDClaw 虛擬幣互通
+    </div>
+
+    <!-- Fields -->
+    <input id="lg-user" type="text" placeholder="帳號" autocomplete="username"
+      style="width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;color:#eee;font-size:14px;margin-bottom:10px;outline:none;font-family:'Barlow',sans-serif"
+      onfocus="this.style.borderColor='#e8ff0066'" onblur="this.style.borderColor='#2a2a2a'">
+
+    <input id="lg-email" type="email" placeholder="Email（註冊用）" autocomplete="email"
+      style="width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;color:#eee;font-size:14px;margin-bottom:10px;outline:none;font-family:'Barlow',sans-serif;display:none"
+      onfocus="this.style.borderColor='#e8ff0066'" onblur="this.style.borderColor='#2a2a2a'">
+
+    <input id="lg-pass" type="password" placeholder="密碼（8 位以上）" autocomplete="current-password"
+      style="width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;color:#eee;font-size:14px;margin-bottom:6px;outline:none;font-family:'Barlow',sans-serif"
+      onfocus="this.style.borderColor='#e8ff0066'" onblur="this.style.borderColor='#2a2a2a'">
+
+    <div id="lg-err" style="color:#ff4444;font-size:12px;min-height:18px;margin-bottom:8px;text-align:center"></div>
+
+    <button id="lg-submit" onclick="doAuth()"
+      style="width:100%;padding:12px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.04em">
+      登入
+    </button>
+
+    <div style="font-size:11px;color:#444;text-align:center;margin-top:14px">
+      新帳號同時可用於 ClawStockMarket 股市交易所
     </div>
   </div>
 </div>
@@ -243,7 +280,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
     </div>
   </div>
   <div class="hero-btns">
-    <button class="btn-primary" onclick="user ? location.href='/race' : showLoginModal()">開始預測</button>
+    <button class="btn-primary" onclick="user ? location.href='/race' : showLoginModal('login')">開始預測</button>
     <button class="btn-secondary" onclick="document.querySelector('.newbie-section').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
   </div>
 </div>
@@ -390,7 +427,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">澳洲</span></div>
         <div style="text-align:center"><div class="result-dot result-pending">?</div><span class="result-label">吉達</span></div>
       </div>
-      <button class="bet-now-btn" onclick="user ? location.href='/race' : showLoginModal()">立即押注 →</button>
+      <button class="bet-now-btn" onclick="user ? location.href='/race' : showLoginModal('login')">立即押注 →</button>
     </div>
   </div>
 
@@ -487,29 +524,72 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
 <script src="/static/assets/js/app.js"></script>
 <script>
 // ─── AUTH ───
-function showLoginModal() { document.getElementById('login-overlay').style.display='flex'; setTimeout(()=>document.getElementById('lg-user').focus(),100); }
-function closeLoginModal() { document.getElementById('login-overlay').style.display='none'; }
-async function doLogin() {
-  const u=document.getElementById('lg-user').value.trim(), p=document.getElementById('lg-pass').value;
-  if(!u||!p){document.getElementById('lg-err').textContent='請輸入帳號和密碼';return;}
-  try{
-    const d=await api('/api/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
-    token=d.access_token; user={username:d.username,balance:d.balance};
-    localStorage.setItem('pitlane_token',token); localStorage.setItem('pitlane_user',JSON.stringify(user));
-    closeLoginModal(); updateNavAuth();
-  }catch(e){document.getElementById('lg-err').textContent=e.message;}
+let authMode = 'login';
+
+function showLoginModal(mode) {
+  authMode = mode || 'login';
+  switchAuthTab(authMode);
+  document.getElementById('lg-err').textContent = '';
+  document.getElementById('login-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('lg-user').focus(), 80);
 }
-function updateNavAuth(){
-  const el=document.getElementById('nav-auth');
-  if(user){
-    el.innerHTML=`<span style="font-family:'Share Tech Mono';font-size:12px;color:#e8ff00">◆ ${Number(user.balance||0).toLocaleString()}</span>
-      <span style="font-size:12px;color:#aaa">${user.username}</span>
-      <button class="btn-login" onclick="token=null;user=null;localStorage.removeItem('pitlane_token');localStorage.removeItem('pitlane_user');updateNavAuth()">登出</button>`;
-  }else{
-    el.innerHTML='<button class="btn-login" onclick="showLoginModal()">登入</button>';
+function closeLoginModal() { document.getElementById('login-overlay').style.display = 'none'; }
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  const isReg = mode === 'register';
+  document.getElementById('lg-email').style.display = isReg ? 'block' : 'none';
+  document.getElementById('modal-mode-label').textContent = isReg ? '新帳號' : '登入';
+  document.getElementById('lg-submit').textContent = isReg ? '建立帳號' : '登入';
+  document.getElementById('lg-pass').placeholder = isReg ? '密碼（8 位以上）' : '密碼';
+  document.getElementById('lg-pass').autocomplete = isReg ? 'new-password' : 'current-password';
+  document.getElementById('lg-err').textContent = '';
+  const on = 'background:#e8ff00;color:#000', off = 'background:transparent;color:#666';
+  document.getElementById('tab-login').style.cssText += isReg ? off : on;
+  document.getElementById('tab-register').style.cssText += isReg ? on : off;
+}
+
+async function doAuth() {
+  const u = document.getElementById('lg-user').value.trim();
+  const p = document.getElementById('lg-pass').value;
+  const errEl = document.getElementById('lg-err');
+  if (!u || !p) { errEl.textContent = '請輸入帳號和密碼'; return; }
+  const btn = document.getElementById('lg-submit');
+  btn.disabled = true; btn.textContent = '處理中…';
+  try {
+    let d;
+    if (authMode === 'register') {
+      const e = document.getElementById('lg-email').value.trim();
+      if (!e) { errEl.textContent = '請輸入 Email'; btn.disabled=false; btn.textContent='建立帳號'; return; }
+      d = await api('/api/auth/register', {method:'POST', body:JSON.stringify({username:u, email:e, password:p})});
+    } else {
+      d = await api('/api/auth/login', {method:'POST', body:JSON.stringify({username:u, password:p})});
+    }
+    token = d.access_token; user = {username: d.username, balance: d.balance};
+    localStorage.setItem('pitlane_token', token);
+    localStorage.setItem('pitlane_user', JSON.stringify(user));
+    closeLoginModal(); updateNavAuth(); loadPage();
+  } catch(e) {
+    errEl.textContent = e?.detail || e?.message || '登入失敗，請確認帳號密碼';
+    btn.disabled = false; btn.textContent = authMode === 'register' ? '建立帳號' : '登入';
   }
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLoginModal();if(e.key==='Enter'&&document.getElementById('lg-user'))doLogin();});
+
+function updateNavAuth(){
+  const el = document.getElementById('nav-auth');
+  if(user){
+    el.innerHTML = `
+      <span style="font-family:'Share Tech Mono';font-size:12px;color:#e8ff00;padding:4px 8px;background:#e8ff0010;border:1px solid #e8ff0025;border-radius:5px">◆ ${Number(user.balance||0).toLocaleString()}</span>
+      <span style="font-size:12px;color:#aaa">${user.username}</span>
+      <button class="btn-login" onclick="token=null;user=null;localStorage.removeItem('pitlane_token');localStorage.removeItem('pitlane_user');updateNavAuth()">登出</button>`;
+  } else {
+    el.innerHTML = `<button class="btn-login" onclick="showLoginModal('login')">登入</button><button class="btn-register" onclick="showLoginModal('register')">加入</button>`;
+  }
+}
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') closeLoginModal();
+  if(e.key==='Enter' && document.getElementById('login-overlay').style.display==='flex') doAuth();
+});
 updateNavAuth();
 
 // ─── LOAD REAL DATA ───
