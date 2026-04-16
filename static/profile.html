@@ -4,185 +4,628 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PitLane — 個人戰績</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/assets/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0d0d0d;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height:100vh;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;text-decoration:none;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:#e8ff00;}
+.nav-links{display:flex;gap:20px;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;letter-spacing:0.05em;transition:color .2s;}
+.nav-links a:hover,.nav-links a.active{color:#fff;}
+.nav-actions{display:flex;gap:8px;align-items:center;}
+.btn-login{padding:7px 16px;border-radius:8px;border:1px solid #333;background:transparent;color:#ccc;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-register{padding:7px 16px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.nav-balance{font-family:'Share Tech Mono',monospace;font-size:12px;color:#e8ff00;padding:4px 10px;background:#e8ff0010;border:1px solid #e8ff0030;border-radius:6px;}
+
+/* PAGE LAYOUT */
+.page{max-width:1100px;margin:0 auto;padding:32px 20px;}
+
+/* GATE (not logged in) */
+.gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center;}
+.gate h2{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#fff;}
+.gate p{color:#888;font-size:14px;}
+.btn-gold{padding:12px 28px;border-radius:10px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.05em;}
+
+/* PROFILE HERO */
+.p-hero{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;padding:28px;background:#111;border:1px solid #1e1e1e;border-radius:16px;margin-bottom:20px;position:relative;overflow:hidden;}
+.p-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#e8ff00,#00b0ff,#a855f7);}
+.p-avatar{width:80px;height:80px;border-radius:14px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;}
+.p-avatar-frame{position:absolute;inset:-3px;border-radius:16px;pointer-events:none;}
+.p-info{min-width:0;}
+.p-name{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#fff;line-height:1;}
+.p-title-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.p-tier{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-radius:20px;background:#e8ff0015;border:1px solid #e8ff0033;color:#e8ff00;}
+.p-status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.p-status-label{font-size:12px;color:#aaa;}
+.p-level-block{text-align:right;min-width:120px;}
+.p-lvl{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:#e8ff00;line-height:1;}
+.p-lvl-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#555;letter-spacing:.1em;margin-top:-2px;}
+
+/* XP BAR */
+.xp-row{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;margin-bottom:20px;}
+.xp-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#555;letter-spacing:.1em;white-space:nowrap;}
+.xp-bar-wrap{flex:1;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,#e8ff00,#a0c400);border-radius:4px;transition:width 1s cubic-bezier(.22,1,.36,1);}
+.xp-nums{font-family:'Share Tech Mono',monospace;font-size:11px;color:#888;white-space:nowrap;}
+
+/* STATS GRID */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.stat-box{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:16px 12px;text-align:center;}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;line-height:1;}
+.stat-lbl{font-size:11px;color:#666;margin-top:3px;letter-spacing:.05em;}
+
+/* SECTION CARD */
+.sec{background:#111;border:1px solid #1e1e1e;border-radius:14px;margin-bottom:16px;overflow:hidden;}
+.sec-hd{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid #1a1a1a;}
+.sec-hd-icon{font-size:16px;}
+.sec-hd h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#ccc;letter-spacing:.05em;}
+.sec-body{padding:16px 20px;}
+
+/* TITLES */
+.titles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.title-chip{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:10px;}
+.title-icon{font-size:20px;}
+.title-info{min-width:0;}
+.title-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:#e8e8e8;}
+.title-cond{font-size:10px;color:#555;margin-top:1px;}
+.title-empty{color:#444;font-size:13px;text-align:center;padding:20px;}
+
+/* TROPHIES */
+.trophy-row{display:flex;gap:10px;flex-wrap:wrap;}
+.trophy-chip{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;font-size:13px;}
+.trophy-icon{font-size:18px;}
+.trophy-info{min-width:0;}
+.trophy-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:#ccc;}
+.trophy-race{font-size:10px;color:#555;}
+.trophy-empty{color:#444;font-size:13px;text-align:center;padding:20px;}
+
+/* BLOOD TYPE */
+.blood-card{display:flex;align-items:center;gap:20px;padding:4px 0;}
+.blood-icon{font-size:40px;}
+.blood-type{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#e8ff00;margin-bottom:4px;}
+.blood-desc{font-size:13px;color:#aaa;line-height:1.5;}
+
+/* XP LOG */
+.xp-log-list{display:grid;gap:6px;}
+.xp-item{display:flex;align-items:center;gap:12px;padding:8px 12px;background:#0d0d0d;border-radius:8px;border:1px solid #1a1a1a;}
+.xp-item-amt{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;min-width:56px;text-align:right;}
+.xp-item-reason{flex:1;font-size:12px;color:#aaa;}
+.xp-item-date{font-size:10px;color:#444;}
+
+/* FRAMES */
+.frames-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.frame-card{padding:12px;background:#0d0d0d;border-radius:10px;text-align:center;cursor:pointer;transition:border-color .2s;}
+.frame-card.locked{opacity:.4;cursor:default;}
+.frame-card.active{border-color:#e8ff00!important;}
+.frame-demo{width:50px;height:50px;border-radius:10px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 8px;}
+.frame-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:#ccc;}
+.frame-level{font-size:10px;color:#555;margin-top:2px;}
+
+/* BET HISTORY */
+.bet-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;}
+.bet-result{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;width:44px;text-align:center;padding:3px 0;border-radius:4px;}
+.bet-result.won{background:#00ff8815;color:#00ff88;border:1px solid #00ff8830;}
+.bet-result.lost{background:#ff444415;color:#ff4444;border:1px solid #ff444430;}
+.bet-result.pending{background:#e8ff0015;color:#e8ff00;border:1px solid #e8ff0030;}
+.bet-race{font-weight:600;font-size:14px;color:#e8e8e8;}
+.bet-pred{font-size:12px;color:#888;margin-top:2px;}
+.bet-amt{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#e8ff00;text-align:right;white-space:nowrap;}
+.bet-odds{font-size:11px;color:#555;text-align:right;}
+.bet-date{font-size:10px;color:#444;width:70px;text-align:right;}
+.bets-empty{color:#444;font-size:13px;text-align:center;padding:28px;}
+
+/* LEADERBOARD TABS */
+.lb-tabs{display:flex;gap:4px;margin-bottom:14px;}
+.lb-tab{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;padding:6px 16px;border-radius:6px;border:1px solid #1e1e1e;background:transparent;color:#666;cursor:pointer;transition:.2s;}
+.lb-tab.active{background:#e8ff0015;border-color:#e8ff0040;color:#e8ff00;}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;margin-bottom:6px;}
+.lb-rank{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;width:30px;text-align:center;}
+.lb-user{flex:1;font-weight:600;font-size:14px;}
+.lb-tier{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:#888;}
+.lb-val{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#e8ff00;text-align:right;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:#111;border:1px solid #222;border-radius:16px;padding:32px;min-width:340px;max-width:420px;width:100%;}
+.modal h3{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;margin-bottom:20px;}
+.modal-inp{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#e8e8e8;font-size:14px;margin-bottom:12px;font-family:'Barlow',sans-serif;}
+.modal-inp:focus{outline:none;border-color:#e8ff0040;}
+.modal-submit{width:100%;padding:12px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;cursor:pointer;margin-top:4px;}
+.modal-close{float:right;background:none;border:none;color:#555;font-size:20px;cursor:pointer;margin:-4px -4px 0 0;}
+.modal-err{color:#ff4444;font-size:13px;margin-top:8px;text-align:center;}
+.modal-switch{text-align:center;margin-top:16px;font-size:13px;color:#888;}
+.modal-switch a{color:#e8ff00;cursor:pointer;text-decoration:none;}
+
+@media(max-width:700px){
+  .stats-row{grid-template-columns:repeat(3,1fr);}
+  .p-hero{grid-template-columns:auto 1fr;grid-template-rows:auto auto;}
+  .p-level-block{grid-column:1/-1;text-align:left;display:flex;gap:8px;align-items:baseline;}
+}
+</style>
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
-    <div class="nav-links">
-      <a href="/">首頁</a>
-      <a href="/race">賽事</a>
-      <a href="/cards">卡牌</a>
-      <a href="/profile" class="active">戰績</a>
-    </div>
-    <div id="nav-auth" class="nav-auth"></div>
+<nav>
+  <a href="/" class="nav-logo"><span class="logo-dot"></span>PITLANE</a>
+  <div class="nav-links">
+    <a href="/">首頁</a>
+    <a href="/race">賽事</a>
+    <a href="/cards">卡牌</a>
+    <a href="/profile" class="active">戰績</a>
+  </div>
+  <div class="nav-actions">
+    <span class="nav-balance" id="nav-balance" style="display:none"></span>
+    <div id="nav-auth-area"></div>
   </div>
 </nav>
 
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="auth-modal"></div>
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modal-title">登入</h3>
+    <input class="modal-inp" type="text" id="m-user" placeholder="帳號">
+    <input class="modal-inp" type="password" id="m-pass" placeholder="密碼">
+    <button class="modal-submit" onclick="doAuth()">確認</button>
+    <div class="modal-err" id="m-err"></div>
+    <div class="modal-switch" id="modal-switch">
+      還沒有帳號？<a onclick="toggleMode()">立即註冊</a>
+    </div>
+  </div>
 </div>
 
-<section style="padding-top:100px" class="section">
-  <div class="container">
-    <div id="profile-content">
-      <div id="not-logged-in" style="text-align:center;padding:60px 0">
-        <h2 style="margin-bottom:16px">登入查看你的戰績（使用交易所帳號）</h2>
-        <p style="color:var(--text-secondary);margin-bottom:24px">追蹤你的預測記錄、USDClaw變化和卡牌收藏</p>
-        <button class="btn btn-gold" onclick="showModal('login')">登入</button>
-      </div>
+<div class="page">
+  <!-- Not logged in gate -->
+  <div class="gate" id="gate" style="display:none">
+    <div style="font-size:48px">🏎</div>
+    <h2>登入查看你的戰績</h2>
+    <p>追蹤 RPG 等級、稱號、獎杯和預測歷史</p>
+    <button class="btn-gold" onclick="openModal('login')">登入 / 使用交易所帳號</button>
+  </div>
 
-      <div id="profile-data" style="display:none">
-        <!-- Profile Header -->
-        <div style="display:flex;gap:32px;align-items:flex-start;margin-bottom:48px">
-          <div style="flex:1">
-            <h1 id="profile-name" style="margin-bottom:8px">—</h1>
-            <div id="profile-rarity" style="margin-bottom:16px"></div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px">
-              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
-                <div style="color:var(--gold);font-size:2rem;font-weight:900" id="p-coins">0</div>
-                <div style="color:var(--text-secondary);font-size:12px">USDClaw</div>
-              </div>
-              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
-                <div style="color:var(--text-primary);font-size:2rem;font-weight:900" id="p-bets">0</div>
-                <div style="color:var(--text-secondary);font-size:12px">總預測</div>
-              </div>
-              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
-                <div style="color:var(--green);font-size:2rem;font-weight:900" id="p-wins">0</div>
-                <div style="color:var(--text-secondary);font-size:12px">命中</div>
-              </div>
-              <div class="hud-box" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center">
-                <div style="color:var(--blue);font-size:2rem;font-weight:900" id="p-rate">0%</div>
-                <div style="color:var(--text-secondary);font-size:12px">命中率</div>
-              </div>
+  <!-- Main profile content -->
+  <div id="p-main" style="display:none">
+
+    <!-- Hero: avatar + name + level -->
+    <div class="p-hero" id="p-hero">
+      <div class="p-avatar" id="p-avatar">🏁
+        <div class="p-avatar-frame" id="p-avatar-frame"></div>
+      </div>
+      <div class="p-info">
+        <div class="p-name" id="p-name">—</div>
+        <div class="p-title-row">
+          <span class="p-tier" id="p-tier">—</span>
+          <span class="p-status-dot" id="p-status-dot" style="background:#00ff88"></span>
+          <span class="p-status-label" id="p-status-label">在線</span>
+        </div>
+        <div style="font-size:12px;color:#555;margin-top:8px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.05em" id="p-perks"></div>
+      </div>
+      <div class="p-level-block">
+        <div class="p-lvl" id="p-lvl">1</div>
+        <div class="p-lvl-label">LEVEL</div>
+      </div>
+    </div>
+
+    <!-- XP bar -->
+    <div class="xp-row">
+      <div class="xp-label">XP</div>
+      <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-fill" style="width:0%"></div></div>
+      <div class="xp-nums" id="xp-nums">0 / 100</div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" style="color:#e8ff00" id="s-coins">0</div>
+        <div class="stat-lbl">USDCLAW</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="s-bets">0</div>
+        <div class="stat-lbl">下注數</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#00ff88" id="s-wins">0</div>
+        <div class="stat-lbl">命中</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#00b0ff" id="s-rate">0%</div>
+        <div class="stat-lbl">命中率</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#a855f7" id="s-streak">0</div>
+        <div class="stat-lbl">連勝</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+      <!-- Blood type -->
+      <div class="sec">
+        <div class="sec-hd">
+          <span class="sec-hd-icon">🧬</span>
+          <h3>賽車血型</h3>
+        </div>
+        <div class="sec-body">
+          <div class="blood-card" id="blood-card">
+            <div class="blood-icon" id="blood-icon">🌱</div>
+            <div>
+              <div class="blood-type" id="blood-type">新秀</div>
+              <div class="blood-desc" id="blood-desc">還沒有足夠的數據分析你的賽車血型</div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Bet History -->
-        <h2 style="margin-bottom:20px">預測記錄</h2>
-        <div id="bet-history"></div>
+      <!-- XP log -->
+      <div class="sec">
+        <div class="sec-hd">
+          <span class="sec-hd-icon">⚡</span>
+          <h3>最近 XP</h3>
+        </div>
+        <div class="sec-body">
+          <div class="xp-log-list" id="xp-log"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Titles -->
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-hd-icon">🎖</span>
+        <h3>獲得稱號</h3>
+      </div>
+      <div class="sec-body">
+        <div class="titles-grid" id="titles-grid">
+          <div class="title-empty">尚未解鎖稱號，繼續下注吧！</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trophies -->
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-hd-icon">🏆</span>
+        <h3>獎杯陳列室</h3>
+        <span style="margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#555" id="trophy-count">0</span>
+      </div>
+      <div class="sec-body">
+        <div class="trophy-row" id="trophy-row">
+          <div class="trophy-empty" style="width:100%">還沒有獎杯，押中高賠率冠軍就能獲得！</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avatar frames -->
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-hd-icon">🖼</span>
+        <h3>頭像外框</h3>
+      </div>
+      <div class="sec-body">
+        <div class="frames-grid" id="frames-grid"></div>
+      </div>
+    </div>
+
+    <!-- Bet history -->
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-hd-icon">📋</span>
+        <h3>預測記錄</h3>
+      </div>
+      <div class="sec-body" id="bet-history">
+        <div class="bets-empty">載入中⋯</div>
       </div>
     </div>
 
     <!-- Leaderboard -->
-    <div style="margin-top:60px">
-      <div class="section-header">
-        <h2>全站排行榜</h2>
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-hd-icon">🏅</span>
+        <h3>全站排行榜</h3>
       </div>
-      <div id="leaderboard" class="loading">
-        <div class="spinner"></div>
+      <div class="sec-body">
+        <div class="lb-tabs">
+          <button class="lb-tab active" onclick="showLb('rpg')">RPG 等級</button>
+          <button class="lb-tab" onclick="showLb('coins')">USDClaw</button>
+        </div>
+        <div id="lb-rpg"></div>
+        <div id="lb-coins" style="display:none"></div>
       </div>
     </div>
-  </div>
-</section>
 
-<footer class="footer">
-  <div class="container">
-    <p>PitLane — 賽車預測卡牌平台</p>
-  </div>
-</footer>
+  </div><!-- /p-main -->
+</div>
 
-<script src="/static/assets/js/app.js"></script>
 <script>
-async function loadProfile() {
-  if (!user) {
-    document.getElementById('not-logged-in').style.display = 'block';
-    document.getElementById('profile-data').style.display = 'none';
+const token = () => localStorage.getItem('pitlane_token');
+let modalMode = 'login';
+
+async function api(path, opts={}) {
+  const r = await fetch(path, {
+    headers: {'Content-Type':'application/json', ...(token() ? {'Authorization':'Bearer '+token()} : {})},
+    ...opts
+  });
+  if (!r.ok) throw await r.json();
+  return r.json();
+}
+
+function openModal(mode) {
+  modalMode = mode;
+  document.getElementById('modal-title').textContent = mode==='login' ? '登入' : '註冊';
+  document.getElementById('modal-switch').innerHTML = mode==='login'
+    ? '還沒有帳號？<a onclick="toggleMode()">立即註冊</a>'
+    : '已有帳號？<a onclick="toggleMode()">去登入</a>';
+  document.getElementById('m-err').textContent = '';
+  document.getElementById('auth-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('auth-modal').classList.remove('open'); }
+function toggleMode() { openModal(modalMode==='login'?'register':'login'); }
+
+async function doAuth() {
+  const u = document.getElementById('m-user').value.trim();
+  const p = document.getElementById('m-pass').value;
+  const errEl = document.getElementById('m-err');
+  if (!u || !p) { errEl.textContent='請輸入帳號和密碼'; return; }
+  try {
+    const ep = modalMode==='login' ? '/api/auth/login' : '/api/auth/register';
+    const d = await api(ep, {method:'POST', body:JSON.stringify({username:u,password:p})});
+    localStorage.setItem('pitlane_token', d.token);
+    closeModal();
+    initPage();
+  } catch(e) {
+    errEl.textContent = e.detail || '失敗';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('pitlane_token');
+  initPage();
+}
+
+const FRAME_CSS = {
+  silverstone: 'border:2px solid #666',
+  monza: 'border:2px solid #00b0ff;box-shadow:0 0 8px rgba(0,176,255,.3)',
+  suzuka: 'border:2px solid #a855f7;box-shadow:0 0 8px rgba(168,85,247,.3)',
+  monaco: 'border:2px solid #e8ff00;box-shadow:0 0 12px rgba(232,255,0,.3)',
+  champion: 'border:2px solid #fff;animation:rainbowBorder 3s linear infinite',
+  legend: 'border:3px solid #e8ff00;box-shadow:0 0 20px rgba(232,255,0,.4)',
+};
+const FRAME_EMOJI = {silverstone:'⬜',monza:'🔵',suzuka:'🟣',monaco:'🌟',champion:'🌈',legend:'👑'};
+const FRAME_NAMES = {silverstone:'銀石框',monza:'蒙扎框',suzuka:'鈴鹿框',monaco:'摩納哥框',champion:'冠軍框',legend:'傳奇框'};
+const FRAME_LEVELS = {silverstone:1,monza:10,suzuka:25,monaco:50,champion:0,legend:100};
+
+async function initPage() {
+  const t = token();
+  const authArea = document.getElementById('nav-auth-area');
+  const balEl = document.getElementById('nav-balance');
+
+  if (!t) {
+    document.getElementById('gate').style.display = 'flex';
+    document.getElementById('p-main').style.display = 'none';
+    balEl.style.display = 'none';
+    authArea.innerHTML = `<button class="btn-login" onclick="openModal('login')">登入</button><button class="btn-register" onclick="openModal('register')">加入</button>`;
     return;
   }
 
-  document.getElementById('not-logged-in').style.display = 'none';
-  document.getElementById('profile-data').style.display = 'block';
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('p-main').style.display = 'block';
+  authArea.innerHTML = `<button class="btn-login" onclick="logout()">登出</button>`;
 
   try {
-    const profile = await api('/api/profile');
-    document.getElementById('profile-name').textContent = profile.username;
-    document.getElementById('profile-rarity').innerHTML =
-      `<span class="rarity-badge ${rarityClass(profile.rarity_level)}">${rarityLabel(profile.rarity_level)}</span>`;
-    document.getElementById('p-coins').textContent = profile.balance?.toLocaleString();
-    document.getElementById('p-bets').textContent = profile.total_bets;
-    document.getElementById('p-wins').textContent = profile.total_wins;
-    document.getElementById('p-rate').textContent = profile.win_rate + '%';
+    const [rpg, bets, rpgLb] = await Promise.all([
+      api('/api/rpg/profile'),
+      api('/api/bets/my'),
+      api('/api/rpg/leaderboard'),
+    ]);
+    renderProfile(rpg);
+    renderBets(bets.bets || []);
+    renderRpgLeaderboard(rpgLb.leaderboard || []);
 
-    // Load bet history
-    const bets = await api('/api/bets/my');
-    const histEl = document.getElementById('bet-history');
-    if (!bets.bets?.length) {
-      histEl.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:32px">還沒有預測記錄，去<a href="/race">賽事頁面</a>下你的第一注！</p>';
-    } else {
-      histEl.innerHTML = `
-        <div style="display:grid;gap:8px">
-          ${bets.bets.map(b => `
-            <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;
-                        background:var(--bg-card);border:1px solid var(--border);border-radius:8px">
-              <div style="width:60px;text-align:center">
-                ${b.result === 'won'
-                  ? '<span style="color:var(--green);font-weight:700">✓ 命中</span>'
-                  : b.result === 'lost'
-                  ? '<span style="color:var(--red);font-weight:700">✗ 未中</span>'
-                  : '<span style="color:var(--gold);font-weight:700">⏳ 等待</span>'}
-              </div>
-              <div style="flex:1">
-                <div style="font-weight:600">${b.race_name}</div>
-                <div style="color:var(--text-secondary);font-size:13px">預測: ${b.prediction}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-weight:600">◆ ${b.amount}</div>
-                <div style="color:var(--text-muted);font-size:12px">x${b.odds}</div>
-              </div>
-              <div style="color:var(--text-muted);font-size:12px;width:80px;text-align:right">
-                ${new Date(b.created_at).toLocaleDateString('zh-TW')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+    // Load coin leaderboard
+    try {
+      const cLb = await api('/api/profile/leaderboard');
+      renderCoinLeaderboard(cLb.leaderboard || []);
+    } catch(e) {}
+
+    // balance
+    try {
+      const bal = await api('/api/profile');
+      balEl.textContent = '◆ ' + (bal.balance||0).toLocaleString();
+      balEl.style.display = 'inline';
+      document.getElementById('s-coins').textContent = (bal.balance||0).toLocaleString();
+    } catch(e) {}
+
+  } catch(e) {
+    if (e?.detail?.includes?.('token') || e?.detail?.includes?.('Token')) {
+      localStorage.removeItem('pitlane_token');
+      initPage();
     }
-  } catch (e) {
-    document.getElementById('profile-data').innerHTML = '<p style="color:var(--red)">載入個人資料失敗</p>';
   }
 }
 
-async function loadLeaderboard() {
-  const el = document.getElementById('leaderboard');
-  try {
-    const data = await api('/api/profile/leaderboard');
-    const lb = data.leaderboard || [];
-    if (!lb.length) {
-      el.innerHTML = '<p style="text-align:center;color:var(--text-secondary)">還沒有玩家，成為第一個！</p>';
-      return;
-    }
-    el.className = '';
-    el.innerHTML = `
-      <div style="display:grid;gap:6px">
-        ${lb.map(p => `
-          <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;
-                      background:var(--bg-card);border:1px solid ${p.rank <= 3 ? 'var(--border-gold)' : 'var(--border)'};
-                      border-radius:8px">
-            <span style="font-size:1.2rem;font-weight:900;width:40px;text-align:center;
-                         color:${p.rank === 1 ? 'var(--gold)' : p.rank === 2 ? '#c0c0c0' : p.rank === 3 ? '#cd7f32' : 'var(--text-muted)'}">
-              ${p.rank <= 3 ? ['🥇','🥈','🥉'][p.rank-1] : '#' + p.rank}
-            </span>
-            <span style="flex:1;font-weight:600">${p.username}</span>
-            <span style="color:var(--gold);font-weight:700">◆ ${p.coins?.toLocaleString()}</span>
-            <span style="color:var(--text-secondary);font-size:13px;width:100px;text-align:right">
-              ${p.total_bets}注 · ${p.win_rate}%
-            </span>
-          </div>
-        `).join('')}
+function renderProfile(d) {
+  const lvl = d.level;
+  document.getElementById('p-name').textContent = d.username;
+  document.getElementById('p-lvl').textContent = lvl.level;
+  document.getElementById('p-tier').textContent = lvl.title;
+  document.getElementById('p-perks').textContent = lvl.perks;
+
+  // XP bar
+  setTimeout(() => {
+    document.getElementById('xp-fill').style.width = lvl.progress_pct + '%';
+  }, 200);
+  document.getElementById('xp-nums').textContent = `${lvl.xp_in_level.toLocaleString()} / ${lvl.xp_to_next.toLocaleString()} XP`;
+
+  // Status
+  const si = d.status_info || {};
+  document.getElementById('p-status-dot').style.background = si.color || '#00ff88';
+  document.getElementById('p-status-label').textContent = si.label || '在線';
+
+  // Frame
+  const frameId = d.frame?.id || 'silverstone';
+  const fCss = FRAME_CSS[frameId] || '';
+  document.getElementById('p-avatar-frame').style.cssText = fCss;
+
+  // Stats
+  const st = d.stats || {};
+  document.getElementById('s-bets').textContent = st.total_bets || 0;
+  document.getElementById('s-wins').textContent = st.total_wins || 0;
+  const rate = st.total_bets ? Math.round(st.total_wins/st.total_bets*100) : 0;
+  document.getElementById('s-rate').textContent = rate + '%';
+  document.getElementById('s-streak').textContent = st.win_streak || 0;
+
+  // Blood type
+  const bt = d.blood_type || {};
+  document.getElementById('blood-icon').textContent = bt.icon || '🌱';
+  document.getElementById('blood-type').textContent = bt.type || '新秀';
+  document.getElementById('blood-desc').textContent = bt.desc || '';
+
+  // XP log
+  const xpLog = document.getElementById('xp-log');
+  const logs = d.xp_history || [];
+  if (!logs.length) {
+    xpLog.innerHTML = '<div style="color:#444;font-size:12px;text-align:center;padding:12px">尚無 XP 記錄</div>';
+  } else {
+    xpLog.innerHTML = logs.map(x => `
+      <div class="xp-item">
+        <span class="xp-item-amt" style="color:${x.amount>=0?'#00ff88':'#ff4444'}">${x.amount>=0?'+':''}${x.amount} XP</span>
+        <span class="xp-item-reason">${x.reason}</span>
+        <span class="xp-item-date">${x.date?.slice(0,10)}</span>
+      </div>
+    `).join('');
+  }
+
+  // Titles
+  const titlesEl = document.getElementById('titles-grid');
+  if (!d.auto_titles?.length) {
+    titlesEl.innerHTML = '<div class="title-empty">尚未解鎖稱號，繼續下注吧！</div>';
+  } else {
+    titlesEl.innerHTML = d.auto_titles.map(t => `
+      <div class="title-chip">
+        <span class="title-icon">${t.icon}</span>
+        <div class="title-info">
+          <div class="title-name">${t.name}</div>
+          <div class="title-cond">${t.condition}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Trophies
+  document.getElementById('trophy-count').textContent = d.trophy_count || 0;
+  const tRow = document.getElementById('trophy-row');
+  if (!d.trophies?.length) {
+    tRow.innerHTML = '<div class="trophy-empty" style="width:100%">還沒有獎杯，押中高賠率冠軍就能獲得！</div>';
+  } else {
+    tRow.innerHTML = d.trophies.map(t => `
+      <div class="trophy-chip">
+        <span class="trophy-icon">${t.icon||'🏆'}</span>
+        <div class="trophy-info">
+          <div class="trophy-name">${t.name||t.type}</div>
+          <div class="trophy-race">${t.race||''} ${t.driver||''}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Frames
+  const fgEl = document.getElementById('frames-grid');
+  const availFrames = lvl.available_frames || ['silverstone'];
+  fgEl.innerHTML = Object.entries(FRAME_NAMES).map(([id, name]) => {
+    const locked = !availFrames.includes(id) && id !== 'champion';
+    const active = id === frameId;
+    return `
+      <div class="frame-card ${locked?'locked':''} ${active?'active':''}"
+           style="border:1px solid ${active?'#e8ff00':'#1e1e1e'}"
+           onclick="${locked||active?'':''}"
+           title="${locked?'等級'+FRAME_LEVELS[id]+'解鎖':''}">
+        <div class="frame-demo" style="${FRAME_CSS[id]||''}">
+          ${FRAME_EMOJI[id]||'⬜'}
+        </div>
+        <div class="frame-name">${name}</div>
+        <div class="frame-level">${locked?'🔒 Lv.'+FRAME_LEVELS[id]:'✓ 已解鎖'}</div>
       </div>
     `;
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary)">無法載入排行榜</p>';
-  }
+  }).join('');
 }
 
-loadProfile();
-loadLeaderboard();
+function renderBets(bets) {
+  const el = document.getElementById('bet-history');
+  if (!bets.length) {
+    el.innerHTML = '<div class="bets-empty">還沒有預測記錄，去<a href="/race" style="color:#e8ff00">賽事頁面</a>下你的第一注！</div>';
+    return;
+  }
+  el.innerHTML = '<div style="display:grid;gap:7px">' + bets.slice(0,30).map(b => `
+    <div class="bet-row">
+      <span class="bet-result ${b.result||'pending'}">${
+        b.result==='won'?'命中':b.result==='lost'?'未中':'等待'
+      }</span>
+      <div style="flex:1;min-width:0">
+        <div class="bet-race">${b.race_name||'—'}</div>
+        <div class="bet-pred">預測：${b.prediction||'—'}</div>
+      </div>
+      <div>
+        <div class="bet-amt">◆ ${(b.amount||0).toLocaleString()}</div>
+        <div class="bet-odds">× ${b.odds||'—'}</div>
+      </div>
+      <div class="bet-date">${(b.created_at||'').slice(0,10)}</div>
+    </div>
+  `).join('') + '</div>';
+}
+
+function renderRpgLeaderboard(lb) {
+  document.getElementById('lb-rpg').innerHTML = lb.length
+    ? lb.slice(0,20).map(p => `
+      <div class="lb-row">
+        <span class="lb-rank" style="color:${p.rank===1?'#e8ff00':p.rank===2?'#c0c0c0':p.rank===3?'#cd7f32':'#555'}">${
+          p.rank<=3?['🥇','🥈','🥉'][p.rank-1]:'#'+p.rank
+        }</span>
+        <div style="flex:1;min-width:0">
+          <span class="lb-user">${p.username}</span>
+          <span class="lb-tier" style="margin-left:8px">${p.title||''}</span>
+        </div>
+        <span class="lb-val" style="color:#a855f7">Lv.${p.level}</span>
+        <span style="font-size:11px;color:#444;margin-left:12px;min-width:60px;text-align:right">${(p.xp||0).toLocaleString()} XP</span>
+      </div>
+    `).join('')
+    : '<div style="color:#444;font-size:13px;text-align:center;padding:20px">還沒有玩家</div>';
+}
+
+function renderCoinLeaderboard(lb) {
+  document.getElementById('lb-coins').innerHTML = lb.length
+    ? lb.slice(0,20).map(p => `
+      <div class="lb-row">
+        <span class="lb-rank" style="color:${p.rank===1?'#e8ff00':p.rank===2?'#c0c0c0':p.rank===3?'#cd7f32':'#555'}">${
+          p.rank<=3?['🥇','🥈','🥉'][p.rank-1]:'#'+p.rank
+        }</span>
+        <div style="flex:1;min-width:0">
+          <span class="lb-user">${p.username}</span>
+        </div>
+        <span class="lb-val">◆ ${(p.total_payout||0).toLocaleString()}</span>
+        <span style="font-size:11px;color:#444;margin-left:12px;min-width:80px;text-align:right">${p.total_bets||0}注 · ${p.win_rate||0}%</span>
+      </div>
+    `).join('')
+    : '<div style="color:#444;font-size:13px;text-align:center;padding:20px">還沒有玩家</div>';
+}
+
+let lbMode = 'rpg';
+function showLb(mode) {
+  lbMode = mode;
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('lb-rpg').style.display = mode==='rpg'?'block':'none';
+  document.getElementById('lb-coins').style.display = mode==='coins'?'block':'none';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') closeModal();
+});
+
+initPage();
 </script>
 </body>
 </html>
