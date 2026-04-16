@@ -769,6 +769,31 @@ async function loadPage() {
 
   render();
   resetAuto();
+
+  // Patch DR entries with real 2024 stats from API
+  async function loadRealStats() {
+    try {
+      const data = await api('/api/drivers/stats');
+      const map = {};
+      for (const d of (data.drivers || [])) {
+        map[d.name?.split(' ').pop()?.toLowerCase()] = d;
+        map[d.code?.toLowerCase()] = d;
+      }
+      let updated = false;
+      DR.forEach(d => {
+        const h = map[d.name.toLowerCase()] || map[d.code?.toLowerCase()];
+        if (!h) return;
+        d.win  = Math.round(h.win_rate) || d.win;
+        d.pts  = h.points ?? d.pts;
+        d.odds = h.wins > 0
+          ? Number(Math.max(1.5, Math.min(50, 100 / (h.win_rate || 1))).toFixed(1))
+          : d.odds;
+        updated = true;
+      });
+      if (updated) render();
+    } catch (_) {}
+  }
+  loadRealStats();
 })();
 
 // Load real data (dashboard, bets panel, etc)

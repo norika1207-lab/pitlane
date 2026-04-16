@@ -180,23 +180,37 @@ let currentSort = 'ovr';
 let sortAsc = false; // false = 高到低（預設）
 let currentTierFilter = 'all';
 
-// Load real drivers from API
+// Load real drivers from API + 2024 historical stats
 async function loadDrivers() {
   try {
-    const data = await api('/api/drivers');
+    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','RB':'#6692FF','Kick Sauber':'#52E252','Audi':'#52E252'};
+
+    // Fetch in parallel: OpenF1 drivers + 2024 stats
+    const [data, histData] = await Promise.all([
+      api('/api/drivers'),
+      api('/api/drivers/stats').catch(()=>({drivers:[]})),
+    ]);
     const drivers = data.drivers || [];
+    // Build a stats map keyed by family name or driver_id
+    const histMap = {};
+    for (const h of (histData.drivers || [])) {
+      histMap[h.driver_id] = h;
+      if (h.name) histMap[h.name.split(' ').pop().toLowerCase()] = h;
+    }
+
     const cards = await Promise.all(drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null)));
-    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
 
     DRIVERS = drivers.map((d, i) => {
       const card = cards[i];
       const s = card?.stats || {};
+      // Enrich with historical data if available
+      const hist = histMap[d.driver_id] || histMap[d.name?.split(' ').pop()?.toLowerCase()] || {};
       const ovr = s.overall || 50;
-      const color = teamColors[card?.team || d.team] || '#888';
+      const color = hist.color || teamColors[card?.team || d.team] || '#888';
       const odds = card?.odds || 10.0;
-      const win = odds ? Math.round(1 / odds * 100) : 5;
+      // win% from real data if available, else derive from odds
+      const win = hist.win_rate != null ? Math.round(hist.win_rate) : (odds ? Math.round(1/odds*100) : 5);
 
-      // Assign tier based on OVR
       let tier = 'silverstone';
       if (ovr >= 88) tier = 'monaco';
       else if (ovr >= 83) tier = 'spa';
@@ -210,11 +224,18 @@ async function loadDrivers() {
         name: d.name?.split(' ').pop() || '?',
         fullName: d.name || '?',
         team: card?.team || d.team || '',
-        color, emoji: '🏎', tier,
-        headshot,
+        color, emoji: '🏎', tier, headshot,
         stats: {q: s.qualifying||50, t: s.tire_management||50, w: s.wet_weather||50, o: s.overtaking||50},
         ovr, win, odds: Number(odds).toFixed(1),
         driver_id: d.driver_id,
+        // real 2024 data
+        pts2024: hist.points || 0,
+        wins2024: hist.wins || 0,
+        podiums2024: hist.podiums || 0,
+        champPos: hist.championship_pos || 99,
+        podium_rate: hist.podium_rate || 0,
+        avg_grid: hist.avg_grid || '-',
+        last5: hist.last5_points || [],
       };
     });
 
@@ -397,9 +418,13 @@ function buildCard(d) {
           </div>
         </div>
         <div class="c-divider" style="background:${t.divider};"></div>
+        ${d.last5?.length ? `<div style="padding:4px 12px 0;display:flex;align-items:center;gap:3px;position:relative;z-index:5;">
+          <span style="font-size:7px;color:#666;letter-spacing:.05em;font-family:'Barlow Condensed',sans-serif;margin-right:2px">L5</span>
+          ${(()=>{const mx=Math.max(...d.last5,1);return d.last5.map(p=>`<div style="width:8px;height:${Math.max(3,Math.round(p/mx*18))}px;background:${p>0?t.statColor:'#222'};border-radius:1px;align-self:flex-end;${p>0?`box-shadow:0 0 3px ${t.ovrColor}44;`:''}"></div>`).join('')})()}
+        </div>` : ''}
         <div class="c-bottom">
           <div>
-            <div class="c-wn" style="color:${t.winColor};${d.tier==='monaco'?'text-shadow:0 0 12px rgba(0,255,136,1);':''}">${d.win}%</div>
+            <div class="c-wn" style="color:${t.winColor};${d.tier==='monaco'?'text-shadow:0 0 12px rgba(0,255,136,1);''}">${d.win}%</div>
             <div class="c-wl">WIN</div>
           </div>
           <div>
@@ -407,8 +432,7 @@ function buildCard(d) {
             <div class="c-ol">OVR</div>
           </div>
           <div>
-            <div class="c-od" style="color:${t.oddsColor};${d.tier==='monaco'?'text-shadow:0 0 12px rgba(255,255,0,1);':''}">${d.odds}x</div>
-            <div class="c-odl">ODDS</div>
+            ${d.pts2024 ? `<div class="c-od" style="color:${t.oddsColor};${d.tier==='monaco'?'text-shadow:0 0 12px rgba(255,255,0,1);':''}">${d.pts2024}</div><div class="c-odl">PTS</div>` : `<div class="c-od" style="color:${t.oddsColor}">${d.odds}x</div><div class="c-odl">ODDS</div>`}
           </div>
         </div>
       </div>

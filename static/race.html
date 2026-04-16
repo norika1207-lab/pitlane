@@ -434,6 +434,7 @@
   content: ''; flex: 1; height: 1px; background: var(--border);
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -720,6 +721,39 @@
       <div class="pit-compare" id="pit-compare">
         <div class="pit-compare-title">Pit Stop Time Comparison</div>
         <div id="pit-compare-bars" class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HISTORICAL DATA ─── -->
+  <section style="padding:32px 0 8px;background:var(--bg-secondary);">
+    <div class="container">
+      <div class="strip-title" style="margin-bottom:20px">2024 賽季歷史數據</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;" id="charts-grid">
+        <!-- Points trend chart -->
+        <div class="ai-card" style="padding:20px">
+          <div class="info-card-title"><span>📈</span> 積分趨勢（最後5站）</div>
+          <canvas id="chart-points" height="160"></canvas>
+        </div>
+        <!-- Podium rate chart -->
+        <div class="ai-card" style="padding:20px">
+          <div class="info-card-title"><span>🏆</span> 勝率 &amp; 頒獎台率</div>
+          <canvas id="chart-winrate" height="160"></canvas>
+        </div>
+      </div>
+      <!-- Jeddah / track history table -->
+      <div class="ai-card" style="padding:20px;margin-bottom:16px" id="jeddah-history-card">
+        <div class="info-card-title"><span>🇸🇦</span> 吉達賽道歷史成績</div>
+        <div id="jeddah-table-wrap">
+          <div class="loading" style="padding:20px 0"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <!-- Recent race results -->
+      <div class="ai-card" style="padding:20px" id="recent-races-card">
+        <div class="info-card-title"><span>🏁</span> 近5站比賽結果</div>
+        <div id="recent-races-wrap">
+          <div class="loading" style="padding:20px 0"><div class="spinner"></div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -1579,6 +1613,10 @@ async function loadSchedule() {
     const today = new Date().toISOString().slice(0, 10);
     const nextRace = races.find(r => r.date >= today);
 
+    // ─── Historical data charts ────────────────────────────────────────
+    loadHistoricalCharts();
+    // ────────────────────────────────────────────────────────────────────
+
     el.className = 'schedule-grid';
     el.innerHTML = races.map(r => {
       const isPast = r.date < today;
@@ -1600,6 +1638,159 @@ async function loadSchedule() {
   } catch (e) {
     el.innerHTML = '<p style="color:var(--text-muted)">無法載入賽程</p>';
   }
+}
+
+// ─── Historical Charts ─────────────────────────────────────────────────────
+const CHART_DRIVERS = ['verstappen','norris','leclerc','piastri','sainz','hamilton','russell'];
+const CHART_COLORS  = {'verstappen':'#3671C6','norris':'#F47600','leclerc':'#E8002D',
+                       'piastri':'#FF6B35','sainz':'#E8002D','hamilton':'#27F4D2','russell':'#00d2be'};
+const CHART_LABELS  = {'verstappen':'VER','norris':'NOR','leclerc':'LEC',
+                       'piastri':'PIA','sainz':'SAI','hamilton':'HAM','russell':'RUS'};
+
+async function loadHistoricalCharts() {
+  try {
+    const [statsRes, histRes] = await Promise.all([
+      api('/api/drivers/stats').catch(()=>({drivers:[]})),
+      api('/api/races/history?limit=5').catch(()=>({races:[]})),
+    ]);
+
+    const stats = statsRes.drivers || [];
+    const races = histRes.races || [];
+
+    renderPointsTrendChart(stats, races);
+    renderWinRateChart(stats);
+    renderJeddahTable(stats);
+    renderRecentRaces(races);
+  } catch(e) { console.error('hist charts:', e); }
+}
+
+function renderPointsTrendChart(stats, races) {
+  const ctx = document.getElementById('chart-points');
+  if (!ctx || !races.length) return;
+
+  const top5 = stats.filter(d => CHART_DRIVERS.includes(d.driver_id)).slice(0, 5);
+  const labels = races.map(r => r.circuit?.split(' ').pop() || `R${r.round}`);
+
+  const datasets = top5.map(d => ({
+    label: CHART_LABELS[d.driver_id] || d.code,
+    data: (d.last5_points || []),
+    borderColor: CHART_COLORS[d.driver_id] || '#888',
+    backgroundColor: (CHART_COLORS[d.driver_id] || '#888') + '22',
+    borderWidth: 2,
+    pointRadius: 3,
+    tension: 0.35,
+    fill: false,
+  }));
+
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels.slice(-Math.max(...datasets.map(d=>d.data.length), 1)), datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#aaa', font: { size: 10 }, boxWidth: 12 } } },
+      scales: {
+        x: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#1a1a1a' } },
+        y: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#1a1a1a' }, min: 0 },
+      },
+    },
+  });
+}
+
+function renderWinRateChart(stats) {
+  const ctx = document.getElementById('chart-winrate');
+  if (!ctx) return;
+
+  const top8 = stats.filter(d => CHART_DRIVERS.includes(d.driver_id)).slice(0, 7);
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top8.map(d => CHART_LABELS[d.driver_id] || d.code),
+      datasets: [
+        {
+          label: '勝率 %',
+          data: top8.map(d => d.win_rate || 0),
+          backgroundColor: top8.map(d => (CHART_COLORS[d.driver_id] || '#888') + 'cc'),
+          borderRadius: 3,
+        },
+        {
+          label: '頒獎台率 %',
+          data: top8.map(d => d.podium_rate || 0),
+          backgroundColor: top8.map(d => (CHART_COLORS[d.driver_id] || '#888') + '44'),
+          borderRadius: 3,
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#aaa', font: { size: 10 }, boxWidth: 12 } } },
+      scales: {
+        x: { ticks: { color: '#666', font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#666', font: { size: 10 } }, grid: { color: '#1a1a1a' }, max: 100 },
+      },
+    },
+  });
+}
+
+function renderJeddahTable(stats) {
+  const wrap = document.getElementById('jeddah-table-wrap');
+  if (!wrap) return;
+
+  const relevant = stats.filter(d => d.jeddah_history?.length > 0)
+                        .sort((a,b) => (a.jeddah_history[0]?.pos || 99) - (b.jeddah_history[0]?.pos || 99))
+                        .slice(0, 8);
+
+  if (!relevant.length) { wrap.innerHTML = '<p style="color:var(--text-muted);font-size:13px">暫無吉達數據</p>'; return; }
+
+  const years = [...new Set(relevant.flatMap(d => d.jeddah_history.map(h => h.year)))].sort();
+
+  wrap.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:6px 8px;color:var(--text-muted);font-weight:700;border-bottom:1px solid var(--border)">車手</th>
+          ${years.map(y=>`<th style="text-align:center;padding:6px 8px;color:var(--text-muted);font-weight:700;border-bottom:1px solid var(--border)">${y}</th>`).join('')}
+          <th style="text-align:center;padding:6px 8px;color:var(--gold);font-weight:700;border-bottom:1px solid var(--border)">最佳</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${relevant.map(d => {
+          const posMap = Object.fromEntries(d.jeddah_history.map(h=>[h.year, h.pos]));
+          const best = Math.min(...d.jeddah_history.map(h=>h.pos));
+          return `<tr style="border-bottom:1px solid var(--border)20">
+            <td style="padding:7px 8px;font-weight:700;color:var(--text-primary)">${d.code}</td>
+            ${years.map(y => {
+              const pos = posMap[y];
+              const c = pos===1?'var(--gold)':pos<=3?'var(--green)':'var(--text-secondary)';
+              return `<td style="text-align:center;padding:7px 8px;color:${c};font-weight:${pos<=3?700:400}">${pos||'—'}</td>`;
+            }).join('')}
+            <td style="text-align:center;padding:7px 8px;font-weight:900;color:${best===1?'var(--gold)':best<=3?'var(--green)':'var(--text-secondary)'}">${best}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderRecentRaces(races) {
+  const wrap = document.getElementById('recent-races-wrap');
+  if (!wrap || !races.length) return;
+
+  wrap.innerHTML = races.slice(-5).reverse().map(race => `
+    <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)20;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <span style="font-weight:700;font-size:14px">R${race.round} ${race.name}</span>
+          ${race.wet?`<span style="font-size:10px;color:var(--blue);margin-left:6px;background:rgba(100,180,255,.12);padding:2px 6px;border-radius:10px;border:1px solid rgba(100,180,255,.3)">🌧 WET</span>`:''}
+        </div>
+        <span style="font-size:11px;color:var(--text-muted)">${race.date}</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${(race.results||[]).slice(0,5).map((r,i) => `
+          <div style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:var(--bg-card);border-radius:6px;border:1px solid ${i===0?r.color+'44':'var(--border)'};min-width:80px">
+            <span style="font-size:11px;font-weight:900;color:${i===0?'var(--gold)':'var(--text-muted)'}">P${r.pos}</span>
+            <span style="font-size:12px;font-weight:700;color:${r.color||'#aaa'}">${r.driver}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
 }
 </script>
 </body>

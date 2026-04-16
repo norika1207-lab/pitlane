@@ -37,6 +37,7 @@ from routes.profile import router as profile_router
 from routes.p2p import router as p2p_router
 from routes.challenge import router as challenge_router
 from routes.rpg import router as rpg_router
+from routes.historical import router as historical_router
 
 app.include_router(auth_router)
 app.include_router(races_router)
@@ -46,6 +47,7 @@ app.include_router(profile_router)
 app.include_router(p2p_router)
 app.include_router(challenge_router)
 app.include_router(rpg_router)
+app.include_router(historical_router)
 
 # AI analysis + track + odds endpoints
 from fastapi import APIRouter, Header
