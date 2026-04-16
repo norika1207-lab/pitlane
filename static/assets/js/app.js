@@ -122,6 +122,25 @@ async function handleLogin() {
   }
 }
 
+// ─── CAR IMAGES ───
+const TEAM_CAR_MAP = {
+  'McLaren': '/static/assets/cars/car_orange.png',
+  'Red Bull Racing': '/static/assets/cars/car_blue.png',
+  'Ferrari': '/static/assets/cars/car_red.png',
+  'Mercedes': '/static/assets/cars/car_teal.png',
+  'Aston Martin': '/static/assets/cars/car_green.png',
+  'Alpine': '/static/assets/cars/car_blue.png',
+  'Williams': '/static/assets/cars/car_blue.png',
+  'Haas': '/static/assets/cars/car_black.png',
+  'Racing Bulls': '/static/assets/cars/car_blue.png',
+  'RB': '/static/assets/cars/car_blue.png',
+  'Audi': '/static/assets/cars/car_green.png',
+  'Kick Sauber': '/static/assets/cars/car_green.png',
+};
+function getCarImage(team) {
+  return TEAM_CAR_MAP[team] || '/static/assets/cars/car_black.png';
+}
+
 // ─── UTILITY ───
 function statBarClass(val) {
   if (val >= 70) return 'high';

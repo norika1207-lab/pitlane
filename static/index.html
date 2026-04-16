@@ -1021,6 +1021,9 @@ function renderCarousel() {
           ${c.passive ? `<span class="cc-skill-tag passive">${c.passive}</span>` : ''}
           ${c.skills.slice(0, 2).map(s => `<span class="cc-skill-tag">${s}</span>`).join('')}
         </div>
+        <div style="padding:0 16px;text-align:center;opacity:${isCenter ? 1 : 0.3};transition:opacity 0.4s;max-height:${isCenter ? '80px' : '0'};overflow:hidden">
+          <img src="${getCarImage(c.team)}" alt="${c.team}" style="width:100%;max-height:60px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(232,255,0,0.15))">
+        </div>
         <div class="cc-footer">
           <div>
             <div class="cc-ovr">${c.overall}</div>
