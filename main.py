@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from database import init_db
+from database import init_db, get_db
 
 
 @asynccontextmanager
@@ -48,7 +48,8 @@ app.include_router(challenge_router)
 # AI analysis + track + odds endpoints
 from fastapi import APIRouter, Header
 from routes.auth import get_current_user
-from services.ai_analysis import generate_race_preview, generate_driver_analysis
+from services.ai_analysis import (generate_race_preview, generate_driver_analysis,
+    generate_driver_track_analysis, generate_race_postmortem, generate_learning_progress)
 from services.track_data import get_track, get_all_tracks
 from services.pit_analysis import get_team_pit_stats
 from services.odds_engine import get_market_odds
@@ -69,15 +70,15 @@ async def track_info(circuit: str):
 
 @extra.get("/api/races/{race_id}/analysis")
 async def race_analysis(race_id: str):
-    """AI 賽前分析"""
+    """AI 完整賽前分析（賽道+天氣+積分+進站+推薦）"""
     from routes.races import current_race
     race = await current_race()
-    drivers_data = await cards_router.routes[0].endpoint()  # /api/drivers
+    drivers_data = await cards_router.routes[0].endpoint()
     weather = {}
     if race.get("session_key"):
         try:
-            weather = await openf1.get_weather(race["session_key"])
-            weather = weather[-1] if weather else {}
+            w = await openf1.get_weather(race["session_key"])
+            weather = w[-1] if w else {}
             weather["available"] = True
         except:
             weather = {"available": False}
@@ -85,23 +86,65 @@ async def race_analysis(race_id: str):
     drivers_list = [{"name": d["name"], "team": d.get("team", ""), "points": d.get("points", 0)}
                     for d in drivers_data.get("drivers", [])[:8]]
 
+    # Get pit stats
+    pit_stats = None
+    if race.get("session_key"):
+        try:
+            pit_stats = await get_team_pit_stats(race["session_key"])
+        except:
+            pass
+
     return await generate_race_preview(
         race.get("race_name", ""), race.get("circuit", ""),
-        race.get("circuit_type", "技術型賽道"), weather, drivers_list
+        race.get("circuit_type", "技術型賽道"), weather, drivers_list,
+        pit_stats=pit_stats
     )
 
 
 @extra.get("/api/drivers/{driver_id}/analysis")
 async def driver_analysis(driver_id: str):
-    """AI 車手深度分析"""
+    """AI 車手 × 賽道深度分析"""
     from routes.cards import driver_card
     card = await driver_card(driver_id)
     from routes.races import current_race
     race = await current_race()
-    return {"analysis": await generate_driver_analysis(
-        card["name"], card.get("team", ""), card.get("stats", {}),
+    return await generate_driver_track_analysis(
+        card["name"], driver_id, card.get("team", ""), card.get("stats", {}),
         race.get("circuit", ""), race.get("circuit_type", "")
-    )}
+    )
+
+
+@extra.get("/api/races/{race_id}/postmortem")
+async def race_postmortem(race_id: str, prediction: str = "", authorization: str = Header(None)):
+    """賽後解析 + 個人預測回顧"""
+    from routes.races import current_race
+    race = await current_race()
+    # Try to get user's prediction
+    if authorization and authorization.startswith("Bearer "):
+        try:
+            user = await get_current_user(authorization)
+            db = await get_db()
+            try:
+                rows = await db.execute_fetchall(
+                    "SELECT prediction FROM bets WHERE username = ? AND race_id = ? LIMIT 1",
+                    (user["username"], race_id)
+                )
+                if rows:
+                    prediction = rows[0][0]
+            finally:
+                await db.close()
+        except:
+            pass
+    return await generate_race_postmortem(
+        race.get("race_name", ""), [], prediction, race.get("circuit", "")
+    )
+
+
+@extra.get("/api/profile/learning-progress")
+async def learning_progress(authorization: str = Header(None)):
+    """用戶學習進度追蹤"""
+    user = await get_current_user(authorization)
+    return await generate_learning_progress(user["username"])
 
 
 @extra.get("/api/races/{race_id}/odds")
