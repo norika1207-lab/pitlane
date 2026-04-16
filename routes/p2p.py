@@ -21,7 +21,7 @@ async def create_order(body: dict, authorization: str = Header(None)):
     odds = float(body.get("odds", 2.0))
     amount = float(body.get("amount", 500))
 
-    if amount < 100 or amount > 50000:
+    if amount < 1000 or amount > 500000:
         raise HTTPException(400, "金額需在 100-50000 之間")
     if odds < 1.1 or odds > 50.0:
         raise HTTPException(400, "賠率需在 1.1-50.0 之間")

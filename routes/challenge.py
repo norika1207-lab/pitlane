@@ -19,7 +19,7 @@ async def create_challenge(body: dict, authorization: str = Header(None)):
     amount = float(body.get("amount", 500))
     creator_pick = body.get("prediction", "")
 
-    if amount < 100 or amount > 50000:
+    if amount < 1000 or amount > 500000:
         raise HTTPException(400, "金額需在 100-50000 之間")
 
     fee_info = apply_fee(amount, "challenge_room")

@@ -20,8 +20,8 @@ OPENF1_BASE = "https://api.openf1.org/v1"
 ERGAST_BASE = "https://ergast.com/api/f1"
 
 # Game
-BET_MIN = 100
-BET_MAX = 50000
+BET_MIN = 1000
+BET_MAX = 500000
 
 # Fee structure
 FEE_CONFIG = {

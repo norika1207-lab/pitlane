@@ -651,17 +651,19 @@
       <!-- AMOUNT + SUMMARY + BUTTON -->
       <div style="margin-top:24px">
         <div class="amount-section">
-          <div class="amount-header">下注金額 (USDClaw ◆)</div>
-          <div class="amount-input-row">
-            <input type="number" id="bet-amount-input" value="500" min="100" max="50000"
-                   oninput="betAmount=parseInt(this.value)||500;updateBetSummary()">
+          <div class="amount-header">下注金額 (USDClaw ◆) · 點擊累加</div>
+          <div class="amount-display" id="bet-amount-display" style="font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:#e8ff00;text-align:center;padding:12px 0;letter-spacing:0.02em">
+            ◆ 0
           </div>
-          <div class="amount-quick">
-            <button onclick="setAmount(100)">100</button>
-            <button onclick="setAmount(500)">500</button>
-            <button onclick="setAmount(1000)">1K</button>
-            <button onclick="setAmount(2000)">2K</button>
-            <button onclick="setAmount(5000)">5K</button>
+          <div class="amount-quick" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px">
+            <button onclick="addBetAmount(1000)" style="flex:1;min-width:70px">+1,000</button>
+            <button onclick="addBetAmount(2000)" style="flex:1;min-width:70px">+2,000</button>
+            <button onclick="addBetAmount(3000)" style="flex:1;min-width:70px">+3,000</button>
+            <button onclick="addBetAmount(4000)" style="flex:1;min-width:70px">+4,000</button>
+            <button onclick="addBetAmount(5000)" style="flex:1;min-width:70px">+5,000</button>
+            <button onclick="addBetAmount(10000)" style="flex:1;min-width:70px">+10,000</button>
+            <button onclick="addBetAmount(100000)" style="flex:1;min-width:70px;color:#e8ff00;border-color:rgba(232,255,0,0.3)">+100,000</button>
+            <button onclick="resetBetAmount()" style="flex:1;min-width:70px;color:#ff4444;border-color:rgba(255,68,68,0.3)">歸零</button>
           </div>
 
           <div class="bet-summary-box" id="bet-summary-box">
@@ -748,7 +750,7 @@
    ═══════════════════════════════════════════ */
 
 // ── State ──
-let betAmount = 500;
+let betAmount = 0;
 let currentTab = 'beginner';
 let currentRace = null;
 let driversData = [];
@@ -1271,9 +1273,18 @@ function switchTab(tab) {
 // ─────────────────────────────────────────────
 // AMOUNT
 // ─────────────────────────────────────────────
-function setAmount(v) {
-  betAmount = v;
-  document.getElementById('bet-amount-input').value = v;
+function addBetAmount(v) {
+  betAmount += v;
+  document.getElementById('bet-amount-display').textContent = '◆ ' + betAmount.toLocaleString();
+  // Flash animation
+  const el = document.getElementById('bet-amount-display');
+  el.style.transform = 'scale(1.1)';
+  setTimeout(() => el.style.transform = 'scale(1)', 150);
+  updateBetSummary();
+}
+function resetBetAmount() {
+  betAmount = 0;
+  document.getElementById('bet-amount-display').textContent = '◆ 0';
   updateBetSummary();
 }
 
@@ -1281,8 +1292,7 @@ function setAmount(v) {
 // BET SUMMARY
 // ─────────────────────────────────────────────
 function updateBetSummary() {
-  const amt = parseInt(document.getElementById('bet-amount-input').value) || 500;
-  betAmount = amt;
+  const amt = betAmount;
 
   let label = '尚未選擇';
   let odds = null;
@@ -1336,7 +1346,7 @@ function updateBetSummary() {
   document.getElementById('sum-selection').textContent = label;
   document.getElementById('sum-selection').style.color = valid ? 'var(--text-primary)' : 'var(--text-muted)';
 
-  if (odds && valid) {
+  if (odds && valid && amt >= 1000) {
     const fee = Math.floor(amt * 0.05);
     const win = Math.floor(amt * odds);
     document.getElementById('sum-odds').textContent = `x${Number(odds).toFixed(1)}`;
@@ -1344,10 +1354,14 @@ function updateBetSummary() {
     document.getElementById('sum-win').textContent = `◆ ${win.toLocaleString()}`;
     document.getElementById('place-bet-btn').disabled = false;
   } else {
-    document.getElementById('sum-odds').textContent = '—';
+    document.getElementById('sum-odds').textContent = odds ? `x${Number(odds).toFixed(1)}` : '—';
     document.getElementById('sum-fee').textContent = '—';
     document.getElementById('sum-win').textContent = '—';
     document.getElementById('place-bet-btn').disabled = true;
+    if (valid && amt < 1000 && amt > 0) {
+      document.getElementById('sum-fee').textContent = '最低 ◆1,000';
+      document.getElementById('sum-fee').style.color = '#ff4444';
+    }
   }
 }
 
@@ -1356,6 +1370,10 @@ function updateBetSummary() {
 // ─────────────────────────────────────────────
 async function placeBet() {
   if (!user) { showModal('login'); return; }
+  if (betAmount < 1000) {
+    alert('最低下注金額為 1,000 USDClaw');
+    return;
+  }
   const resultEl = document.getElementById('bet-result-area');
   const btn = document.getElementById('place-bet-btn');
   btn.disabled = true;
