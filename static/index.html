@@ -5,414 +5,327 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PitLane — 賽車預測卡牌平台</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
 <style>
-  /* ─── CARD CAROUSEL ─── */
-  .carousel-wrap {
-    position: relative;
-    margin-top: 48px;
-    padding: 0 60px;
-    user-select: none;
-  }
-  .carousel-stage {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 420px;
-    position: relative;
-    perspective: 1200px;
-  }
-  .carousel-card {
-    position: absolute;
-    width: 280px;
-    background: var(--bg-secondary, #1c1c28);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-    cursor: pointer;
-    transform-style: preserve-3d;
-  }
-  .carousel-card .cc-team-stripe {
-    position: absolute; top: 0; left: 0;
-    width: 4px; height: 100%;
-    border-radius: 8px 0 0 8px;
-  }
-  .carousel-card .cc-top {
-    padding: 20px 20px 0 28px;
-    display: flex; align-items: center; gap: 14px;
-    position: relative;
-  }
-  .carousel-card .cc-ghost {
-    position: absolute; top: 8px; right: 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 4rem; font-weight: 900;
-    color: rgba(232,255,0,0.05);
-    line-height: 1; pointer-events: none;
-  }
-  .carousel-card .cc-avatar {
-    width: 56px; height: 56px; border-radius: 50%;
-    object-fit: cover; border: 2px solid rgba(255,255,255,0.08);
-    background: var(--bg-card, #242432); flex-shrink: 0;
-  }
-  .carousel-card .cc-avatar-fb {
-    width: 56px; height: 56px; border-radius: 50%;
-    background: rgba(232,255,0,0.08);
-    border: 2px solid rgba(232,255,0,0.2);
-    display: none; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 1.6rem; font-weight: 800; color: #e8ff00;
-    flex-shrink: 0;
-  }
-  .carousel-card .cc-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 1.15rem; font-weight: 700; color: #e8e8e8;
-    line-height: 1.2;
-  }
-  .carousel-card .cc-team {
-    font-size: 0.75rem; color: #777; margin-top: 2px;
-  }
+/* ─── COMPACT HERO ─── */
+.hero-compact {
+  padding: 72px 0 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero-compact::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(232,255,0,0.03) 0%, transparent 60%);
+}
+.hero-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; flex-wrap: wrap;
+  position: relative; z-index: 2;
+}
+.hero-logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.6rem; font-weight: 900;
+  color: var(--gold); letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.hero-divider { width: 1px; height: 24px; background: var(--border); }
+.hero-slogan {
+  font-size: 0.95rem; color: var(--text-secondary);
+  font-weight: 500;
+}
+.hero-slogan em { color: var(--gold); font-style: normal; font-weight: 700; }
+.hero-cta {
+  display: flex; gap: 8px; align-items: center;
+}
 
-  /* Stats panel — only visible on center card */
-  .carousel-card .cc-stats {
-    padding: 16px 28px 0;
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 6px 16px;
-    opacity: 0; max-height: 0;
-    transition: opacity 0.4s, max-height 0.4s;
-    overflow: hidden;
-  }
-  .carousel-card.is-center .cc-stats {
-    opacity: 1; max-height: 200px;
-  }
-  .cc-stat-item {
-    display: flex; justify-content: space-between;
-    align-items: baseline;
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-  .cc-stat-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 0.7rem; color: #555;
-    text-transform: uppercase; letter-spacing: 0.08em;
-  }
-  .cc-stat-val {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.85rem; font-weight: 700; color: #e8ff00;
-  }
+/* ─── CAROUSEL V2 ─── */
+.carousel-section {
+  padding: 16px 0 32px;
+  position: relative;
+  overflow: hidden;
+}
+.carousel-wrap {
+  position: relative; padding: 0 60px;
+  user-select: none; max-width: 1200px;
+  margin: 0 auto;
+}
+.carousel-stage {
+  display: flex; justify-content: center; align-items: center;
+  height: 380px; position: relative; perspective: 1200px;
+}
+.carousel-card {
+  position: absolute; width: 260px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer; transform-style: preserve-3d;
+}
+.carousel-card .cc-team-stripe {
+  position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+  border-radius: 8px 0 0 8px;
+}
+.carousel-card .cc-top {
+  padding: 16px 16px 0 22px;
+  display: flex; align-items: center; gap: 12px; position: relative;
+}
+.carousel-card .cc-ghost {
+  position: absolute; top: 4px; right: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 3.5rem; font-weight: 900;
+  color: rgba(232,255,0,0.04); line-height: 1; pointer-events: none;
+}
+.carousel-card .cc-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--border);
+  background: var(--bg-secondary); flex-shrink: 0;
+}
+.carousel-card .cc-avatar-fb {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(232,255,0,0.06); border: 2px solid var(--border-gold);
+  display: none; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.4rem; font-weight: 800; color: var(--gold); flex-shrink: 0;
+}
+.carousel-card .cc-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.05rem; font-weight: 700; color: var(--text-primary); line-height: 1.2;
+}
+.carousel-card .cc-team { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; }
+.carousel-card .cc-stats {
+  padding: 12px 22px 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px;
+  opacity: 0; max-height: 0; transition: opacity 0.4s, max-height 0.4s; overflow: hidden;
+}
+.carousel-card.is-center .cc-stats { opacity: 1; max-height: 200px; }
+.cc-stat-item {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.cc-stat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.cc-stat-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem; font-weight: 700; color: var(--gold);
+}
+.carousel-card .cc-skills {
+  padding: 8px 22px 0; display: flex; flex-wrap: wrap; gap: 3px;
+  opacity: 0; max-height: 0; transition: opacity 0.4s 0.1s, max-height 0.4s; overflow: hidden;
+}
+.carousel-card.is-center .cc-skills { opacity: 1; max-height: 80px; }
+.cc-skill-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem; font-weight: 600; padding: 2px 6px; border-radius: 3px;
+  background: rgba(232,255,0,0.06); border: 1px solid rgba(232,255,0,0.12);
+  color: var(--gold); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.cc-skill-tag.passive {
+  background: rgba(0,176,255,0.08); border-color: rgba(0,176,255,0.2); color: var(--blue);
+}
+.carousel-card .cc-footer {
+  padding: 10px 22px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cc-ovr {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
+}
+.cc-ovr-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+}
+.cc-bet-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 6px 14px; border-radius: 4px;
+  background: var(--gold); color: var(--bg-primary); border: none; cursor: pointer;
+  transition: all 0.15s; opacity: 0; transform: translateY(4px);
+}
+.carousel-card.is-center .cc-bet-btn { opacity: 1; transform: translateY(0); transition-delay: 0.15s; }
+.cc-bet-btn:hover { box-shadow: 0 0 16px rgba(232,255,0,0.3); }
+.carousel-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--bg-secondary);
+  color: var(--gold); font-size: 1.4rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; font-family: sans-serif; line-height: 1;
+}
+.carousel-prev { left: 0; }
+.carousel-next { right: 0; }
+.carousel-arrow:hover { background: rgba(232,255,0,0.08); border-color: var(--border-gold); }
+.carousel-dots {
+  display: flex; gap: 5px; justify-content: center; margin-top: 12px;
+}
+.carousel-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-muted); border: none; cursor: pointer;
+  transition: all 0.3s; padding: 0;
+}
+.carousel-dot.active {
+  background: var(--gold); box-shadow: 0 0 6px rgba(232,255,0,0.4);
+  width: 20px; border-radius: 3px;
+}
 
-  /* Skills row */
-  .carousel-card .cc-skills {
-    padding: 10px 28px 0;
-    display: flex; flex-wrap: wrap; gap: 4px;
-    opacity: 0; max-height: 0;
-    transition: opacity 0.4s 0.1s, max-height 0.4s;
-    overflow: hidden;
-  }
-  .carousel-card.is-center .cc-skills {
-    opacity: 1; max-height: 100px;
-  }
-  .cc-skill-tag {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 0.65rem; font-weight: 600;
-    padding: 2px 8px; border-radius: 3px;
-    background: rgba(232,255,0,0.06);
-    border: 1px solid rgba(232,255,0,0.15);
-    color: #e8ff00; text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .cc-skill-tag.passive {
-    background: rgba(0,176,255,0.08);
-    border-color: rgba(0,176,255,0.2);
-    color: #00b0ff;
-  }
+/* ─── DASHBOARD ─── */
+.dash-section { padding: 20px 0 40px; }
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.gauge-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 16px 16px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.gauge-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.gauge-card.g-speed::before { background: var(--gold); }
+.gauge-card.g-pos::before { background: var(--red); }
+.gauge-card.g-fuel::before { background: var(--green); }
+.gauge-card.g-pressure::before { background: var(--blue); }
+.gauge-svg { width: 100%; max-width: 140px; height: auto; margin: 0 auto 8px; display: block; }
+.gauge-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+.gauge-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.8rem; font-weight: 800; line-height: 1;
+}
+.gauge-unit {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; color: var(--text-muted); margin-top: 2px;
+}
 
-  /* Footer */
-  .carousel-card .cc-footer {
-    padding: 14px 28px 18px;
-    display: flex; justify-content: space-between;
-    align-items: center;
-  }
-  .cc-ovr {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 2.2rem; font-weight: 900;
-    color: #e8ff00; line-height: 1;
-  }
-  .cc-ovr-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem; color: #444;
-    text-transform: uppercase; letter-spacing: 0.12em;
-  }
-  .cc-bet-btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 0.75rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    padding: 7px 16px; border-radius: 4px;
-    background: #e8ff00; color: #15151E;
-    border: none; cursor: pointer;
-    transition: all 0.15s;
-    opacity: 0; transform: translateY(4px);
-  }
-  .carousel-card.is-center .cc-bet-btn {
-    opacity: 1; transform: translateY(0);
-    transition-delay: 0.15s;
-  }
-  .cc-bet-btn:hover {
-    box-shadow: 0 0 16px rgba(232,255,0,0.35);
-  }
+/* ─── CHARTS ROW ─── */
+.charts-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin-bottom: 24px;
+}
+.chart-box {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 18px; position: relative; overflow: hidden;
+}
+.chart-box::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--scanline); opacity: 0.2; pointer-events: none;
+}
+.chart-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); margin-bottom: 14px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.chart-title .live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+  display: inline-block; animation: pulse 1.5s infinite;
+}
+.chart-canvas { width: 100%; position: relative; }
+.chart-canvas svg { width: 100%; height: 100%; }
 
-  /* Arrows */
-  .carousel-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    z-index: 10; width: 44px; height: 44px;
-    border-radius: 50%; border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(20,20,20,0.8);
-    color: #e8ff00; font-size: 1.6rem;
-    cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
-    transition: all 0.15s; backdrop-filter: blur(4px);
-    font-family: sans-serif; line-height: 1;
-  }
-  .carousel-prev { left: 0; }
-  .carousel-next { right: 0; }
-  .carousel-arrow:hover {
-    background: rgba(232,255,0,0.1);
-    border-color: rgba(232,255,0,0.3);
-    box-shadow: 0 0 12px rgba(232,255,0,0.15);
-  }
+/* Bar chart */
+.bar-group { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-top: 8px; }
+.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.bar-fill {
+  width: 100%; border-radius: 3px 3px 0 0;
+  transition: height 1s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+.bar-fill::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--scanline); opacity: 0.3;
+}
+.bar-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem; color: var(--text-muted); text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 50px;
+}
+.bar-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; color: var(--text-secondary);
+}
 
-  /* Dots */
-  .carousel-dots {
-    display: flex; gap: 6px;
-    justify-content: center;
-    margin-top: 16px;
-  }
-  .carousel-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #333; border: none; cursor: pointer;
-    transition: all 0.3s; padding: 0;
-  }
-  .carousel-dot.active {
-    background: #e8ff00;
-    box-shadow: 0 0 8px rgba(232,255,0,0.4);
-    width: 24px; border-radius: 4px;
-  }
+/* ─── TRACK MINI ─── */
+.track-mini {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 18px;
+}
+.track-mini-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.track-mini-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+}
+.track-mini-type {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; padding: 3px 8px; border-radius: 3px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.track-mini-type.street { background: rgba(225,6,0,0.12); color: var(--red); }
+.track-mini-type.high_speed { background: rgba(0,210,190,0.12); color: var(--green); }
+.track-mini-type.technical { background: rgba(160,32,240,0.12); color: var(--purple); }
+.track-mini-body {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.track-mini-stat { text-align: center; }
+.track-mini-stat-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.6rem; font-weight: 800; color: var(--text-primary);
+}
+.track-mini-stat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.track-chars-list {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;
+}
+.track-char-tag {
+  font-size: 0.65rem; padding: 3px 8px; border-radius: 3px;
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
 
-  /* ─── ACTION BAR ─── */
-  .action-bar {
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border-gold);
-    border-bottom: 1px solid var(--border-gold);
-    padding: 20px 0;
-  }
-  .action-bar-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 24px; flex-wrap: wrap;
-  }
-  .action-bar-left {
-    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-  }
-  .action-bar-race {
-    display: flex; align-items: center; gap: 12px;
-  }
-  .action-bar-race-flag {
-    font-size: 1.8rem; line-height: 1;
-  }
-  .action-bar-race-name {
-    font-size: 1rem; font-weight: 700; color: var(--gold);
-  }
-  .action-bar-race-meta {
-    font-size: 12px; color: var(--text-secondary); margin-top: 2px;
-  }
-  .action-bar-countdown {
-    padding: 6px 14px; border-radius: var(--radius-sm);
-    background: rgba(212,168,67,0.1); border: 1px solid var(--border-gold);
-    color: var(--gold); font-weight: 700; font-size: 13px;
-    white-space: nowrap;
-  }
-  .action-bar-msg {
-    color: var(--text-secondary); font-size: 14px;
-  }
-  .action-bar-msg strong { color: var(--text-primary); }
-  .action-bar-divider {
-    width: 1px; height: 36px; background: var(--border);
-    flex-shrink: 0;
-  }
+/* ─── BOTTOM ACTIONS ─── */
+.bottom-actions {
+  display: flex; gap: 14px; justify-content: center; padding: 24px 0 40px;
+}
+.action-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 24px 32px; text-align: center;
+  flex: 1; max-width: 280px; transition: all 0.2s; cursor: pointer;
+}
+.action-card:hover { border-color: var(--border-gold); transform: translateY(-2px); }
+.action-card-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.action-card h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem; font-weight: 700; margin-bottom: 4px;
+}
+.action-card p { font-size: 0.75rem; color: var(--text-secondary); }
 
-  /* ─── AI ANALYSIS ─── */
-  .analysis-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-  }
-  .analysis-card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 24px;
-    position: relative; overflow: hidden;
-  }
-  .analysis-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .analysis-card.top-picks::before {
-    background: linear-gradient(90deg, var(--gold), transparent);
-  }
-  .analysis-card.dark-horse::before {
-    background: linear-gradient(90deg, var(--red), transparent);
-  }
-  .analysis-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.1em; margin-bottom: 12px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .analysis-card.top-picks .analysis-label { color: var(--gold); }
-  .analysis-card.dark-horse .analysis-label { color: var(--red); }
-  .analysis-pick {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
-  }
-  .analysis-pick:last-child { border-bottom: none; }
-  .analysis-pick-num {
-    width: 28px; height: 28px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; flex-shrink: 0;
-  }
-  .top-picks .analysis-pick-num {
-    background: rgba(212,168,67,0.15); color: var(--gold);
-  }
-  .dark-horse .analysis-pick-num {
-    background: rgba(232,54,78,0.15); color: var(--red);
-  }
-  .analysis-pick-info { flex: 1; }
-  .analysis-pick-name { font-weight: 600; font-size: 14px; }
-  .analysis-pick-reason { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-  .analysis-pick-prob {
-    font-weight: 700; font-size: 15px;
-  }
-  .top-picks .analysis-pick-prob { color: var(--gold); }
-  .dark-horse .analysis-pick-prob { color: var(--red); }
-
-  /* ─── ENHANCED DRIVER CARD ─── */
-  .driver-card-v2 {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 0;
-    transition: all 0.3s; position: relative; overflow: hidden;
-    display: flex; flex-direction: column;
-  }
-  .driver-card-v2:hover {
-    border-color: var(--border-gold);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(212,168,67,0.1);
-  }
-  .driver-card-top {
-    padding: 20px 20px 16px;
-    border-left: 4px solid transparent;
-    display: flex; align-items: center; gap: 14px;
-    position: relative;
-  }
-  .driver-card-top .ghost-num {
-    font-size: 3.5rem; font-weight: 900; color: var(--gold);
-    opacity: 0.07; position: absolute; top: 6px; right: 14px;
-    line-height: 1; pointer-events: none;
-  }
-  .driver-card-info { flex: 1; min-width: 0; }
-  .driver-card-name {
-    font-size: 1rem; font-weight: 700; margin-bottom: 2px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .driver-card-team {
-    font-size: 12px; color: var(--text-secondary);
-  }
-  .driver-card-nation {
-    font-size: 12px; color: var(--text-muted); margin-top: 1px;
-  }
-  .driver-card-stats {
-    padding: 0 20px 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .driver-card-skills {
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .skills-title {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 8px;
-  }
-  .skill-item {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 6px; font-size: 12px;
-  }
-  .skill-item:last-child { margin-bottom: 0; }
-  .skill-name { flex: 1; color: var(--text-secondary); }
-  .skill-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
-  .skill-passive-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 8px; border-radius: 4px;
-    background: rgba(212,168,67,0.12); border: 1px solid var(--border-gold);
-    color: var(--gold); font-size: 11px; font-weight: 600;
-    letter-spacing: 0.03em;
-  }
-  .driver-card-footer {
-    padding: 14px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: auto;
-  }
-  .overall-score {
-    display: flex; align-items: baseline; gap: 4px;
-  }
-  .overall-score .num {
-    font-size: 2rem; font-weight: 900; color: var(--gold); line-height: 1;
-  }
-  .overall-score .label {
-    font-size: 11px; color: var(--text-muted); font-weight: 500;
-  }
-
-  /* ─── TRACK INFO ─── */
-  .track-info-grid {
-    display: grid; grid-template-columns: 1fr 2fr; gap: 24px;
-    align-items: start;
-  }
-  .track-main {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px; text-align: center;
-  }
-  .track-icon { font-size: 3rem; margin-bottom: 12px; }
-  .track-name {
-    font-size: 1.4rem; font-weight: 700; margin-bottom: 4px;
-  }
-  .track-country { color: var(--text-secondary); font-size: 14px; }
-  .track-type-badge {
-    display: inline-block; margin-top: 12px;
-    padding: 4px 12px; border-radius: 20px;
-    background: rgba(212,168,67,0.1); border: 1px solid var(--border-gold);
-    color: var(--gold); font-size: 12px; font-weight: 600;
-  }
-  .track-chars {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
-  }
-  .track-char-card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 16px;
-  }
-  .track-char-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px;
-  }
-  .track-char-value { font-size: 14px; font-weight: 600; }
-  .difficulty-bar {
-    display: flex; gap: 4px; margin-top: 8px;
-  }
-  .diff-pip {
-    width: 18px; height: 6px; border-radius: 3px;
-    background: var(--border);
-  }
-  .diff-pip.filled { background: var(--gold); }
-
-  @media (max-width: 768px) {
-    .analysis-grid { grid-template-columns: 1fr; }
-    .track-info-grid { grid-template-columns: 1fr; }
-    .track-chars { grid-template-columns: 1fr; }
-    .action-bar-inner { flex-direction: column; align-items: flex-start; }
-  }
+@media (max-width: 768px) {
+  .dash-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+  .carousel-stage { height: 340px; }
+  .carousel-card { width: 220px; }
+  .bottom-actions { flex-direction: column; align-items: center; }
+}
 </style>
 </head>
 <body>
@@ -438,685 +351,443 @@
   <div class="modal" id="auth-modal"></div>
 </div>
 
-<!-- HERO -->
-<section class="hero">
-  <!-- Speed particles -->
-  <div class="speed-particle" style="--y:15%;--dur:2.5s;--delay:0s"></div>
-  <div class="speed-particle" style="--y:30%;--dur:1.8s;--delay:0.7s"></div>
-  <div class="speed-particle" style="--y:50%;--dur:3.2s;--delay:0.3s"></div>
-  <div class="speed-particle" style="--y:65%;--dur:2.0s;--delay:1.2s"></div>
-  <div class="speed-particle" style="--y:80%;--dur:2.8s;--delay:0.5s"></div>
-  <div class="speed-particle" style="--y:22%;--dur:3.5s;--delay:1.8s"></div>
-  <div class="speed-particle" style="--y:45%;--dur:1.5s;--delay:2.1s"></div>
-  <div class="speed-particle" style="--y:72%;--dur:2.2s;--delay:0.9s"></div>
-  <div class="container" style="position:relative;z-index:2">
-    <div class="hero-badge">
-      <span class="dot" style="width:6px;height:6px"></span>
-      2026 Season Live
+<!-- COMPACT HERO: one line -->
+<section class="hero-compact">
+  <div class="speed-particle" style="--y:20%;--dur:2.5s;--delay:0s"></div>
+  <div class="speed-particle" style="--y:50%;--dur:1.8s;--delay:0.7s"></div>
+  <div class="speed-particle" style="--y:75%;--dur:3s;--delay:0.3s"></div>
+  <div class="hero-row">
+    <span class="hero-logo">PitLane</span>
+    <span class="hero-divider"></span>
+    <span class="hero-slogan">用卡牌預測 <em>F1</em>，讓你秒懂賽車</span>
+    <span class="hero-divider"></span>
+    <div class="hero-cta">
+      <button class="btn btn-gold btn-sm" onclick="user ? location.href='/race' : showModal('login')">開始預測</button>
     </div>
-    <h1>用卡牌預測 <span>F1</span><br>讓你秒懂賽車</h1>
-    <p>收集車手卡牌、分析數據、預測比賽結果。<br>不是賭博，是用數據說話的賽車學習平台。</p>
-    <div class="race-lights" id="hero-lights">
-      <div class="race-light"></div><div class="race-light"></div>
-      <div class="race-light"></div><div class="race-light"></div>
-      <div class="race-light"></div>
-    </div>
-    <div class="hero-actions">
-      <button class="btn btn-gold" onclick="user ? location.href='/race' : showModal('login')">開始預測</button>
-      <button class="btn btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
-    </div>
-
-    <!-- CARD CAROUSEL -->
-    <div class="carousel-wrap">
-      <button class="carousel-arrow carousel-prev" onclick="carouselPrev()">&#8249;</button>
-      <div class="carousel-stage" id="carousel-stage"></div>
-      <button class="carousel-arrow carousel-next" onclick="carouselNext()">&#8250;</button>
-      <div class="carousel-dots" id="carousel-dots"></div>
-    </div>
-
   </div>
 </section>
 
-<!-- HUD INFO BAR -->
-<div class="hud-info-bar" id="hud-bar">
-  <div class="hud-info-bar-inner" id="hud-bar-inner">
-    <div class="hud-info-item">
-      <span class="hud-info-label">Next Race</span>
-      <span class="hud-info-val" id="hud-next-race">---</span>
+<!-- CARD CAROUSEL -->
+<section class="carousel-section">
+  <div class="carousel-wrap">
+    <button class="carousel-arrow carousel-prev" onclick="carouselPrev()">&#8249;</button>
+    <div class="carousel-stage" id="carousel-stage"></div>
+    <button class="carousel-arrow carousel-next" onclick="carouselNext()">&#8250;</button>
+    <div class="carousel-dots" id="carousel-dots"></div>
+  </div>
+</section>
+
+<!-- DASHBOARD: Racing Gauges -->
+<section class="dash-section">
+  <div class="container">
+    <div class="dash-grid" id="dash-gauges">
+      <!-- Filled by JS -->
+      <div class="gauge-card g-speed"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
+      <div class="gauge-card g-pos"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
+      <div class="gauge-card g-fuel"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
+      <div class="gauge-card g-pressure"><div class="gauge-label">Loading</div><div class="spinner" style="margin:20px auto"></div></div>
     </div>
-    <div class="hud-info-divider"></div>
-    <div class="hud-info-item">
-      <span class="hud-info-label">Countdown</span>
-      <span class="hud-info-val red" id="hud-countdown">--d --h</span>
+
+    <!-- CHARTS: Bar + Line -->
+    <div class="charts-grid" id="charts-area">
+      <div class="chart-box" id="chart-odds">
+        <div class="chart-title"><span>冠軍賠率分布</span><span class="live-dot"></span></div>
+        <div class="chart-canvas"><div class="bar-group" id="odds-bars"></div></div>
+      </div>
+      <div class="chart-box" id="chart-stats">
+        <div class="chart-title"><span>車手能力雷達</span><span class="live-dot"></span></div>
+        <div class="chart-canvas" id="radar-canvas" style="height:160px"></div>
+      </div>
     </div>
-    <div class="hud-info-divider"></div>
-    <div class="hud-info-item">
-      <span class="hud-info-label">Leader</span>
-      <span class="hud-info-val" id="hud-leader">---</span>
+
+    <!-- TRACK + AI ANALYSIS ROW -->
+    <div class="charts-grid">
+      <div class="track-mini" id="track-card">
+        <div class="track-mini-header">
+          <span class="track-mini-name">載入中...</span>
+        </div>
+      </div>
+      <div class="chart-box" id="ai-preview">
+        <div class="chart-title"><span>AI 賽前分析</span><span class="live-dot"></span></div>
+        <div id="ai-content" style="font-size:0.8rem;color:var(--text-secondary)">
+          <div class="spinner" style="margin:20px auto"></div>
+        </div>
+      </div>
     </div>
-    <div class="hud-info-divider"></div>
-    <div class="hud-info-item">
-      <span class="hud-info-label">Your Rank</span>
-      <span class="hud-info-val blue" id="hud-rank">#--</span>
+  </div>
+</section>
+
+<!-- BOTTOM ACTIONS -->
+<div class="container">
+  <div class="bottom-actions">
+    <div class="action-card" onclick="location.href='/race'">
+      <div class="action-card-icon">🏁</div>
+      <h3>下注預測</h3>
+      <p>用 USDClaw 預測比賽結果</p>
+    </div>
+    <div class="action-card" onclick="location.href='/cards'">
+      <div class="action-card-icon">🃏</div>
+      <h3>卡牌收藏</h3>
+      <p>車手 · 車隊 · 賽道卡</p>
+    </div>
+    <div class="action-card" onclick="location.href='/battle'">
+      <div class="action-card-icon">⚔️</div>
+      <h3>P2P 對戰</h3>
+      <p>跟朋友對賭比眼光</p>
+    </div>
+    <div class="action-card" onclick="location.href='/leaderboard'">
+      <div class="action-card-icon">🏆</div>
+      <h3>排行榜</h3>
+      <p>看誰預測最準</p>
     </div>
   </div>
 </div>
 
-<!-- ACTION BAR -->
-<div class="action-bar" id="action-bar" style="display:none">
-  <div class="container">
-    <div class="action-bar-inner">
-      <div class="action-bar-left">
-        <div class="action-bar-race" id="action-race-info">
-          <!-- filled by JS -->
-        </div>
-        <div class="action-bar-divider"></div>
-        <div class="action-bar-msg">
-          <strong>你還沒有下注！</strong>現在就預測誰會拿冠軍？
-        </div>
-      </div>
-      <a href="/race" class="btn btn-gold" style="white-space:nowrap">立即下注 →</a>
-    </div>
-  </div>
-</div>
-
-<!-- AI 賽前分析預覽 -->
-<section class="section" style="background: var(--bg-secondary);">
-  <div class="container">
-    <div class="section-header">
-      <h2>🤖 AI 賽前分析預覽</h2>
-      <p>根據本站賽道、天氣與車手數據，AI 給出的預測參考</p>
-    </div>
-    <div id="ai-analysis">
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>AI 分析載入中...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- DRIVER CARDS -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <h2>本季車手卡牌</h2>
-      <p>數值來自真實賽事數據，每站更新</p>
-    </div>
-    <div id="drivers-grid" class="card-grid">
-      <div class="loading" style="grid-column:1/-1">
-        <div class="spinner"></div>
-        <p>載入車手資料中...</p>
-      </div>
-    </div>
-    <div style="text-align:center;margin-top:32px">
-      <a href="/cards" class="btn btn-outline">查看全部卡牌 →</a>
-    </div>
-  </div>
-</section>
-
-<!-- TRACK INFO -->
-<section class="section" style="background: var(--bg-secondary);">
-  <div class="container">
-    <div class="section-header">
-      <h2>賽道資訊</h2>
-      <p>了解本站賽道特性，做出更精準的預測</p>
-    </div>
-    <div id="track-info">
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>載入賽道資訊中...</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section" id="how-it-works">
-  <div class="container">
-    <div class="section-header">
-      <h2>怎麼玩？</h2>
-      <p>四步驟，從新手到賽車通</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <h4>收集車手卡牌</h4>
-        <p>登入即獲得入門卡組。完成預測解鎖稀有卡牌，每張卡的數值都來自真實比賽數據。</p>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <h4>研究 AI 分析</h4>
-        <p>AI 分析賽道特性、車手狀態與天氣預報。看懂分析，用數據做判斷，不是靠運氣。</p>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <h4>押注冠軍</h4>
-        <p>選擇你認為會贏的車手，用 USDClaw (◆) 虛擬幣下注。新手只要選冠軍就好，簡單直覺。</p>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <h4>賽後學習成長</h4>
-        <p>比賽結束後看 AI 解析，了解為什麼對或錯。累積預測準確度，解鎖更強的傳奇卡牌。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- RARITY SHOWCASE -->
-<section class="section" style="background: var(--bg-secondary);">
-  <div class="container">
-    <div class="section-header">
-      <h2>卡牌稀有度</h2>
-      <p>用賽道命名，靠實力解鎖</p>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center">
-      <div class="feature-card" style="border-color:rgba(160,160,180,0.2)">
-        <div style="font-size:2rem;margin-bottom:8px">🏁</div>
-        <span class="rarity-badge rarity-silverstone">Silverstone</span>
-        <h4 style="margin-top:12px">入門</h4>
-        <p style="color:var(--text-secondary);font-size:13px">註冊即獲得</p>
-      </div>
-      <div class="feature-card" style="border-color:rgba(59,130,246,0.2)">
-        <div style="font-size:2rem;margin-bottom:8px">⚡</div>
-        <span class="rarity-badge rarity-monza">Monza</span>
-        <h4 style="margin-top:12px">進階</h4>
-        <p style="color:var(--text-secondary);font-size:13px">完成 10 站預測</p>
-      </div>
-      <div class="feature-card" style="border-color:rgba(168,85,247,0.2)">
-        <div style="font-size:2rem;margin-bottom:8px">🌀</div>
-        <span class="rarity-badge rarity-suzuka">Suzuka</span>
-        <h4 style="margin-top:12px">經典</h4>
-        <p style="color:var(--text-secondary);font-size:13px">單站完全命中</p>
-      </div>
-      <div class="feature-card" style="border-color:rgba(212,168,67,0.2)">
-        <div style="font-size:2rem;margin-bottom:8px">👑</div>
-        <span class="rarity-badge rarity-monaco">Monaco</span>
-        <h4 style="margin-top:12px">傳奇</h4>
-        <p style="color:var(--text-secondary);font-size:13px">連續 10 站 80%+</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
 <footer class="footer">
-  <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · 使用 USDClaw (◆) 虛擬幣 · 與 ClawStockMarket 帳號互通 · 數據來自 OpenF1</p>
-  </div>
+  <div class="container">PitLane — F1 賽車預測卡牌平台 · USDClaw 虛擬幣 · 與 ClawStockMarket 帳號互通</div>
 </footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
-// ─── ACTION BAR & CURRENT RACE ───
-async function loadCurrentRace() {
-  try {
-    const data = await api('/api/races/current');
-    if (data.season_over) return;
+// ═══════════════════════════════════════
+// GAUGE SVG GENERATOR
+// ═══════════════════════════════════════
+function renderGaugeSVG(value, max, color, label) {
+  const pct = Math.min(value / max, 1);
+  const angle = pct * 240; // 240 degree arc
+  const startAngle = 150; // start from bottom-left
+  const r = 52;
+  const cx = 65, cy = 65;
 
-    const bar = document.getElementById('action-bar');
-    const raceInfo = document.getElementById('action-race-info');
-
-    const date = new Date(data.date);
-    const now = new Date();
-    const diffMs = date - now;
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    const dateStr = date.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' });
-
-    let countdownText = '';
-    if (diffDays > 0) {
-      countdownText = `還有 ${diffDays} 天`;
-    } else if (diffDays === 0) {
-      countdownText = '今天開賽！';
-    } else {
-      countdownText = '賽事進行中';
-    }
-
-    raceInfo.innerHTML = `
-      <div class="action-bar-race-flag">🏎</div>
-      <div>
-        <div class="action-bar-race-name">${data.race_name || data.circuit || '下一站賽事'}</div>
-        <div class="action-bar-race-meta">📅 ${dateStr}${data.country ? ' &nbsp;·&nbsp; ' + data.country : ''}</div>
-      </div>
-      <div class="action-bar-countdown">${countdownText}</div>
-    `;
-
-    bar.style.display = '';
-
-    // also load track info while we have current race
-    if (data.circuit) loadTrackInfo(data.circuit);
-    // load AI analysis
-    if (data.race_id) loadAIAnalysis(data.race_id);
-
-  } catch (e) {
-    // hide action bar if no race
+  function polarToCart(deg) {
+    const rad = (deg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
+
+  // Background arc
+  const bgStart = polarToCart(startAngle);
+  const bgEnd = polarToCart(startAngle + 240);
+  // Value arc
+  const valEnd = polarToCart(startAngle + angle);
+  const largeArc = angle > 180 ? 1 : 0;
+  const bgLargeArc = 1;
+
+  // Tick marks
+  let ticks = '';
+  for (let i = 0; i <= 8; i++) {
+    const tickAngle = startAngle + (240 / 8) * i;
+    const inner = polarToCart(tickAngle);
+    const outerR = r + 6;
+    const outerRad = (tickAngle - 90) * Math.PI / 180;
+    const outer = { x: cx + outerR * Math.cos(outerRad), y: cy + outerR * Math.sin(outerRad) };
+    ticks += `<line x1="${inner.x}" y1="${inner.y}" x2="${outer.x}" y2="${outer.y}" stroke="${i <= pct * 8 ? color : 'rgba(255,255,255,0.1)'}" stroke-width="1.5"/>`;
+  }
+
+  // Needle
+  const needleAngle = startAngle + angle;
+  const needleEnd = polarToCart(needleAngle);
+  const needleR = r - 14;
+  const needleRad = (needleAngle - 90) * Math.PI / 180;
+  const needleTip = { x: cx + needleR * Math.cos(needleRad), y: cy + needleR * Math.sin(needleRad) };
+
+  return `<svg viewBox="0 0 130 100" class="gauge-svg">
+    <!-- bg arc -->
+    <path d="M${bgStart.x},${bgStart.y} A${r},${r} 0 ${bgLargeArc},1 ${bgEnd.x},${bgEnd.y}"
+          fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8" stroke-linecap="round"/>
+    <!-- value arc -->
+    ${angle > 0 ? `<path d="M${bgStart.x},${bgStart.y} A${r},${r} 0 ${largeArc},1 ${valEnd.x},${valEnd.y}"
+          fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+          style="filter:drop-shadow(0 0 6px ${color}40)"/>` : ''}
+    ${ticks}
+    <!-- center dot -->
+    <circle cx="${cx}" cy="${cy}" r="4" fill="${color}" opacity="0.8"/>
+    <!-- needle -->
+    <line x1="${cx}" y1="${cy}" x2="${needleTip.x}" y2="${needleTip.y}"
+          stroke="${color}" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
 }
 
-// ─── AI ANALYSIS ───
-async function loadAIAnalysis(raceId) {
-  const el = document.getElementById('ai-analysis');
+// ═══════════════════════════════════════
+// LOAD DASHBOARD
+// ═══════════════════════════════════════
+async function loadDashboard() {
   try {
-    const data = await api(`/api/races/${raceId}/analysis`);
-    const topPicks = data.top_picks || [];
-    const darkHorse = data.dark_horse || [];
+    const [raceRes, driversRes, oddsRes, analysisRes] = await Promise.allSettled([
+      api('/api/races/current'),
+      api('/api/drivers'),
+      api('/api/races/x/odds'),
+      api('/api/races/x/analysis'),
+    ]);
 
-    if (!topPicks.length && !darkHorse.length) {
-      el.innerHTML = '<p style="color:var(--text-secondary);text-align:center">本站 AI 分析尚未生成</p>';
-      return;
-    }
+    const race = raceRes.status === 'fulfilled' ? raceRes.value : {};
+    const drivers = driversRes.status === 'fulfilled' ? (driversRes.value.drivers || []) : [];
+    const odds = oddsRes.status === 'fulfilled' ? (oddsRes.value.odds || []) : [];
+    const analysis = analysisRes.status === 'fulfilled' ? analysisRes.value : {};
 
-    function renderPickList(picks, cardClass) {
-      if (!picks.length) return '<p style="color:var(--text-secondary);font-size:13px">暫無資料</p>';
-      return picks.map((p, i) => `
-        <div class="analysis-pick">
-          <div class="analysis-pick-num">${i + 1}</div>
-          <div class="analysis-pick-info">
-            <div class="analysis-pick-name">${p.driver_name || p.name || '車手'}</div>
-            <div class="analysis-pick-reason">${p.reason || p.analysis || ''}</div>
-          </div>
-          ${p.probability != null ? `<div class="analysis-pick-prob">${Math.round(p.probability * 100)}%</div>` : ''}
-        </div>
-      `).join('');
-    }
+    // ── GAUGES ──
+    const raceDate = new Date(race.date || Date.now());
+    const daysLeft = Math.max(0, Math.floor((raceDate - new Date()) / 86400000));
+    const topOdds = odds[0]?.winner_odds || 2.0;
+    const topProb = odds[0]?.win_probability || 50;
+    const totalDrivers = drivers.length || 20;
 
+    const el = document.getElementById('dash-gauges');
     el.innerHTML = `
-      <div class="analysis-grid">
-        <div class="analysis-card top-picks">
-          <div class="analysis-label">⭐ AI 熱門推薦</div>
-          ${renderPickList(topPicks, 'top-picks')}
-        </div>
-        <div class="analysis-card dark-horse">
-          <div class="analysis-label">🐎 黑馬潛力</div>
-          ${renderPickList(darkHorse, 'dark-horse')}
-        </div>
+      <div class="gauge-card g-speed">
+        ${renderGaugeSVG(daysLeft, 14, '#e8ff00', 'days')}
+        <div class="gauge-label">Next Race</div>
+        <div class="gauge-value" style="color:var(--gold)">${daysLeft}</div>
+        <div class="gauge-unit">${race.race_name || '---'}</div>
+      </div>
+      <div class="gauge-card g-pos">
+        ${renderGaugeSVG(topProb, 100, '#E10600', 'prob')}
+        <div class="gauge-label">Top Favourite</div>
+        <div class="gauge-value" style="color:var(--red)">${topProb}%</div>
+        <div class="gauge-unit">${odds[0]?.name?.split(' ').pop() || '---'} x${topOdds}</div>
+      </div>
+      <div class="gauge-card g-fuel">
+        ${renderGaugeSVG(totalDrivers, 24, '#00D2BE', 'drivers')}
+        <div class="gauge-label">Drivers</div>
+        <div class="gauge-value" style="color:var(--green)">${totalDrivers}</div>
+        <div class="gauge-unit">${race.circuit_type || 'Loading'}</div>
+      </div>
+      <div class="gauge-card g-pressure">
+        ${renderGaugeSVG(odds.length, 22, '#00b0ff', 'market')}
+        <div class="gauge-label">Market Odds</div>
+        <div class="gauge-value" style="color:var(--blue)">${odds.length}</div>
+        <div class="gauge-unit">Active Entries</div>
       </div>
     `;
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary);text-align:center">AI 分析暫時無法取得</p>';
-  }
-}
 
-// ─── DRIVER CARDS ───
-function renderStars(rating) {
-  const r = Math.round(Math.min(5, Math.max(0, rating || 0)));
-  return '★'.repeat(r) + '☆'.repeat(5 - r);
-}
+    // ── ODDS BAR CHART ──
+    const barsEl = document.getElementById('odds-bars');
+    const topN = odds.slice(0, 8);
+    const maxProb = Math.max(...topN.map(o => o.win_probability), 1);
+    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
 
-function renderSkillsSection(skills) {
-  if (!skills || !skills.length) return '';
-  const passive = skills.find(s => s.type === 'passive' || s.passive);
-  const active = skills.filter(s => s.type !== 'passive' && !s.passive);
-
-  let html = '<div class="driver-card-skills">';
-  html += '<div class="skills-title">技能</div>';
-
-  if (passive) {
-    html += `
-      <div class="skill-item" style="margin-bottom:8px">
-        <span class="skill-passive-badge">被動</span>
-        <span class="skill-name">${passive.name || passive.skill_name || '被動技能'}</span>
-      </div>
-    `;
-  }
-
-  active.forEach(sk => {
-    const rating = sk.level || sk.rating || sk.stars || 3;
-    html += `
-      <div class="skill-item">
-        <span class="skill-name">${sk.name || sk.skill_name || '技能'}</span>
-        <span class="skill-stars">${renderStars(rating)}</span>
-      </div>
-    `;
-  });
-
-  html += '</div>';
-  return html;
-}
-
-async function loadDrivers() {
-  const el = document.getElementById('drivers-grid');
-  try {
-    const data = await api('/api/drivers');
-    const drivers = (data.drivers || data || []).slice(0, 6);
-    if (!drivers.length) {
-      el.innerHTML = '<p style="color:var(--text-secondary)">暫無車手資料</p>';
-      return;
-    }
-
-    const cards = await Promise.all(
-      drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
-    );
-
-    el.className = 'card-grid';
-    el.innerHTML = cards.map((card, i) => {
-      if (!card) return '';
-      const d = drivers[i];
-      const s = card.stats || {};
-      const teamColor = card.team_colour || card.team_color || '#d4a843';
-      const headshotUrl = card.headshot_url || d.headshot_url || '';
-      const driverNum = d.number || card.number || '';
-      const rarity = card.rarity || 'silverstone';
-      const overall = s.overall || card.overall || 50;
-      const skills = card.skills || [];
-
-      return `
-        <div class="driver-card-v2">
-          <div class="driver-card-top" style="border-left-color:${teamColor}">
-            <div class="ghost-num">${driverNum}</div>
-            <img src="${headshotUrl}"
-              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
-              style="width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0">
-            <div style="display:none;width:60px;height:60px;border-radius:50%;background:var(--bg-secondary);align-items:center;justify-content:center;font-size:20px;font-weight:900;color:var(--gold);flex-shrink:0">#${driverNum}</div>
-            <div class="driver-card-info">
-              <div class="driver-card-name">${d.name || card.name}</div>
-              <div class="driver-card-team">${card.team || d.team || ''}</div>
-              <div class="driver-card-nation">${d.nationality || card.nationality || ''}</div>
-            </div>
-          </div>
-          <div class="driver-card-stats">
-            ${renderStatBar('單圈速度', s.qualifying || 50)}
-            ${renderStatBar('輪胎管理', s.tire_management || 50)}
-            ${renderStatBar('雨戰能力', s.wet_weather || 50)}
-            ${renderStatBar('超車能力', s.overtaking || 50)}
-            ${renderStatBar('街道賽', s.street_circuit || 50)}
-          </div>
-          ${renderSkillsSection(skills)}
-          <div class="driver-card-footer">
-            <div class="overall-score">
-              <span class="num">${overall}</span>
-              <span class="label">總分</span>
-            </div>
-            <span class="rarity-badge ${rarityClass(rarity)}">${rarityLabel(rarity).split(' ')[0]}</span>
-          </div>
-          <div style="padding:0 16px 16px">
-            <a href="/race?pick=${d.driver_id}" class="btn btn-gold" style="width:100%;justify-content:center">押這個人 →</a>
-          </div>
-        </div>
-      `;
+    barsEl.innerHTML = topN.map(o => {
+      const h = (o.win_probability / maxProb) * 100;
+      const color = teamColors[o.team] || 'var(--gold)';
+      const lastName = o.name?.split(' ').pop() || '?';
+      return `<div class="bar-item">
+        <div class="bar-val">${o.win_probability}%</div>
+        <div class="bar-fill" style="height:${h}%;background:${color}"></div>
+        <div class="bar-label">${lastName}</div>
+      </div>`;
     }).join('');
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary)">暫時無法載入車手資料</p>';
-  }
-}
 
-// ─── TRACK INFO ───
-async function loadTrackInfo(circuit) {
-  const el = document.getElementById('track-info');
-  try {
-    const data = await api(`/api/tracks/${circuit}`);
+    // ── RADAR CHART (top driver) ──
+    const radarEl = document.getElementById('radar-canvas');
+    if (drivers[0]) {
+      try {
+        const card = await api(`/api/drivers/${drivers[0].driver_id}/card`);
+        const s = card.stats || {};
+        const dims = [
+          {label:'SPD', val:s.qualifying||50},
+          {label:'TYRE', val:s.tire_management||50},
+          {label:'WET', val:s.wet_weather||50},
+          {label:'OVT', val:s.overtaking||50},
+          {label:'STR', val:s.street_circuit||50},
+        ];
+        const cx=100,cy=80,r=60;
+        let polyPoints = '';
+        let labels = '';
+        let axes = '';
+        dims.forEach((d,i) => {
+          const angle = (i / dims.length) * Math.PI * 2 - Math.PI/2;
+          const px = cx + r * (d.val/100) * Math.cos(angle);
+          const py = cy + r * (d.val/100) * Math.sin(angle);
+          polyPoints += `${px},${py} `;
+          const lx = cx + (r+16) * Math.cos(angle);
+          const ly = cy + (r+16) * Math.sin(angle);
+          labels += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="var(--text-muted)" font-size="7" font-family="Share Tech Mono">${d.label} ${d.val}</text>`;
+          axes += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(angle)}" y2="${cy+r*Math.sin(angle)}" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>`;
+        });
+        // Grid rings
+        let rings = '';
+        [0.25,0.5,0.75,1].forEach(s => {
+          let pts='';
+          dims.forEach((_,i)=>{
+            const a=(i/dims.length)*Math.PI*2-Math.PI/2;
+            pts+=`${cx+r*s*Math.cos(a)},${cy+r*s*Math.sin(a)} `;
+          });
+          rings+=`<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>`;
+        });
 
-    const diffLevel = Math.min(5, Math.max(1, data.difficulty || 3));
-    const diffPips = Array.from({length: 5}, (_, i) =>
-      `<div class="diff-pip ${i < diffLevel ? 'filled' : ''}"></div>`
-    ).join('');
+        radarEl.innerHTML = `<svg viewBox="0 0 200 160" style="width:100%;height:100%">
+          ${rings}${axes}
+          <polygon points="${polyPoints}" fill="rgba(232,255,0,0.1)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/>
+          ${labels}
+          <text x="${cx}" y="155" text-anchor="middle" fill="var(--text-secondary)" font-size="8" font-family="Barlow Condensed" font-weight="600">${card.name || 'Driver'}</text>
+        </svg>`;
+      } catch(e) {
+        radarEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem;text-align:center;padding:40px 0">數據載入中...</p>';
+      }
+    }
 
-    const chars = data.characteristics || {};
-    const charKeys = Object.keys(chars).filter(k => typeof chars[k] === 'string' || typeof chars[k] === 'number');
-
-    el.innerHTML = `
-      <div class="track-info-grid">
-        <div class="track-main">
-          <div class="track-icon">🏁</div>
-          <div class="track-name">${data.name || circuit}</div>
-          <div class="track-country">${data.country || ''}</div>
-          ${data.type ? `<div class="track-type-badge">${data.type}</div>` : ''}
-          <div style="margin-top:20px;text-align:left">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:6px">難度</div>
-            <div class="difficulty-bar">${diffPips}</div>
+    // ── TRACK CARD ──
+    const trackEl = document.getElementById('track-card');
+    try {
+      const track = await api(`/api/tracks/${encodeURIComponent(race.circuit || 'Jeddah')}`);
+      const typeClass = track.type || 'technical';
+      const typeMap = {street:'街道賽', high_speed:'高速賽道', technical:'技術賽道'};
+      trackEl.innerHTML = `
+        <div class="track-mini-header">
+          <span class="track-mini-name">${track.name_zh || race.circuit || '---'}</span>
+          <span class="track-mini-type ${typeClass}">${typeMap[typeClass] || typeClass}</span>
+        </div>
+        <div class="track-mini-body">
+          <div class="track-mini-stat">
+            <div class="track-mini-stat-val">${track.difficulty || '?'}<span style="font-size:0.8rem;color:var(--text-muted)">/10</span></div>
+            <div class="track-mini-stat-label">難度</div>
           </div>
-          ${data.length ? `<div style="margin-top:14px;font-size:13px;color:var(--text-secondary)">全長 ${data.length} km</div>` : ''}
-          ${data.laps ? `<div style="font-size:13px;color:var(--text-secondary)">${data.laps} 圈</div>` : ''}
+          <div class="track-mini-stat">
+            <div class="track-mini-stat-val">${track.overtaking || '?'}<span style="font-size:0.8rem;color:var(--text-muted)">/10</span></div>
+            <div class="track-mini-stat-label">超車機會</div>
+          </div>
+          <div class="track-chars-list">
+            ${(track.characteristics || []).map(c => `<span class="track-char-tag">${c}</span>`).join('')}
+          </div>
+          <div style="grid-column:1/-1;margin-top:6px;font-size:0.75rem;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:8px">
+            <strong style="color:var(--gold)">策略建議：</strong>${track.strategy || '---'}
+          </div>
+        </div>`;
+    } catch(e) {
+      trackEl.innerHTML = '<p style="color:var(--text-muted);padding:20px;font-size:0.8rem">賽道資料載入中...</p>';
+    }
+
+    // ── AI ANALYSIS ──
+    const aiEl = document.getElementById('ai-content');
+    if (analysis.top_picks) {
+      const tp = analysis.top_picks || [];
+      const dh = analysis.dark_horse || {};
+      aiEl.innerHTML = `
+        <div style="margin-bottom:10px">
+          <div style="font-family:'Barlow Condensed';font-weight:700;color:var(--gold);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">推薦車手</div>
+          ${tp.map((p,i) => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+            <span>${i+1}. ${p.driver}</span>
+            <span style="color:var(--gold);font-family:'Share Tech Mono';font-size:0.75rem">${p.confidence}%</span>
+          </div>`).join('')}
         </div>
-        <div class="track-chars">
-          ${charKeys.length ? charKeys.map(k => `
-            <div class="track-char-card">
-              <div class="track-char-label">${k}</div>
-              <div class="track-char-value">${chars[k]}</div>
-            </div>
-          `).join('') : `
-            <div class="track-char-card">
-              <div class="track-char-label">賽道類型</div>
-              <div class="track-char-value">${data.type || '混合型'}</div>
-            </div>
-            <div class="track-char-card">
-              <div class="track-char-label">難度</div>
-              <div class="track-char-value">${diffLevel} / 5</div>
-            </div>
-            ${data.overtaking_opportunities != null ? `
-            <div class="track-char-card">
-              <div class="track-char-label">超車機會</div>
-              <div class="track-char-value">${data.overtaking_opportunities}</div>
-            </div>` : ''}
-            ${data.tire_deg != null ? `
-            <div class="track-char-card">
-              <div class="track-char-label">輪胎磨損</div>
-              <div class="track-char-value">${data.tire_deg}</div>
-            </div>` : ''}
-          `}
+        <div style="margin-bottom:8px">
+          <span style="font-family:'Barlow Condensed';font-weight:700;color:var(--red);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em">黑馬</span>
+          <span style="margin-left:8px">${dh.driver || '?'}</span>
         </div>
-      </div>
-    `;
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-secondary);text-align:center">賽道資訊暫時無法取得</p>';
+        <div style="font-size:0.72rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px">
+          ${analysis.one_liner || analysis.key_factor || ''}
+        </div>
+        ${analysis.source === 'data_analysis' ? '<div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px">⚡ 基於歷史數據分析</div>' : ''}
+      `;
+    } else {
+      aiEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.75rem">分析資料暫不可用</p>';
+    }
+
+  } catch(e) {
+    console.error('Dashboard error:', e);
   }
 }
 
-// ─── CARD CAROUSEL ───
+// ═══════════════════════════════════════
+// CAROUSEL (same logic as before)
+// ═══════════════════════════════════════
 let carouselCards = [];
 let carouselIdx = 0;
 let carouselTimer = null;
 
 async function loadCarousel() {
-  const stage = document.getElementById('carousel-stage');
-  if (!stage) return;
   try {
     const data = await api('/api/drivers');
     const drivers = (data.drivers || []).slice(0, 10);
     if (!drivers.length) return;
-
-    // Fetch cards in parallel
     const cards = await Promise.all(
       drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null))
     );
-
     carouselCards = drivers.map((d, i) => {
       const card = cards[i];
       const s = card?.stats || {};
       const sk = card?.skills || {};
       return {
-        id: d.driver_id,
-        name: d.name || '',
-        number: d.number || '',
+        id: d.driver_id, name: d.name || '', number: d.number || '',
         team: card?.team || d.team || '',
         teamColour: card?.team_colour || d.team_colour || 'e8ff00',
         headshot: card?.headshot_url || d.headshot_url || '',
-        overall: s.overall || 50,
-        odds: card?.odds || 5.0,
+        overall: s.overall || 50, odds: card?.odds || 5.0,
         winProb: card?.odds ? Math.round(1 / card.odds * 100) : 20,
-        points: d.points || s.season_points || 0,
-        qualifying: s.qualifying || 50,
-        tireMgmt: s.tire_management || 50,
-        wetWeather: s.wet_weather || 50,
-        overtaking: s.overtaking || 50,
+        qualifying: s.qualifying||50, tireMgmt: s.tire_management||50,
+        wetWeather: s.wet_weather||50, overtaking: s.overtaking||50,
         passive: sk.passive?.name || '',
-        skills: (sk.skills || []).map(x => `${x.name} ${'★'.repeat(x.stars)}${'☆'.repeat(3 - x.stars)}`),
+        skills: (sk.skills || []).map(x => `${x.name} ${'★'.repeat(x.stars)}`),
       };
     });
-
     renderCarousel();
-    startCarouselAuto();
-  } catch (e) {
-    // silent fail
-  }
+    carouselTimer = setInterval(carouselNext, 4000);
+  } catch(e) {}
 }
 
 function renderCarousel() {
   const stage = document.getElementById('carousel-stage');
   const dotsEl = document.getElementById('carousel-dots');
   if (!stage || !carouselCards.length) return;
-
   const total = carouselCards.length;
-  const visible = Math.min(total, 5); // show up to 5 cards
-  const half = Math.floor(visible / 2);
-
+  const half = 2;
   let html = '';
   for (let offset = -half; offset <= half; offset++) {
     const idx = ((carouselIdx + offset) % total + total) % total;
     const c = carouselCards[idx];
     const isCenter = offset === 0;
     const absOff = Math.abs(offset);
-
-    // Transform: center=full size, others shrink/translate/dim
-    const tx = offset * 220;
-    const scale = isCenter ? 1 : Math.max(0.7, 1 - absOff * 0.15);
-    const opacity = isCenter ? 1 : Math.max(0.3, 1 - absOff * 0.3);
+    const tx = offset * 200;
+    const scale = isCenter ? 1 : Math.max(0.72, 1 - absOff * 0.14);
+    const opacity = isCenter ? 1 : Math.max(0.35, 1 - absOff * 0.3);
     const z = 10 - absOff;
-    const rotY = offset * -4;
-
+    const rotY = offset * -3;
     html += `
       <div class="carousel-card ${isCenter ? 'is-center' : ''}"
-           style="transform:translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg);
-                  opacity:${opacity}; z-index:${z};
-                  ${isCenter ? 'box-shadow:0 8px 40px rgba(232,255,0,0.08),0 0 0 1px rgba(232,255,0,0.1);' : ''}"
-           ${isCenter ? `onmouseenter="pauseCarousel()" onmouseleave="resumeCarousel()"` : `onclick="carouselGo(${idx})"`}>
+           style="transform:translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg);opacity:${opacity};z-index:${z};
+                  ${isCenter ? 'box-shadow:0 6px 30px rgba(232,255,0,0.06),0 0 0 1px rgba(232,255,0,0.08);' : ''}"
+           ${isCenter ? 'onmouseenter="clearInterval(carouselTimer)" onmouseleave="carouselTimer=setInterval(carouselNext,4000)"' : `onclick="carouselIdx=${idx};renderCarousel()"`}>
         <div class="cc-team-stripe" style="background:#${c.teamColour}"></div>
         <div class="cc-top">
           <span class="cc-ghost">${c.number}</span>
-          <img class="cc-avatar" src="${c.headshot}" alt="${c.name}"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <img class="cc-avatar" src="${c.headshot}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="cc-avatar-fb">#${c.number}</div>
-          <div>
-            <div class="cc-name">${c.name}</div>
-            <div class="cc-team">${c.team}</div>
-          </div>
+          <div><div class="cc-name">${c.name}</div><div class="cc-team">${c.team}</div></div>
         </div>
         <div class="cc-stats">
-          <div class="cc-stat-item">
-            <span class="cc-stat-label">Win Prob</span>
-            <span class="cc-stat-val">${c.winProb}%</span>
-          </div>
-          <div class="cc-stat-item">
-            <span class="cc-stat-label">Odds</span>
-            <span class="cc-stat-val">x${c.odds}</span>
-          </div>
-          <div class="cc-stat-item">
-            <span class="cc-stat-label">Qualifying</span>
-            <span class="cc-stat-val">${c.qualifying}</span>
-          </div>
-          <div class="cc-stat-item">
-            <span class="cc-stat-label">Tyre Mgmt</span>
-            <span class="cc-stat-val">${c.tireMgmt}</span>
-          </div>
-          <div class="cc-stat-item">
-            <span class="cc-stat-label">Wet Race</span>
-            <span class="cc-stat-val">${c.wetWeather}</span>
-          </div>
-          <div class="cc-stat-item">
-            <span class="cc-stat-label">Overtake</span>
-            <span class="cc-stat-val">${c.overtaking}</span>
-          </div>
+          <div class="cc-stat-item"><span class="cc-stat-label">Win</span><span class="cc-stat-val">${c.winProb}%</span></div>
+          <div class="cc-stat-item"><span class="cc-stat-label">Odds</span><span class="cc-stat-val">x${c.odds}</span></div>
+          <div class="cc-stat-item"><span class="cc-stat-label">Qual</span><span class="cc-stat-val">${c.qualifying}</span></div>
+          <div class="cc-stat-item"><span class="cc-stat-label">Tyre</span><span class="cc-stat-val">${c.tireMgmt}</span></div>
+          <div class="cc-stat-item"><span class="cc-stat-label">Wet</span><span class="cc-stat-val">${c.wetWeather}</span></div>
+          <div class="cc-stat-item"><span class="cc-stat-label">Ovt</span><span class="cc-stat-val">${c.overtaking}</span></div>
         </div>
         <div class="cc-skills">
           ${c.passive ? `<span class="cc-skill-tag passive">${c.passive}</span>` : ''}
-          ${c.skills.slice(0, 2).map(s => `<span class="cc-skill-tag">${s}</span>`).join('')}
+          ${c.skills.slice(0,2).map(s => `<span class="cc-skill-tag">${s}</span>`).join('')}
         </div>
-        <div style="padding:0 16px;text-align:center;opacity:${isCenter ? 1 : 0.3};transition:opacity 0.4s;max-height:${isCenter ? '80px' : '0'};overflow:hidden">
-          <img src="${getCarImage(c.team)}" alt="${c.team}" style="width:100%;max-height:60px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(232,255,0,0.15))">
-        </div>
+        ${isCenter ? `<div style="padding:0 14px;text-align:center;max-height:60px;overflow:hidden">
+          <img src="${getCarImage(c.team)}" alt="${c.team}" style="width:100%;max-height:50px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(232,255,0,0.12))">
+        </div>` : ''}
         <div class="cc-footer">
-          <div>
-            <div class="cc-ovr">${c.overall}</div>
-            <div class="cc-ovr-label">Overall</div>
-          </div>
+          <div><div class="cc-ovr">${c.overall}</div><div class="cc-ovr-label">Overall</div></div>
           <button class="cc-bet-btn" onclick="event.stopPropagation();location.href='/race?pick=${c.id}'">押這個人 →</button>
         </div>
       </div>`;
   }
-
   stage.innerHTML = html;
-
-  // Dots
   dotsEl.innerHTML = carouselCards.map((_, i) =>
-    `<button class="carousel-dot ${i === carouselIdx ? 'active' : ''}" onclick="carouselGo(${i})"></button>`
+    `<button class="carousel-dot ${i === carouselIdx ? 'active' : ''}" onclick="carouselIdx=${i};renderCarousel()"></button>`
   ).join('');
 }
 
-function carouselNext() {
-  carouselIdx = (carouselIdx + 1) % carouselCards.length;
-  renderCarousel();
-}
-function carouselPrev() {
-  carouselIdx = (carouselIdx - 1 + carouselCards.length) % carouselCards.length;
-  renderCarousel();
-}
-function carouselGo(idx) {
-  carouselIdx = idx;
-  renderCarousel();
-  restartCarouselAuto();
-}
-function startCarouselAuto() {
-  carouselTimer = setInterval(carouselNext, 4000);
-}
-function pauseCarousel() {
-  clearInterval(carouselTimer);
-}
-function resumeCarousel() {
-  startCarouselAuto();
-}
-function restartCarouselAuto() {
-  clearInterval(carouselTimer);
-  startCarouselAuto();
-}
+function carouselNext() { carouselIdx = (carouselIdx + 1) % carouselCards.length; renderCarousel(); }
+function carouselPrev() { carouselIdx = (carouselIdx - 1 + carouselCards.length) % carouselCards.length; renderCarousel(); }
 
-// ─── HUD INFO BAR ───
-async function loadHudBar() {
-  try {
-    const race = await api('/api/races/current');
-    if (race.race_name) {
-      document.getElementById('hud-next-race').textContent = race.race_name;
-      const raceDate = new Date(race.date);
-      const now = new Date();
-      const diffMs = raceDate - now;
-      const days = Math.floor(diffMs / 86400000);
-      const hrs = Math.floor((diffMs % 86400000) / 3600000);
-      document.getElementById('hud-countdown').textContent = days > 0 ? `${days}d ${hrs}h` : 'RACE DAY';
-    }
-    // Leader
-    const drivers = await api('/api/drivers');
-    if (drivers.drivers?.length) {
-      document.getElementById('hud-leader').textContent = drivers.drivers[0].name?.split(' ').pop() || '---';
-    }
-  } catch(e) {}
-}
-
-// ─── RACE LIGHTS ANIMATION ───
-function raceLightsAnim() {
-  const lights = document.querySelectorAll('#hero-lights .race-light');
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i < lights.length) {
-      lights[i].classList.add('on');
-      i++;
-    } else {
-      clearInterval(interval);
-      setTimeout(() => {
-        lights.forEach(l => { l.classList.remove('on'); l.classList.add('go'); });
-        setTimeout(() => {
-          lights.forEach(l => l.classList.remove('go'));
-          setTimeout(raceLightsAnim, 3000);
-        }, 1500);
-      }, 800);
-    }
-  }, 400);
-}
-
-// ─── INIT ───
-loadCurrentRace();
-loadDrivers();
-loadHudBar();
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
 loadCarousel();
-setTimeout(raceLightsAnim, 1000);
+loadDashboard();
 </script>
 </body>
 </html>

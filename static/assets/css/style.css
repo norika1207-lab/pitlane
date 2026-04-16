@@ -6,10 +6,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap');
 
 :root {
-  --bg-primary: #15151E;
-  --bg-secondary: #1c1c28;
-  --bg-card: #242432;
-  --bg-card-hover: #2c2c3a;
+  --bg-primary: #1e1e2a;
+  --bg-secondary: #272738;
+  --bg-card: #2f2f42;
+  --bg-card-hover: #383850;
   --gold: #e8ff00;
   --gold-light: #f0ff44;
   --gold-dark: #b8cc00;
@@ -17,11 +17,11 @@
   --green: #00D2BE;
   --blue: #00b0ff;
   --purple: #A020F0;
-  --text-primary: #f0f0f5;
-  --text-secondary: #8888a0;
-  --text-muted: #555568;
-  --border: rgba(255,255,255,0.08);
-  --border-gold: rgba(232,255,0,0.2);
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0c8;
+  --text-muted: #787890;
+  --border: rgba(255,255,255,0.12);
+  --border-gold: rgba(232,255,0,0.25);
   --radius: 6px;
   --radius-sm: 4px;
   --shadow: 0 4px 24px rgba(0,0,0,0.6);
