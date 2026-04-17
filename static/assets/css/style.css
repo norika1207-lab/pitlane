@@ -925,3 +925,55 @@ a:hover { color: var(--gold-light); }
   .nav-links { display: none; }
   .card-grid { grid-template-columns: 1fr; }
 }
+
+/* ─── NAV USER BUTTON ─── */
+.nav-user-btn {
+  background: rgba(232,255,0,0.08); border: 1px solid rgba(232,255,0,0.2);
+  color: #e8ff00; font-family: var(--font); font-size: 13px; font-weight: 600;
+  padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all .2s;
+  white-space: nowrap;
+}
+.nav-user-btn:hover { background: rgba(232,255,0,0.15); border-color: rgba(232,255,0,0.4); }
+
+/* ─── PROFILE PANEL ─── */
+#profile-panel {
+  position: fixed; z-index: 500;
+  background: #141420; border: 1px solid rgba(232,255,0,0.2);
+  border-radius: 12px; padding: 0; width: 280px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+.pp-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 18px 14px;
+  background: linear-gradient(135deg, #1e1e30, #141420);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.pp-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #e8ff00; color: #000;
+  font-size: 20px; font-weight: 900; font-family: 'Share Tech Mono', monospace;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.pp-name { font-size: 15px; font-weight: 700; color: #fff; }
+.pp-tag { font-size: 11px; color: #888; margin-top: 2px; }
+.pp-balance {
+  padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: #0d0d18;
+}
+.pp-bal-label { font-size: 10px; color: #666; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+.pp-bal-amount { font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: 700; color: #e8ff00; }
+.pp-links { padding: 8px 0; }
+.pp-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px; color: #ccc; text-decoration: none;
+  font-size: 13px; transition: background .15s;
+}
+.pp-link:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.pp-logout {
+  display: block; width: 100%; padding: 12px 18px;
+  background: none; border: none; border-top: 1px solid rgba(255,255,255,0.07);
+  color: #ff5555; font-size: 13px; font-weight: 600; text-align: left;
+  cursor: pointer; transition: background .15s;
+}
+.pp-logout:hover { background: rgba(255,50,50,0.08); }

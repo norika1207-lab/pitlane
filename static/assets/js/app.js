@@ -24,14 +24,55 @@ function updateAuthUI() {
   if (user) {
     authArea.innerHTML = `
       <span class="nav-coins">◆ <span id="user-coins">${formatNum(user.balance)}</span></span>
-      <span style="color:var(--text-secondary);font-size:14px">${user.username}</span>
-      <button class="btn btn-outline btn-sm" onclick="logout()">Log Out</button>
+      <button class="nav-user-btn" onclick="toggleProfilePanel(event)">👤 ${user.username} ▾</button>
     `;
   } else {
     authArea.innerHTML = `
       <button class="btn btn-gold btn-sm" onclick="showModal('login')">Log In</button>
     `;
   }
+}
+
+// ─── PROFILE PANEL ───
+function toggleProfilePanel(e) {
+  e.stopPropagation();
+  let panel = document.getElementById('profile-panel');
+  if (panel) { panel.remove(); return; }
+
+  panel = document.createElement('div');
+  panel.id = 'profile-panel';
+  panel.innerHTML = `
+    <div class="pp-header">
+      <div class="pp-avatar">${(user.username||'?')[0].toUpperCase()}</div>
+      <div>
+        <div class="pp-name">${user.username}</div>
+        <div class="pp-tag">ClawStockMarket 會員</div>
+      </div>
+    </div>
+    <div class="pp-balance">
+      <div class="pp-bal-label">USDClaw 餘額</div>
+      <div class="pp-bal-amount">◆ <span id="pp-coins">${formatNum(user.balance)}</span></div>
+    </div>
+    <div class="pp-links">
+      <a class="pp-link" href="/collection">🃏 我的卡牌收藏</a>
+      <a class="pp-link" href="/profile">📊 預測紀錄</a>
+      <a class="pp-link" href="https://clawstockmarket.com" target="_blank">🏦 ClawStockMarket 交易所 ↗</a>
+    </div>
+    <button class="pp-logout" onclick="logout()">登出 Log Out</button>
+  `;
+  document.body.appendChild(panel);
+
+  // position below the button
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  panel.style.top = (rect.bottom + 8) + 'px';
+  panel.style.right = (window.innerWidth - rect.right) + 'px';
+
+  // close on outside click
+  setTimeout(() => document.addEventListener('click', _closePP = () => {
+    document.getElementById('profile-panel')?.remove();
+    document.removeEventListener('click', _closePP);
+  }), 10);
 }
 
 function formatNum(n) {
