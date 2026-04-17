@@ -9,14 +9,14 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#060608;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height:100vh;}
 
-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
-.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;}
+nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;padding:0 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
+.nav-logo{grid-column:1;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;text-decoration:none;}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:#e8ff00;}
-.nav-links{display:flex;gap:20px;}
-.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;letter-spacing:0.05em;}
+.nav-links{grid-column:2;display:flex;gap:20px;align-items:center;}
+.nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;letter-spacing:0.05em;transition:color .2s;}
 .nav-links a:hover{color:#fff;}
 .nav-links a.active{color:#e8ff00;}
-.nav-actions{display:flex;gap:8px;}
+.nav-actions{grid-column:3;display:flex;gap:8px;justify-self:end;align-items:center;}
 .btn-login{padding:7px 16px;border-radius:8px;border:1px solid #333;background:transparent;color:#ccc;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 .btn-register{padding:7px 16px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
@@ -559,10 +559,18 @@ function sortCards(key, btn) {
     sortAsc = false; // default: high to low
   }
 
+  // Reset tier filter to All so sort applies to every card
+  currentTierFilter = 'all';
+  document.querySelectorAll('.tier-pill').forEach(p => {
+    p.classList.remove('active');
+    p.style.opacity = '0.6';
+  });
+  const allPill = document.querySelector('.tier-pill[onclick*="all"]');
+  if (allPill) { allPill.classList.add('active'); allPill.style.opacity = '1'; }
+
   // Update button labels
   document.querySelectorAll('.sort-btn').forEach(b => {
     b.classList.remove('active');
-    // Remove arrows from text
     b.textContent = b.textContent.replace(/ [▲▼]/g, '');
   });
   btn.classList.add('active');

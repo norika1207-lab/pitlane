@@ -3,7 +3,7 @@
    Asphalt dark + Neon Yellow (F1 timing board)
    ═══════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&family=Share+Tech+Mono&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;900&display=swap');
 
 :root {
   --bg-primary: #1e1e2a;
@@ -113,19 +113,16 @@ a:hover { color: var(--gold-light); }
   0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--gold); }
   50% { opacity: 0.5; box-shadow: 0 0 4px var(--gold); }
 }
-.nav-links { display: flex; gap: 6px; align-items: center; }
+.nav-links { display: flex; gap: 20px; align-items: center; }
 .nav-links a {
-  color: var(--text-secondary); font-size: 12px; font-weight: 600;
-  font-family: var(--font-hud);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  transition: all 0.2s; padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  color: #bbb; font-size: 14px; font-weight: 700;
+  font-family: 'Barlow Condensed', var(--font-hud), sans-serif;
+  text-transform: none; letter-spacing: 0.05em;
+  text-decoration: none;
+  transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
-.nav-links a.active {
-  color: #0d0d0d; background: var(--gold);
-  box-shadow: 0 0 12px rgba(232,255,0,0.3);
-}
+.nav-links a:hover { color: #fff; }
+.nav-links a.active { color: #e8ff00; }
 .nav-auth { display: flex; gap: 12px; align-items: center; }
 .nav-coins {
   color: var(--gold); font-weight: 700; font-size: 13px;
