@@ -37,6 +37,21 @@ nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56
 .sort-btn:hover{border-color:#555;color:#ccc;}
 .sort-btn.active{border-color:#e8ff00;color:#e8ff00;background:#1a1a00;}
 
+/* 年份 / 車隊篩選列 */
+.filter-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.filter-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#555;letter-spacing:.1em;width:52px;flex-shrink:0;}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.season-pill{padding:5px 14px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #2a2a2a;background:#111;color:#888;transition:all .15s;letter-spacing:.05em;}
+.season-pill:hover{border-color:#555;color:#ccc;}
+.season-pill.active{background:#131100;border-color:#e8ff00;color:#e8ff00;}
+.team-pill{padding:4px 10px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #222;background:#0a0a0a;color:#666;transition:all .15s;}
+.team-pill:hover{border-color:#555;color:#ddd;}
+.team-pill.active{color:#000!important;}
+/* 卡片數量 */
+.cards-count{font-size:12px;color:#555;font-family:'Barlow Condensed',sans-serif;margin-left:4px;}
+/* 歷史卡年份標記 */
+.c-hist-year{position:absolute;top:26px;left:12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:900;letter-spacing:.08em;z-index:11;opacity:.8;}
+
 /* 卡牌網格 */
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,260px));gap:24px;justify-content:start;}
 .card{width:260px;}
@@ -159,8 +174,27 @@ nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56
 
 <div class="main">
   <div class="page-header">
-    <div class="page-title">Season Driver Cards</div>
-    <div class="page-sub">Stats from real race data · Updated each race · Unlock higher tier cards</div>
+    <div class="page-title">Driver Cards <span class="cards-count" id="cards-count"></span></div>
+    <div class="page-sub">Real race data · 2020–2024 · Click season or team to filter</div>
+  </div>
+
+  <!-- 年份篩選 -->
+  <div class="filter-row">
+    <span class="filter-lbl">SEASON</span>
+    <div class="filter-pills">
+      <div class="season-pill active" onclick="filterSeason('all',this)">All Seasons</div>
+      <div class="season-pill" onclick="filterSeason(2024,this)">2024</div>
+      <div class="season-pill" onclick="filterSeason(2023,this)">2023</div>
+      <div class="season-pill" onclick="filterSeason(2022,this)">2022</div>
+      <div class="season-pill" onclick="filterSeason(2021,this)">2021</div>
+      <div class="season-pill" onclick="filterSeason(2020,this)">2020</div>
+    </div>
+  </div>
+
+  <!-- 車隊篩選 (JS 動態填充) -->
+  <div class="filter-row">
+    <span class="filter-lbl">TEAM</span>
+    <div class="filter-pills" id="team-pills"><div class="team-pill active" onclick="filterTeam('all',this)">All</div></div>
   </div>
 
   <div class="tier-bar">
@@ -192,104 +226,229 @@ nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56
 <script src="/static/assets/js/app.js"></script>
 <script>
 let DRIVERS = [];
-let currentSort = 'ovr';
-let sortAsc = false;
-let currentTierFilter = 'all';
+let CURRENT_DRIVERS = [];   // 2024 current with full card stats
+let HIST_DRIVERS   = [];    // 2020-2023 historical from standings
+let currentSort         = 'ovr';
+let sortAsc             = false;
+let currentTierFilter   = 'all';
+let currentSeasonFilter = 'all';
+let currentTeamFilter   = 'all';
 
 const SW_BANK = {
-  VER:{ str:['Qualifying','Wet Weather','Race Craft'],       wk:['Tyre Conservation','Street Pressure'] },
-  HAM:{ str:['Wet Weather','Starts','Race Pace'],            wk:['Tyre Management'] },
-  NOR:{ str:['High-Speed Corners','Tyre Mgmt','Lap 1'],      wk:['Wheel-to-Wheel','Wet Starts'] },
-  LEC:{ str:['Qualifying','Street Circuits','Lap 1'],        wk:['Tyre Management','Race Starts'] },
-  SAI:{ str:['Consistency','Tyre Management','Strategy'],    wk:['Qualifying Pace'] },
-  RUS:{ str:['Tyre Management','Consistency','Strategy'],    wk:['Qualifying Pace','Overtaking'] },
-  PIA:{ str:['High-Speed Corners','Race Pace'],              wk:['Qualifying','Experience'] },
-  ALO:{ str:['Race Craft','Overtaking','Dirty Air'],         wk:['Tyre Warm-up'] },
-  PER:{ str:['Tyre Management','Street Circuits'],           wk:['Qualifying','Pressure'] },
-  STR:{ str:['Rain Pace','Strategy'],                        wk:['Qualifying','Consistency'] },
-  GAS:{ str:['Qualifying Pace','Street Circuits'],           wk:['Race Starts','Tyre Wear'] },
-  OCO:{ str:['Qualifying','Street Circuits'],                wk:['Wheel-to-Wheel','Strategy'] },
-  BOT:{ str:['Qualifying Pace','Clean Air Pace'],            wk:['Race Craft','Wet Weather'] },
-  TSU:{ str:['Wet Weather','Overtaking'],                    wk:['Consistency','Strategy'] },
-  HUL:{ str:['Tyre Management','Race Craft'],                wk:['Qualifying','Team Orders'] },
-  MAG:{ str:['Aggression','Dirty Air Defence'],              wk:['Tyre Wear','Consistency'] },
-  ALB:{ str:['Consistency','Smooth Driving'],                wk:['Qualifying Pace','Overtaking'] },
-  BEA:{ str:['Wet Weather','Corners'],                       wk:['Experience','Pressure'] },
-  ANT:{ str:['Qualifying','Pace'],                           wk:['Race Craft','Experience'] },
-  DOO:{ str:['Smooth Driving','Consistency'],                wk:['Qualifying','Wet Weather'] },
-  HAD:{ str:['Overtaking','Aggression'],                     wk:['Tyre Management','Strategy'] },
-  LAW:{ str:['Race Craft','Consistency'],                    wk:['Qualifying','Street Circuits'] },
+  // ── 2024 Current ──
+  VER:{ str:['Qualifying','Wet Weather','Race Craft'],          wk:['Tyre Conservation','Street Pressure'] },
+  HAM:{ str:['Wet Weather','Starts','Race Pace'],               wk:['Tyre Management'] },
+  NOR:{ str:['High-Speed Corners','Tyre Mgmt','Lap 1'],         wk:['Wheel-to-Wheel','Wet Starts'] },
+  LEC:{ str:['Qualifying','Street Circuits','Lap 1'],           wk:['Tyre Management','Race Starts'] },
+  SAI:{ str:['Consistency','Tyre Management','Strategy'],       wk:['Qualifying Pace'] },
+  RUS:{ str:['Tyre Management','Consistency','Strategy'],       wk:['Qualifying Pace','Overtaking'] },
+  PIA:{ str:['High-Speed Corners','Race Pace'],                 wk:['Qualifying','Experience'] },
+  ALO:{ str:['Race Craft','Overtaking','Dirty Air'],            wk:['Tyre Warm-up'] },
+  PER:{ str:['Tyre Management','Street Circuits'],              wk:['Qualifying','Pressure'] },
+  STR:{ str:['Rain Pace','Strategy'],                           wk:['Qualifying','Consistency'] },
+  GAS:{ str:['Qualifying Pace','Street Circuits'],              wk:['Race Starts','Tyre Wear'] },
+  OCO:{ str:['Qualifying','Street Circuits'],                   wk:['Wheel-to-Wheel','Strategy'] },
+  BOT:{ str:['Qualifying Pace','Clean Air Pace'],               wk:['Race Craft','Wet Weather'] },
+  TSU:{ str:['Wet Weather','Overtaking'],                       wk:['Consistency','Strategy'] },
+  HUL:{ str:['Tyre Management','Race Craft'],                   wk:['Qualifying','Team Orders'] },
+  MAG:{ str:['Aggression','Dirty Air Defence'],                 wk:['Tyre Wear','Consistency'] },
+  ALB:{ str:['Consistency','Smooth Driving'],                   wk:['Qualifying Pace','Overtaking'] },
+  BEA:{ str:['Wet Weather','Corners'],                          wk:['Experience','Pressure'] },
+  ANT:{ str:['Qualifying','Pace'],                              wk:['Race Craft','Experience'] },
+  DOO:{ str:['Smooth Driving','Consistency'],                   wk:['Qualifying','Wet Weather'] },
+  HAD:{ str:['Overtaking','Aggression'],                        wk:['Tyre Management','Strategy'] },
+  LAW:{ str:['Race Craft','Consistency'],                       wk:['Qualifying','Street Circuits'] },
+  // ── Historical (2020–2023) ──
+  VET:{ str:['Race Craft','Tyre Management','Technical Feedback'], wk:['Wheel-to-Wheel','Aggression'] },
+  RIC:{ str:['Late Braking','Overtaking','Wet Weather'],           wk:['Tyre Management','Qualifying'] },
+  RAI:{ str:['Consistency','Smooth Driving','Race Craft'],         wk:['Qualifying Pace','Motivation'] },
+  GIO:{ str:['Consistency','Smooth Driving'],                      wk:['Qualifying','Overtaking'] },
+  MSC:{ str:['Rain Pace','Tyre Management'],                       wk:['Consistency','Racecraft'] },
+  MAZ:{ str:['Smooth Driving'],                                    wk:['Qualifying','Race Craft'] },
+  LAT:{ str:['Consistency'],                                       wk:['Qualifying','Race Pace'] },
+  KUB:{ str:['Consistency','Street Circuits'],                     wk:['Qualifying','Overtaking'] },
+  ZHO:{ str:['Consistency','Smooth Driving'],                      wk:['Qualifying','Race Pace'] },
+  SAR:{ str:['Consistency'],                                       wk:['Qualifying','Race Pace'] },
+  COL:{ str:['Wet Weather','Smooth Driving'],                      wk:['Experience','Overtaking'] },
+  DEV:{ str:['Qualifying','Race Pace'],                            wk:['Consistency','Experience'] },
 };
 const SW_DEFAULT = { str:['Race Pace'], wk:['Consistency'] };
 
-// Load real drivers from API + 2024 historical stats
+const TEAM_COLORS = {
+  'McLaren':'#F47600','Red Bull':'#3671C6','Red Bull Racing':'#3671C6',
+  'Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75',
+  'Alpine':'#FF87BC','Alpine F1 Team':'#FF87BC','Williams':'#64C4FF',
+  'Haas':'#B6BABD','Racing Bulls':'#6692FF','RB':'#6692FF',
+  'Kick Sauber':'#52E252','Audi':'#52E252','Renault':'#FFD700',
+  'AlphaTauri':'#5090FF','Alpha Tauri':'#5090FF','Alfa Romeo':'#A50F2D',
+  'Force India':'#F596C8','Racing Point':'#F596C8',
+  'Toro Rosso':'#4090FF',
+};
+
+// ── Historical tier / OVR / stats calculation ──
+function calcHistTier(pos) {
+  if (pos === 1) return 'monaco';
+  if (pos === 2) return 'spa';
+  if (pos <= 4)  return 'suzuka';
+  if (pos <= 8)  return 'monza';
+  return 'silverstone';
+}
+function calcHistOVR(pos, wins, pts, maxPts) {
+  const base = [92, 85, 81, 77, 74, 72, 70, 68, 65, 62][Math.min(pos - 1, 9)];
+  const wb   = Math.min(6, (wins || 0) * 0.45);
+  const pb   = maxPts > 0 ? (pts / maxPts) * 3 : 0;
+  return Math.min(98, Math.round(base + wb + pb));
+}
+function calcHistStats(pos, wins, pts, maxPts, code) {
+  const rel  = maxPts > 0 ? pts / maxPts : 0.5;
+  const hash = (code.charCodeAt(0)||0) + (code.charCodeAt(1)||0) + (code.charCodeAt(2)||0);
+  const v    = (hash % 10) - 5;
+  const baseQ = Math.round(50 + rel * 40);
+  const baseT = Math.round(55 + (1 - (pos - 1) / 10) * 30);
+  const baseW = Math.round(52 + rel * 35 + v * 0.5);
+  const baseO = Math.round(52 + Math.min((wins||0)*1.5, 20) + rel * 20);
+  return {
+    q: Math.min(97, Math.max(48, baseQ + v)),
+    t: Math.min(95, Math.max(48, baseT - v)),
+    w: Math.min(95, Math.max(48, baseW)),
+    o: Math.min(95, Math.max(48, baseO)),
+  };
+}
+
+// ── Load 2024 current (full card stats from API) ──
 async function loadDrivers() {
   try {
-    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','RB':'#6692FF','Kick Sauber':'#52E252','Audi':'#52E252'};
-
-    // Fetch in parallel: OpenF1 drivers + 2024 stats
     const [data, histData] = await Promise.all([
       api('/api/drivers'),
       api('/api/drivers/stats').catch(()=>({drivers:[]})),
     ]);
     const drivers = data.drivers || [];
-    // Build a stats map keyed by family name or driver_id
     const histMap = {};
     for (const h of (histData.drivers || [])) {
       histMap[h.driver_id] = h;
       if (h.name) histMap[h.name.split(' ').pop().toLowerCase()] = h;
     }
 
-    const cards = await Promise.all(drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(() => null)));
+    const cards = await Promise.all(drivers.map(d => api(`/api/drivers/${d.driver_id}/card`).catch(()=>null)));
 
-    DRIVERS = drivers.map((d, i) => {
+    CURRENT_DRIVERS = drivers.map((d, i) => {
       const card = cards[i];
-      const s = card?.stats || {};
-      // Enrich with historical data if available
+      const s    = card?.stats || {};
       const hist = histMap[d.driver_id] || histMap[d.name?.split(' ').pop()?.toLowerCase()] || {};
-      const ovr = s.overall || 50;
-      const color = hist.color || teamColors[card?.team || d.team] || '#888';
+      const ovr  = s.overall || 50;
+      const color= hist.color || TEAM_COLORS[card?.team || d.team] || '#888';
       const odds = card?.odds || 10.0;
-      // win% from real data if available, else derive from odds
-      const win = hist.win_rate != null ? Math.round(hist.win_rate) : (odds ? Math.round(1/odds*100) : 5);
-
+      const win  = hist.win_rate != null ? Math.round(hist.win_rate) : (odds ? Math.round(1/odds*100) : 5);
       let tier = 'silverstone';
       if (ovr >= 88) tier = 'monaco';
       else if (ovr >= 83) tier = 'spa';
       else if (ovr >= 78) tier = 'suzuka';
       else if (ovr >= 72) tier = 'monza';
 
-      const headshot = card?.headshot_url || d.headshot_url || '';
-
       const lastName = d.name?.split(' ').pop() || '?';
-      const code3 = lastName.slice(0,3).toUpperCase();
-      const sw = SW_BANK[code3] || SW_DEFAULT;
+      const code3    = lastName.slice(0,3).toUpperCase();
+      const sw       = SW_BANK[code3] || SW_DEFAULT;
       return {
-        num: d.number || '?',
-        name: lastName,
-        fullName: d.name || '?',
-        team: card?.team || d.team || '',
-        color, emoji: '🏎', tier, headshot,
-        stats: {q: s.qualifying||50, t: s.tire_management||50, w: s.wet_weather||50, o: s.overtaking||50},
+        num: d.number || '?', name: lastName, fullName: d.name||'?',
+        team: card?.team || d.team || '', color, emoji:'🏎', tier,
+        headshot: card?.headshot_url || d.headshot_url || '',
+        stats: {q:s.qualifying||50, t:s.tire_management||50, w:s.wet_weather||50, o:s.overtaking||50},
         ovr, win, odds: Number(odds).toFixed(1),
         driver_id: d.driver_id,
         str: sw.str, wk: sw.wk,
-        // real 2024 data
-        pts2024: hist.points || 0,
-        wins2024: hist.wins || 0,
-        podiums2024: hist.podiums || 0,
-        champPos: hist.championship_pos || 99,
-        podium_rate: hist.podium_rate || 0,
-        avg_grid: hist.avg_grid || '-',
+        pts2024: hist.points || 0, wins2024: hist.wins||0,
+        podiums2024: hist.podiums||0, champPos: hist.championship_pos||99,
+        podium_rate: hist.podium_rate||0, avg_grid: hist.avg_grid||'-',
         last5: hist.last5_points || [],
+        season: 2024, isHistorical: false,
       };
     });
 
+    DRIVERS = [...CURRENT_DRIVERS, ...HIST_DRIVERS];
+    updateCount();
+    updateTeamPills();
     renderCards();
+    // Now kick off historical loading in background
+    loadAllHistorical();
   } catch(e) {
     document.getElementById('cardsGrid').innerHTML = '<p style="color:#888;text-align:center;padding:40px">Loading...</p>';
   }
 }
+
+// ── Load 2020-2023 from standings ──
+async function loadAllHistorical() {
+  const years = [2020, 2021, 2022, 2023];
+  const raceCounts = {2020:17, 2021:22, 2022:22, 2023:22};
+
+  const results = await Promise.allSettled(
+    years.map(y => api(`/api/history/standings/${y}`))
+  );
+
+  HIST_DRIVERS = [];
+  results.forEach((res, idx) => {
+    if (res.status !== 'fulfilled') return;
+    const year     = years[idx];
+    const standings= res.value.standings || [];
+    const maxPts   = standings[0]?.pts || 1;
+    const totalRaces = raceCounts[year] || 20;
+
+    standings.forEach(s => {
+      const tier   = calcHistTier(s.pos);
+      const ovr    = calcHistOVR(s.pos, s.wins||0, s.pts||0, maxPts);
+      const stats  = calcHistStats(s.pos, s.wins||0, s.pts||0, maxPts, s.code||'');
+      const sw     = SW_BANK[s.code] || SW_DEFAULT;
+      const winRate= Math.round(((s.wins||0) / totalRaces) * 100);
+      const color  = s.color || TEAM_COLORS[s.team] || '#888';
+      const shortYear = String(year).slice(2);
+
+      HIST_DRIVERS.push({
+        num: `'${shortYear}`,
+        name: s.name?.split(' ').slice(-1)[0] || s.code || '?',
+        fullName: s.name || '?',
+        team: s.team || '?', color, emoji:'🏎',
+        tier, headshot: '',
+        stats, ovr, win: winRate,
+        odds: '—',
+        driver_id: s.driver_id || (s.code||'').toLowerCase(),
+        str: sw.str, wk: sw.wk,
+        pts2024: s.pts||0, wins2024: s.wins||0,
+        podiums2024: 0, champPos: s.pos,
+        podium_rate: 0, avg_grid: '-', last5: [],
+        season: year, isHistorical: true,
+        code: s.code || '',
+      });
+    });
+  });
+
+  DRIVERS = [...CURRENT_DRIVERS, ...HIST_DRIVERS];
+  updateCount();
+  updateTeamPills();
+  renderCards();
+}
+
+function updateCount() {
+  const visible = getFilteredDrivers().length;
+  const total   = DRIVERS.length;
+  document.getElementById('cards-count').textContent = `(${visible}/${total})`;
+}
+
+// ── Team pills: rebuild based on current season filter ──
+function updateTeamPills() {
+  const source = currentSeasonFilter === 'all'
+    ? DRIVERS
+    : DRIVERS.filter(d => d.season === currentSeasonFilter);
+
+  const teams = [...new Set(source.map(d => d.team).filter(Boolean))].sort();
+  const container = document.getElementById('team-pills');
+  container.innerHTML =
+    `<div class="team-pill active" style="border-color:#444;color:#ccc" onclick="filterTeam('all',this)">All</div>` +
+    teams.map(t => {
+      const tc = TEAM_COLORS[t] || '#888';
+      return `<div class="team-pill" style="border-color:${tc}55;color:${tc}cc" onclick="filterTeam(${JSON.stringify(t)},this)">${t.replace(' F1 Team','').replace(' Racing','')}</div>`;
+    }).join('');
+  currentTeamFilter = 'all';
+}
+
 loadDrivers();
 
 const TIER_CONFIG = {
@@ -436,12 +595,16 @@ function buildCard(d) {
 
   const ovrStyle = `color:${t.ovrColor};${t.ovrShadow?`text-shadow:${t.ovrShadow};`:''}${d.tier==='monaco'?'font-size:28px;':''}`;
   const rarityTop = d.tier==='monaco'?'top:46px;':'';
+  const yearBadge = d.isHistorical
+    ? `<div class="c-hist-year" style="color:${t.ovrColor};opacity:.75;top:${d.tier==='monaco'?'64px':'26px'}">${d.season}</div>`
+    : '';
 
   return `
     <div class="card ${d.tier}" data-tier="${d.tier}">
       <div class="card-inner">
         ${extras}
         <span class="c-rarity" style="${rarityTop}color:${t.ovrColor};${d.tier==='monaco'?'text-shadow:0 0 10px rgba(201,168,76,1);':''}">${t.label}</span>
+        ${yearBadge}
         <span class="c-num">${d.num}</span>
         <div class="c-art" style="z-index:5;${monacoArtStyle}">
           ${glowCircle}
@@ -495,9 +658,19 @@ function buildCard(d) {
     </div>`;
 }
 
+function getFilteredDrivers() {
+  return DRIVERS.filter(d => {
+    if (currentSeasonFilter !== 'all' && d.season !== currentSeasonFilter) return false;
+    if (currentTeamFilter   !== 'all' && d.team  !== currentTeamFilter)   return false;
+    if (currentTierFilter   !== 'all' && d.tier  !== currentTierFilter)   return false;
+    return true;
+  });
+}
+
 function renderCards(){
   const grid = document.getElementById('cardsGrid');
-  let list = currentTierFilter === 'all' ? [...DRIVERS] : DRIVERS.filter(d => d.tier === currentTierFilter);
+  let list = getFilteredDrivers();
+  updateCount();
 
   // Sort
   if (currentSort === 'team') {
@@ -539,6 +712,27 @@ function renderCards(){
   }
 }
 
+function filterSeason(year, btn) {
+  document.querySelectorAll('.season-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  currentSeasonFilter = year;
+  currentTeamFilter   = 'all';
+  // Reset tier too
+  currentTierFilter = 'all';
+  document.querySelectorAll('.tier-pill').forEach(p => { p.classList.remove('active'); p.style.opacity='0.6'; });
+  const allPill = document.querySelector('.tier-pill[onclick*="all"]');
+  if (allPill) { allPill.classList.add('active'); allPill.style.opacity='1'; }
+  updateTeamPills();
+  renderCards();
+}
+
+function filterTeam(team, btn) {
+  document.querySelectorAll('.team-pill').forEach(p => { p.classList.remove('active'); p.style.color=''; });
+  btn.classList.add('active');
+  currentTeamFilter = team;
+  renderCards();
+}
+
 function filterTier(tier, btn){
   document.querySelectorAll('.tier-pill').forEach(p => {
     p.classList.remove('active');
@@ -559,14 +753,11 @@ function sortCards(key, btn) {
     sortAsc = false; // default: high to low
   }
 
-  // Reset tier filter to All so sort applies to every card
+  // Reset tier filter only (keep season/team filters)
   currentTierFilter = 'all';
-  document.querySelectorAll('.tier-pill').forEach(p => {
-    p.classList.remove('active');
-    p.style.opacity = '0.6';
-  });
+  document.querySelectorAll('.tier-pill').forEach(p => { p.classList.remove('active'); p.style.opacity='0.6'; });
   const allPill = document.querySelector('.tier-pill[onclick*="all"]');
-  if (allPill) { allPill.classList.add('active'); allPill.style.opacity = '1'; }
+  if (allPill) { allPill.classList.add('active'); allPill.style.opacity='1'; }
 
   // Update button labels
   document.querySelectorAll('.sort-btn').forEach(b => {
@@ -578,8 +769,6 @@ function sortCards(key, btn) {
 
   renderCards();
 }
-
-renderCards();
 </script>
 </body>
 </html>
