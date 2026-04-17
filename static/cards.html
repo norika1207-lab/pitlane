@@ -175,7 +175,7 @@ nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56
 <div class="main">
   <div class="page-header">
     <div class="page-title">Driver Cards <span class="cards-count" id="cards-count"></span></div>
-    <div class="page-sub">Real race data · 2020–2024 · Click season or team to filter</div>
+    <div class="page-sub">Real race data · 2020–2024 · Click season or team to filter <span id="hist-status" style="color:#e8ff00;font-size:11px"></span></div>
   </div>
 
   <!-- 年份篩選 -->
@@ -375,10 +375,18 @@ async function loadDrivers() {
   }
 }
 
+function setHistStatus(msg) {
+  const el = document.getElementById('hist-status');
+  if (el) el.textContent = msg;
+}
+
 // ── Load 2020-2023 from standings ──
 async function loadAllHistorical() {
+  try {
   const years = [2020, 2021, 2022, 2023];
   const raceCounts = {2020:17, 2021:22, 2022:22, 2023:22};
+
+  setHistStatus('⏳ Loading 2020–2023...');
 
   const results = await Promise.allSettled(
     years.map(y => api(`/api/history/standings/${y}`))
@@ -386,7 +394,10 @@ async function loadAllHistorical() {
 
   HIST_DRIVERS = [];
   results.forEach((res, idx) => {
-    if (res.status !== 'fulfilled') return;
+    if (res.status !== 'fulfilled') {
+      console.error('History standings failed for year', years[idx], res.reason);
+      return;
+    }
     const year     = years[idx];
     const standings= res.value.standings || [];
     const maxPts   = standings[0]?.pts || 1;
@@ -421,9 +432,15 @@ async function loadAllHistorical() {
   });
 
   DRIVERS = [...CURRENT_DRIVERS, ...HIST_DRIVERS];
+  setHistStatus(`✓ ${HIST_DRIVERS.length} historical cards loaded`);
+  setTimeout(() => setHistStatus(''), 3000);
   updateCount();
   updateTeamPills();
   renderCards();
+  } catch(e) {
+    console.error('loadAllHistorical error:', e);
+    setHistStatus('⚠ History load failed: ' + e.message);
+  }
 }
 
 function updateCount() {
@@ -444,7 +461,7 @@ function updateTeamPills() {
     `<div class="team-pill active" style="border-color:#444;color:#ccc" onclick="filterTeam('all',this)">All</div>` +
     teams.map(t => {
       const tc = TEAM_COLORS[t] || '#888';
-      return `<div class="team-pill" style="border-color:${tc}55;color:${tc}cc" onclick="filterTeam(${JSON.stringify(t)},this)">${t.replace(' F1 Team','').replace(' Racing','')}</div>`;
+      return `<div class="team-pill" style="border-color:${tc}55;color:${tc}cc" onclick="filterTeam('${t.replace(/'/g,"\\'")}',this)">${t.replace(' F1 Team','').replace(' Racing','')}</div>`;
     }).join('');
   currentTeamFilter = 'all';
 }
@@ -708,7 +725,8 @@ function renderCards(){
     });
     grid.innerHTML = html;
   } else {
-    grid.innerHTML = list.map(buildCard).join('');
+    const htmlParts = list.map(d => { try { return buildCard(d); } catch(e) { console.error('buildCard error for', d.name, d.season, e.message); return ''; } });
+    grid.innerHTML = htmlParts.join('');
   }
 }
 
