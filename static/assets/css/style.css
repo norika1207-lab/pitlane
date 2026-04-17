@@ -1108,3 +1108,21 @@ a:hover { color: var(--gold-light); }
 .pd-pnl-summary { display: flex; gap: 10px; margin-bottom: 16px; }
 .pd-chart-wrap { background: #0a0a14; border-radius: 8px; padding: 8px; }
 .pd-line-chart { width: 100%; }
+.pd-cta-block {
+  padding: 10px 12px 6px; display: flex; flex-direction: column; gap: 6px;
+}
+.pd-cta-btn {
+  display: block; text-align: center; padding: 9px 12px;
+  border-radius: 7px; font-size: 13px; font-weight: 700;
+  font-family: 'Barlow Condensed', var(--font-hud), sans-serif;
+  text-decoration: none; transition: all .18s; letter-spacing: .04em;
+}
+.pd-cta-btn:not(.secondary) {
+  background: #e8ff00; color: #000;
+}
+.pd-cta-btn:not(.secondary):hover { background: #d4e800; }
+.pd-cta-btn.secondary {
+  background: rgba(232,255,0,.08); color: #e8ff00;
+  border: 1px solid rgba(232,255,0,.25);
+}
+.pd-cta-btn.secondary:hover { background: rgba(232,255,0,.15); }

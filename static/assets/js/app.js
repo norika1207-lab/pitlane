@@ -57,6 +57,12 @@ function showProfileDashboard() {
         </div>
 
         <div class="pd-menu">
+          <!-- 購入入口（置頂 highlight） -->
+          <div class="pd-cta-block">
+            <a class="pd-cta-btn" href="https://clawstockmarket.com" target="_blank">💎 購入 Diamond</a>
+            <a class="pd-cta-btn secondary" href="https://clawstockmarket.com" target="_blank">💱 兌換 USDClaw</a>
+          </div>
+
           <!-- 帳戶概覽 -->
           <div class="pd-menu-item ${_pdTab==='overview'?'active':''}" onclick="pdSwitch('overview',this)">🏆 帳戶概覽</div>
 
