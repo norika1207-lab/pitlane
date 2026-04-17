@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PitLane — 用卡牌預測 F1</title>
+<title>Throttenix — Predict F1 with Cards</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#0d0d0d;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height:100vh;}
 
 /* NAVBAR */
-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
-.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;}
+nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56px;padding:0 24px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;position:sticky;top:0;z-index:100;}
+.nav-logo{grid-column:1;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;letter-spacing:0.05em;display:flex;align-items:center;gap:8px;}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:#e8ff00;}
-.nav-links{display:flex;gap:20px;}
+.nav-links{grid-column:2;display:flex;gap:20px;}
 .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#bbb;text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;}
-.nav-links a:hover{color:#fff;}
-.nav-actions{display:flex;gap:8px;}
+.nav-links a:hover,.nav-links a.active{color:#fff;}
+.nav-actions{grid-column:3;display:flex;gap:8px;justify-self:end;align-items:center;}
 .btn-login{padding:7px 16px;border-radius:8px;border:1px solid #333;background:transparent;color:#ccc;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 .btn-register{padding:7px 16px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
 
@@ -34,7 +34,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 /* CAROUSEL */
 .carousel-section{background:#0d0d0d;padding:24px 0 12px;border-bottom:1px solid #1a1a1a;}
 .carousel-label{text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;color:#555;margin-bottom:14px;}
-.carousel-wrap{position:relative;width:100%;height:420px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding-bottom:16px;}
+.carousel-wrap{position:relative;width:100%;height:430px;display:flex;align-items:flex-end;justify-content:center;overflow:visible;padding-bottom:16px;}
 .carousel-track{display:flex;align-items:flex-end;justify-content:center;gap:12px;width:100%;padding:0 48px;}
 .cs{flex-shrink:0;position:relative;cursor:pointer;}
 .dc{border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;overflow:hidden;position:relative;transform-origin:bottom center;transition:width .3s cubic-bezier(.34,1.56,.64,1),height .3s cubic-bezier(.34,1.56,.64,1),transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s ease,border-color .2s,box-shadow .2s;}
@@ -202,92 +202,75 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 .ss-sub{font-size:10px;color:#777;margin-top:2px;}
 
 footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11px;color:#666;margin-top:20px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:32px;max-width:420px;width:90%;position:relative;}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#e8ff00;border-radius:14px 14px 0 0;}
+.modal h2{margin-bottom:20px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#fff;}
+.modal .form-group{margin-bottom:14px;}
+.modal label{display:block;margin-bottom:5px;color:#888;font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;}
+.modal input{width:100%;padding:10px 14px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;color:#eee;font-size:14px;font-family:'Barlow',sans-serif;}
+.modal input:focus{outline:none;border-color:#e8ff0066;box-shadow:0 0 8px rgba(232,255,0,.1);}
+.modal .form-actions{display:flex;gap:10px;margin-top:20px;}
+.modal .form-actions .btn{flex:1;}
+.modal .error-msg{color:#ff4444;font-size:12px;margin-top:6px;}
+.modal .switch-link{text-align:center;margin-top:14px;font-size:12px;color:#666;}
+.modal .switch-link a{color:#e8ff00;}
+.btn{padding:10px 18px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:.2s;}
+.btn-sm{padding:7px 14px;font-size:13px;}
+.btn-gold{background:#e8ff00;color:#000;}
+.btn-gold:hover{background:#d4e800;}
+.btn-outline{background:transparent;border:1px solid #333;color:#ccc;}
+.btn-outline:hover{border-color:#555;color:#fff;}
+.nav-coins{font-family:'Share Tech Mono',monospace;font-size:12px;color:#e8ff00;padding:4px 8px;background:#e8ff0010;border:1px solid #e8ff0025;border-radius:5px;}
 </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
 <nav>
-  <div class="nav-logo"><div class="logo-dot"></div>PITLANE</div>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div>THROTTENIX</a>
   <div class="nav-links">
-    <a href="/">首頁</a><a href="/race">賽事</a><a href="/cards">卡牌</a>
-    <a href="/battle">對戰</a><a href="/leaderboard">排行榜</a><a href="/profile">個人</a>
+    <a href="/" class="active">Home</a>
+    <a href="/race">Race</a>
+    <a href="/cards">Cards</a>
+    <a href="/collection">Collection</a>
+    <a href="/battle">Battle</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/history">History</a>
+    <a href="/halloffame">Hall of Fame</a>
+    <a href="/car-explorer">Car Explorer</a>
+    <a href="/profile">Profile</a>
   </div>
   <div class="nav-actions" id="nav-auth">
-    <button class="btn-login" onclick="showLoginModal('login')">登入</button>
-    <button class="btn-register" onclick="showLoginModal('register')">加入</button>
+    <button class="btn-login" onclick="showModal('login')">Log In</button>
+    <button class="btn-register" onclick="showModal('login')">Sign Up</button>
   </div>
 </nav>
 
-<!-- AUTH MODAL (login + register) -->
-<div id="login-overlay" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.82);display:none;align-items:center;justify-content:center" onclick="if(event.target===this)closeLoginModal()">
-  <div style="background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:28px 28px 24px;max-width:400px;width:92%;position:relative">
+<!-- AUTH MODAL (managed by app.js) -->
+<div class="modal-overlay" id="modal-overlay"><div class="modal" id="auth-modal"></div></div>
 
-    <!-- Top bar -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff">
-        <span style="color:#e8ff00">PITLANE</span> &mdash; <span id="modal-mode-label">登入</span>
-      </div>
-      <button onclick="closeLoginModal()" style="background:none;border:none;color:#555;font-size:20px;cursor:pointer;line-height:1">✕</button>
-    </div>
-
-    <!-- Tabs -->
-    <div style="display:flex;gap:4px;margin-bottom:20px;background:#0d0d0d;border-radius:8px;padding:4px">
-      <button id="tab-login" onclick="switchAuthTab('login')"
-        style="flex:1;padding:8px;border-radius:6px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s">登入</button>
-      <button id="tab-register" onclick="switchAuthTab('register')"
-        style="flex:1;padding:8px;border-radius:6px;border:none;background:transparent;color:#666;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s">新帳號</button>
-    </div>
-
-    <!-- Subtitle -->
-    <div style="font-size:11px;color:#555;text-align:center;margin-bottom:16px">
-      使用 ClawStockMarket 交易所帳號 · USDClaw 虛擬幣互通
-    </div>
-
-    <!-- Fields -->
-    <input id="lg-user" type="text" placeholder="帳號" autocomplete="username"
-      style="width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;color:#eee;font-size:14px;margin-bottom:10px;outline:none;font-family:'Barlow',sans-serif"
-      onfocus="this.style.borderColor='#e8ff0066'" onblur="this.style.borderColor='#2a2a2a'">
-
-    <input id="lg-email" type="email" placeholder="Email（註冊用）" autocomplete="email"
-      style="width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;color:#eee;font-size:14px;margin-bottom:10px;outline:none;font-family:'Barlow',sans-serif;display:none"
-      onfocus="this.style.borderColor='#e8ff0066'" onblur="this.style.borderColor='#2a2a2a'">
-
-    <input id="lg-pass" type="password" placeholder="密碼（8 位以上）" autocomplete="current-password"
-      style="width:100%;padding:10px 12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:7px;color:#eee;font-size:14px;margin-bottom:6px;outline:none;font-family:'Barlow',sans-serif"
-      onfocus="this.style.borderColor='#e8ff0066'" onblur="this.style.borderColor='#2a2a2a'">
-
-    <div id="lg-err" style="color:#ff4444;font-size:12px;min-height:18px;margin-bottom:8px;text-align:center"></div>
-
-    <button id="lg-submit" onclick="doAuth()"
-      style="width:100%;padding:12px;border-radius:8px;border:none;background:#e8ff00;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:.04em">
-      登入
-    </button>
-
-    <div style="font-size:11px;color:#444;text-align:center;margin-top:14px">
-      新帳號同時可用於 ClawStockMarket 股市交易所
-    </div>
-  </div>
-</div>
-
-<!-- HERO 精簡橫條 -->
+<!-- HERO -->
 <div class="hero">
   <div class="hero-left">
-    <div class="hero-badge">2026 賽季進行中</div>
+    <div class="hero-badge">2026 Season in Progress</div>
     <div class="hero-text">
-      <h1>用卡牌預測 <span>F1</span>，讓你秒懂賽車</h1>
-      <p>收集車手卡牌、分析數據、預測比賽結果。不是賭博，是學習。</p>
+      <h1>Predict <span>F1</span> with Cards</h1>
+      <p>Collect driver cards, analyze data, predict race results. Not gambling — learning.</p>
     </div>
   </div>
   <div class="hero-btns">
-    <button class="btn-primary" onclick="user ? location.href='/race' : showLoginModal('login')">開始預測</button>
-    <button class="btn-secondary" onclick="document.querySelector('.newbie-section').scrollIntoView({behavior:'smooth'})">怎麼玩？</button>
+    <button class="btn-primary" onclick="user ? location.href='/race' : showModal('login')">Start Predicting</button>
+    <button class="btn-secondary" onclick="document.querySelector('.newbie-section').scrollIntoView({behavior:'smooth'})">How to Play?</button>
   </div>
 </div>
 
-<!-- 卡牌輪播 主視覺 -->
+<!-- Card Carousel -->
 <section class="carousel-section">
-  <div class="carousel-label">本季車手卡 · 移到中央卡片查看本站數據</div>
+  <div class="carousel-label">Season Driver Cards · Hover the center card to view race data</div>
   <div class="carousel-wrap">
     <button class="cnav cnav-l" id="c-nav-l">&#8249;</button>
     <div class="carousel-track" id="c-track"></div>
@@ -301,38 +284,38 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
 
   <div class="live-bar">
     <div class="live-dot"></div>
-    <span class="live-text">LIVE — 沙烏地阿拉伯大獎賽 4天後開跑</span>
-    <span class="live-count" id="liveCount">2,847 人正在下注</span>
+    <span class="live-text">LIVE — Saudi Arabian Grand Prix in 4 days</span>
+    <span class="live-count" id="liveCount">2,847 placing bets</span>
   </div>
 
   <div class="top-bar">
     <div class="top-card">
       <div class="tc-label">NEXT RACE</div>
       <div class="tc-main" style="color:#e8ff00">4 <span style="font-size:14px;color:#aaa">DAYS</span></div>
-      <div class="tc-sub">沙烏地阿拉伯大獎賽 · 吉達</div>
+      <div class="tc-sub">Saudi Arabian Grand Prix · Jeddah</div>
     </div>
     <div class="top-card">
       <div class="tc-label">SEASON LEADER</div>
       <div class="tc-main" style="color:#3671C6">Verstappen</div>
-      <div class="tc-sub">94 分 · 領先 Norris 16分</div>
+      <div class="tc-sub">94 pts · Leading Norris by 16 pts</div>
     </div>
     <div class="top-card">
       <div class="tc-label">YOUR STATUS</div>
       <div class="tc-main" style="color:#AFA9EC">SUZUKA</div>
-      <div class="tc-sub">準度 61% · 排名 #1,204</div>
+      <div class="tc-sub">Accuracy 61% · Rank #1,204</div>
     </div>
   </div>
 
   <div class="main-grid">
-    <!-- 熱門下注 -->
+    <!-- Hot Bets -->
     <div class="panel">
-      <div class="panel-title">本站熱門下注</div>
+      <div class="panel-title">Top Bets This Race</div>
       <div class="bet-row">
         <span class="bet-rank">1</span>
         <div class="bet-color" style="background:#3671C6"></div>
         <div class="bet-info">
           <div class="bet-name">Verstappen</div>
-          <div class="bet-reason">積分領先16分，吉達勝率50%，策略穩定</div>
+          <div class="bet-reason">Leading by 16 pts, 50% win rate at Jeddah, consistent strategy</div>
         </div>
         <div class="bet-odds-num" style="color:#3671C6">2.1x</div>
       </div>
@@ -342,7 +325,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div class="bet-color" style="background:#F47600"></div>
         <div class="bet-info">
           <div class="bet-name">Norris</div>
-          <div class="bet-reason">McLaren 進站最快 2.3秒，二停優勢大</div>
+          <div class="bet-reason">McLaren fastest pit stop 2.3s, big two-stop advantage</div>
         </div>
         <div class="bet-odds-num" style="color:#F47600">3.8x</div>
       </div>
@@ -352,7 +335,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div class="bet-color" style="background:#E8002D"></div>
         <div class="bet-info">
           <div class="bet-name">Leclerc</div>
-          <div class="bet-reason">街道賽專家，排位圈速全場最強</div>
+          <div class="bet-reason">Street circuit specialist, fastest qualifying lap</div>
         </div>
         <div class="bet-odds-num" style="color:#E8002D">5.5x</div>
       </div>
@@ -362,7 +345,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div class="bet-color" style="background:#E8002D"></div>
         <div class="bet-info">
           <div class="bet-name">Hamilton</div>
-          <div class="bet-reason">Ferrari 新陣容，雨戰最強車手</div>
+          <div class="bet-reason">New Ferrari lineup, best wet weather driver</div>
         </div>
         <div class="bet-odds-num" style="color:#ccc">6.8x</div>
       </div>
@@ -371,24 +354,24 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <span class="bet-rank" style="color:#e8ff00">★</span>
         <div class="bet-color" style="background:#e8ff00"></div>
         <div class="bet-info">
-          <div class="bet-name" style="color:#e8ff00">黑馬推薦</div>
-          <div class="bet-reason" style="color:#bbb">Gasly · 吉達歷史前五，賠率被市場低估</div>
+          <div class="bet-name" style="color:#e8ff00">Dark Horse Pick</div>
+          <div class="bet-reason" style="color:#bbb">Gasly · Top 5 at Jeddah historically, odds undervalued by market</div>
         </div>
         <div class="bet-odds-num" style="color:#e8ff00">18x</div>
       </div>
     </div>
 
-    <!-- 賽道解析 -->
+    <!-- Circuit Analysis -->
     <div class="panel">
-      <div class="panel-title">賽道快速解析</div>
+      <div class="panel-title">Circuit Quick Analysis</div>
       <div class="track-stats">
         <div class="track-stat">
           <div class="ts-num">8<span style="font-size:11px;color:#888">/10</span></div>
-          <div class="ts-label">難易度</div>
+          <div class="ts-label">Difficulty</div>
         </div>
         <div class="track-stat">
           <div class="ts-num">3<span style="font-size:11px;color:#888">/10</span></div>
-          <div class="ts-label">超車機會</div>
+          <div class="ts-label">Overtaking</div>
         </div>
       </div>
       <div style="text-align:center;margin-bottom:10px;">
@@ -400,71 +383,71 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         </svg>
       </div>
       <div class="track-tags">
-        <span class="tag highlight">夜間賽事</span>
-        <span class="tag">高速街道</span>
-        <span class="tag">3個DRS區</span>
-        <span class="tag danger">護牆超近</span>
+        <span class="tag highlight">Night Race</span>
+        <span class="tag">High-Speed Street</span>
+        <span class="tag">3 DRS Zones</span>
+        <span class="tag danger">Very Close Walls</span>
       </div>
-      <div class="track-strategy">⚡ 策略建議：一停為主，軟胎起跑。<br>排位賽決定七成結果——超車極難。</div>
+      <div class="track-strategy">⚡ Strategy: One-stop preferred, start on softs.<br>Qualifying decides 70% of the result — overtaking is very difficult.</div>
     </div>
 
-    <!-- 個人戰績 -->
+    <!-- Your Profile -->
     <div class="panel">
-      <div class="panel-title">你的本季戰績</div>
+      <div class="panel-title">Your Season Profile</div>
       <div class="rank-badge">
-        <span style="font-size:11px;color:#AFA9EC;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.08em">SUZUKA 等級</span>
+        <span style="font-size:11px;color:#AFA9EC;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.08em">SUZUKA TIER</span>
       </div>
       <div class="profile-stats">
-        <div class="ps-box"><div class="ps-num" style="color:#e8ff00">61%</div><div class="ps-label">預測準度</div></div>
-        <div class="ps-box"><div class="ps-num" style="color:#fff">4,280</div><div class="ps-label">累積代幣</div></div>
-        <div class="ps-box"><div class="ps-num" style="color:#ccc">#1,204</div><div class="ps-label">全站排名</div></div>
-        <div class="ps-box"><div class="ps-num" style="color:#ccc">23</div><div class="ps-label">已預測站數</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#e8ff00">61%</div><div class="ps-label">Accuracy</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#fff">4,280</div><div class="ps-label">Balance</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#ccc">#1,204</div><div class="ps-label">Global Rank</div></div>
+        <div class="ps-box"><div class="ps-num" style="color:#ccc">23</div><div class="ps-label">Races Predicted</div></div>
       </div>
-      <div class="panel-title" style="margin-bottom:6px">近三站結果</div>
+      <div class="panel-title" style="margin-bottom:6px">Last 3 Races</div>
       <div style="display:flex;gap:6px;margin-bottom:12px;">
-        <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">巴林</span></div>
-        <div style="text-align:center"><div class="result-dot result-loss">✗</div><span class="result-label">沙特</span></div>
-        <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">澳洲</span></div>
-        <div style="text-align:center"><div class="result-dot result-pending">?</div><span class="result-label">吉達</span></div>
+        <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">Bahrain</span></div>
+        <div style="text-align:center"><div class="result-dot result-loss">✗</div><span class="result-label">Saudi</span></div>
+        <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">Australia</span></div>
+        <div style="text-align:center"><div class="result-dot result-pending">?</div><span class="result-label">Jeddah</span></div>
       </div>
-      <button class="bet-now-btn" onclick="user ? location.href='/race' : showLoginModal('login')">立即押注 →</button>
+      <button class="bet-now-btn" onclick="user ? location.href='/race' : showModal('login')">Bet Now →</button>
     </div>
   </div>
 
   <!-- FEED -->
   <div class="feed-bar">
-    <div class="panel-title">即時動態</div>
+    <div class="panel-title">Live Feed</div>
     <div id="feedList"></div>
   </div>
 
   <!-- NEWBIE -->
   <div class="newbie-section">
-    <div class="newbie-title">第一次來？從這裡開始</div>
+    <div class="newbie-title">First time here? Start here</div>
     <div class="welcome-banner">
       <div class="wb-icon">🏁</div>
       <div class="wb-text">
-        <div class="wb-title">歡迎來到 PitLane！</div>
-        <div class="wb-sub">你不需要懂賽車——我們幫你看懂，你只需要押對人</div>
+        <div class="wb-title">Welcome to Throttenix!</div>
+        <div class="wb-sub">You don't need to know racing — we break it down for you, just pick the right driver</div>
       </div>
-      <button class="wb-btn">新手教學 →</button>
+      <button class="wb-btn">Beginner Guide →</button>
     </div>
     <div class="steps">
       <div class="step done">
-        <div class="step-header"><div class="step-num">✓</div><div class="step-title">建立帳號</div></div>
-        <div class="step-desc">已完成！你有 1,000 USDC 起始代幣可以用</div>
+        <div class="step-header"><div class="step-num">✓</div><div class="step-title">Create Account</div></div>
+        <div class="step-desc">Done! You have 1,000 USDC starting balance</div>
       </div>
       <div class="step current">
         <div class="current-arrow"></div>
-        <div class="step-header"><div class="step-num">2</div><div class="step-title">認識車手卡</div></div>
-        <div class="step-desc">看每個車手的能力數值，找到你覺得這站最強的人</div>
-        <div class="step-action">→ 去看車手卡</div>
+        <div class="step-header"><div class="step-num">2</div><div class="step-title">Explore Driver Cards</div></div>
+        <div class="step-desc">Check each driver's stats and find who you think is strongest this race</div>
+        <div class="step-action">→ View Driver Cards</div>
       </div>
       <div class="step">
-        <div class="step-header"><div class="step-num">3</div><div class="step-title">押注冠軍</div></div>
-        <div class="step-desc">選一個車手，押他拿冠軍，等比賽結果</div>
+        <div class="step-header"><div class="step-num">3</div><div class="step-title">Bet on the Winner</div></div>
+        <div class="step-desc">Pick a driver, bet on them to win, and wait for the race result</div>
       </div>
     </div>
-    <div class="panel-title" style="margin-bottom:8px">AI 今日推薦 · 給新手的最佳選擇</div>
+    <div class="panel-title" style="margin-bottom:8px">AI Today's Pick · Best choice for beginners</div>
     <div class="recommend-card">
       <div class="rc-badge" style="background:#F4760022;border:1px solid #F4760044">
         <div class="rc-num">4</div>
@@ -473,124 +456,58 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
       <div class="rc-info">
         <div class="rc-name">Lando Norris</div>
         <div class="rc-team" style="color:#F47600">McLaren F1 Team</div>
-        <div class="rc-reason">McLaren 本季進站全場最快（平均 2.3 秒），吉達高速賽道對 Norris 的超車能力非常有利。積分落後 Verstappen，這站必須積極搶分。</div>
+        <div class="rc-reason">McLaren has the fastest pit stop this season (avg 2.3s). Jeddah's high-speed layout suits Norris's overtaking ability. Trailing Verstappen in points, he must push for maximum points this race.</div>
         <div class="rc-stats">
-          <div class="rc-stat"><div class="rc-stat-num" style="color:#F47600">88</div><div class="rc-stat-label">超車能力</div></div>
-          <div class="rc-stat"><div class="rc-stat-num" style="color:#F47600">85</div><div class="rc-stat-label">輪胎管理</div></div>
-          <div class="rc-stat"><div class="rc-stat-num" style="color:#e8ff00">28%</div><div class="rc-stat-label">勝率預測</div></div>
+          <div class="rc-stat"><div class="rc-stat-num" style="color:#F47600">88</div><div class="rc-stat-label">Overtaking</div></div>
+          <div class="rc-stat"><div class="rc-stat-num" style="color:#F47600">85</div><div class="rc-stat-label">Tire Mgmt</div></div>
+          <div class="rc-stat"><div class="rc-stat-num" style="color:#e8ff00">28%</div><div class="rc-stat-label">Win Rate</div></div>
         </div>
       </div>
       <div class="rc-bet">
         <div class="rc-odds" style="color:#F47600">3.8x</div>
-        <div class="rc-odds-label">賠率</div>
-        <button class="rc-bet-btn" style="background:#F47600;color:#000">押他 →</button>
+        <div class="rc-odds-label">Odds</div>
+        <button class="rc-bet-btn" style="background:#F47600;color:#000">Bet →</button>
       </div>
     </div>
-    <div class="panel-title" style="margin-bottom:8px">新手須知</div>
+    <div class="panel-title" style="margin-bottom:8px">Beginner's Guide</div>
     <div class="tips">
       <div class="tip-card">
         <span class="tip-icon">🎯</span>
-        <div class="tip-title">賠率是什麼意思？</div>
-        <div class="tip-desc">賠率 <span class="tip-hi">3.8x</span> 表示押 100 USDC，贏了拿回 380 USDC。賠率越高 = 越冷門，但贏了賺更多。</div>
+        <div class="tip-title">What do odds mean?</div>
+        <div class="tip-desc">Odds of <span class="tip-hi">3.8x</span> mean bet 100 USDC, win and get 380 USDC back. Higher odds = longer shot, but bigger payout.</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">🌧</span>
-        <div class="tip-title">天氣會影響結果</div>
-        <div class="tip-desc">下雨天會完全改變比賽——平時弱的車手可能爆冷奪冠。看天氣預報再押注！</div>
+        <div class="tip-title">Weather changes everything</div>
+        <div class="tip-desc">Rain completely changes the race — weaker drivers can pull off surprise wins. Check the weather forecast before betting!</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">🏎</span>
-        <div class="tip-title">排位賽很重要</div>
-        <div class="tip-desc">吉達超車很難，<span class="tip-hi">排位賽第一名</span>有很大優勢。正賽前先看排位結果再押注。</div>
+        <div class="tip-title">Qualifying matters</div>
+        <div class="tip-desc">Overtaking is hard at Jeddah — <span class="tip-hi">pole position</span> has a big advantage. Check qualifying results before placing your bet.</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">📊</span>
-        <div class="tip-title">輸了也有收穫</div>
-        <div class="tip-desc">每次押注結束，AI 會告訴你<span class="tip-hi">為什麼對或錯</span>。輸了也學到東西，下次更準。</div>
+        <div class="tip-title">Learn even when you lose</div>
+        <div class="tip-desc">After every race, AI tells you <span class="tip-hi">why you were right or wrong</span>. Losses teach you something too — get better next time.</div>
       </div>
     </div>
-    <div class="panel-title" style="margin-bottom:8px">本站關鍵數字</div>
+    <div class="panel-title" style="margin-bottom:8px">Key Race Numbers</div>
     <div class="simple-stats">
-      <div class="ss-card"><span class="ss-emoji">🏁</span><div class="ss-num">57</div><div class="ss-label">比賽圈數</div><div class="ss-sub">約 2 小時</div></div>
-      <div class="ss-card"><span class="ss-emoji">⛽</span><div class="ss-num">1–2</div><div class="ss-label">預測進站次數</div><div class="ss-sub">一停策略為主</div></div>
-      <div class="ss-card"><span class="ss-emoji">🌡</span><div class="ss-num">28°C</div><div class="ss-label">賽道氣溫</div><div class="ss-sub">降雨機率 8%</div></div>
+      <div class="ss-card"><span class="ss-emoji">🏁</span><div class="ss-num">57</div><div class="ss-label">Race Laps</div><div class="ss-sub">~2 hours</div></div>
+      <div class="ss-card"><span class="ss-emoji">⛽</span><div class="ss-num">1–2</div><div class="ss-label">Pit Stops</div><div class="ss-sub">One-stop favored</div></div>
+      <div class="ss-card"><span class="ss-emoji">🌡</span><div class="ss-num">28°C</div><div class="ss-label">Track Temp</div><div class="ss-sub">Rain chance 8%</div></div>
     </div>
   </div>
 
 </div>
 
-<footer>© 2026 PitLane · 不是賭博，是用數據說話的賽車學習平台</footer>
+<footer>© 2026 Throttenix · Not gambling — a data-driven F1 learning platform</footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
 // ─── AUTH ───
-let authMode = 'login';
-
-function showLoginModal(mode) {
-  authMode = mode || 'login';
-  switchAuthTab(authMode);
-  document.getElementById('lg-err').textContent = '';
-  document.getElementById('login-overlay').style.display = 'flex';
-  setTimeout(() => document.getElementById('lg-user').focus(), 80);
-}
-function closeLoginModal() { document.getElementById('login-overlay').style.display = 'none'; }
-
-function switchAuthTab(mode) {
-  authMode = mode;
-  const isReg = mode === 'register';
-  document.getElementById('lg-email').style.display = isReg ? 'block' : 'none';
-  document.getElementById('modal-mode-label').textContent = isReg ? '新帳號' : '登入';
-  document.getElementById('lg-submit').textContent = isReg ? '建立帳號' : '登入';
-  document.getElementById('lg-pass').placeholder = isReg ? '密碼（8 位以上）' : '密碼';
-  document.getElementById('lg-pass').autocomplete = isReg ? 'new-password' : 'current-password';
-  document.getElementById('lg-err').textContent = '';
-  const on = 'background:#e8ff00;color:#000', off = 'background:transparent;color:#666';
-  document.getElementById('tab-login').style.cssText += isReg ? off : on;
-  document.getElementById('tab-register').style.cssText += isReg ? on : off;
-}
-
-async function doAuth() {
-  const u = document.getElementById('lg-user').value.trim();
-  const p = document.getElementById('lg-pass').value;
-  const errEl = document.getElementById('lg-err');
-  if (!u || !p) { errEl.textContent = '請輸入帳號和密碼'; return; }
-  const btn = document.getElementById('lg-submit');
-  btn.disabled = true; btn.textContent = '處理中…';
-  try {
-    let d;
-    if (authMode === 'register') {
-      const e = document.getElementById('lg-email').value.trim();
-      if (!e) { errEl.textContent = '請輸入 Email'; btn.disabled=false; btn.textContent='建立帳號'; return; }
-      d = await api('/api/auth/register', {method:'POST', body:JSON.stringify({username:u, email:e, password:p})});
-    } else {
-      d = await api('/api/auth/login', {method:'POST', body:JSON.stringify({username:u, password:p})});
-    }
-    token = d.access_token; user = {username: d.username, balance: d.balance};
-    localStorage.setItem('pitlane_token', token);
-    localStorage.setItem('pitlane_user', JSON.stringify(user));
-    closeLoginModal(); updateNavAuth(); loadPage();
-  } catch(e) {
-    errEl.textContent = e?.detail || e?.message || '登入失敗，請確認帳號密碼';
-    btn.disabled = false; btn.textContent = authMode === 'register' ? '建立帳號' : '登入';
-  }
-}
-
-function updateNavAuth(){
-  const el = document.getElementById('nav-auth');
-  if(user){
-    el.innerHTML = `
-      <span style="font-family:'Share Tech Mono';font-size:12px;color:#e8ff00;padding:4px 8px;background:#e8ff0010;border:1px solid #e8ff0025;border-radius:5px">◆ ${Number(user.balance||0).toLocaleString()}</span>
-      <span style="font-size:12px;color:#aaa">${user.username}</span>
-      <button class="btn-login" onclick="token=null;user=null;localStorage.removeItem('pitlane_token');localStorage.removeItem('pitlane_user');updateNavAuth()">登出</button>`;
-  } else {
-    el.innerHTML = `<button class="btn-login" onclick="showLoginModal('login')">登入</button><button class="btn-register" onclick="showLoginModal('register')">加入</button>`;
-  }
-}
-document.addEventListener('keydown', e => {
-  if(e.key==='Escape') closeLoginModal();
-  if(e.key==='Enter' && document.getElementById('login-overlay').style.display==='flex') doAuth();
-});
-updateNavAuth();
+updateAuthUI();
 
 // ─── LOAD REAL DATA ───
 async function loadPage() {
@@ -599,7 +516,7 @@ async function loadPage() {
     const race = await api('/api/races/current');
     const raceDate = new Date(race.date);
     const days = Math.max(0, Math.floor((raceDate - new Date()) / 86400000));
-    document.querySelector('.live-text').textContent = `LIVE — ${race.race_name} ${days}天後開跑`;
+    document.querySelector('.live-text').textContent = `LIVE — ${race.race_name} in ${days} days`;
     document.querySelector('.top-bar').children[0].querySelector('.tc-main').innerHTML = `${days} <span style="font-size:14px;color:#aaa">DAYS</span>`;
     document.querySelector('.top-bar').children[0].querySelector('.tc-sub').textContent = `${race.race_name} · ${race.circuit}`;
   } catch(e) {}
@@ -623,13 +540,13 @@ async function loadPage() {
           <div class="bet-color" style="background:${tc}"></div>
           <div class="bet-info">
             <div class="bet-name">${o.name?.split(' ').pop()}</div>
-            <div class="bet-reason">勝率 ${o.win_probability}%</div>
+            <div class="bet-reason">Win rate ${o.win_probability}%</div>
           </div>
           <div class="bet-odds-num" style="color:${tc}">${o.winner_odds}x</div>
         </div>
         <div class="bet-bar-wrap"><div class="bet-bar" style="width:${o.win_probability}%;background:${tc}"></div></div>`;
       }).join('');
-      betPanel.innerHTML = `<div class="panel-title">本站熱門下注</div>${betsHtml}`;
+      betPanel.innerHTML = `<div class="panel-title">Top Bets This Race</div>${betsHtml}`;
     }
 
     // Leader
@@ -645,12 +562,12 @@ async function loadPage() {
 (function(){
   const BASE = 'https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers';
   const DR = [
-    {num:'1', name:'Verstappen',team:'Red Bull',    color:'#3671C6',img:`${BASE}/M/MAXVER01_Max_Verstappen/maxver01.png.transform/4col/image.png`,   rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:95,t:88,w:92,o:85},ovr:91,win:42,odds:2.1,pts:94,passive:'冠軍心態',  skills:[{n:'雨中之神',s:'★★★'},{n:'開賽衝刺',s:'★★'}]},
-    {num:'4', name:'Norris',    team:'McLaren',     color:'#F47600',img:`${BASE}/L/LANNOR01_Lando_Norris/lannor01.png.transform/4col/image.png`,     rarity:'SPA',    rBg:'#060810',rC:'#00ccff',rB:'#00b8ff',s:{q:90,t:85,w:78,o:88},ovr:85,win:28,odds:3.8,pts:78,passive:'橘色閃電',  skills:[{n:'超車機器',s:'★★★'},{n:'輪胎刺客',s:'★★'}]},
-    {num:'16',name:'Leclerc',   team:'Ferrari',     color:'#E8002D',img:`${BASE}/C/CHALEC01_Charles_Leclerc/chalec01.png.transform/4col/image.png`,  rarity:'SUZUKA', rBg:'#1a1a2e',rC:'#AFA9EC',rB:'#534AB7',s:{q:92,t:80,w:75,o:78},ovr:83,win:18,odds:5.5,pts:61,passive:'摩納哥之子',skills:[{n:'排位飛人',s:'★★★'},{n:'街道賽王',s:'★★★'}]},
-    {num:'44',name:'Hamilton',  team:'Ferrari',     color:'#E8002D',img:`${BASE}/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/4col/image.png`,   rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:88,t:90,w:95,o:82},ovr:89,win:15,odds:6.8,pts:52,passive:'七冠傳說',  skills:[{n:'雨神降臨',s:'★★★'},{n:'逆轉大師',s:'★★★'}]},
-    {num:'63',name:'Russell',   team:'Mercedes',    color:'#27F4D2',img:`${BASE}/G/GEORUS01_George_Russell/georus01.png.transform/4col/image.png`,   rarity:'MONZA',  rBg:'#0d1a18',rC:'#27F4D2',rB:'#1D9E75',s:{q:87,t:78,w:80,o:76},ovr:79,win:8, odds:12, pts:44,passive:'積分獵人',  skills:[{n:'穩定完賽',s:'★★★'},{n:'進站把握',s:'★★'}]},
-    {num:'81',name:'Piastri',   team:'McLaren',     color:'#F47600',img:`${BASE}/O/OSCPIA01_Oscar_Piastri/oscpia01.png.transform/4col/image.png`,    rarity:'MONZA',  rBg:'#0d1a18',rC:'#00ccff',rB:'#00b8ff',s:{q:88,t:84,w:76,o:82},ovr:82,win:12,odds:4.5,pts:72,passive:'沉默殺手',  skills:[{n:'彎道大師',s:'★★★'},{n:'輪胎管理',s:'★★'}]},
+    {num:'1', name:'Verstappen',team:'Red Bull',    color:'#3671C6',img:`${BASE}/M/MAXVER01_Max_Verstappen/maxver01.png.transform/4col/image.png`,   rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:95,t:88,w:92,o:85},ovr:91,win:42,odds:2.1,pts:94,passive:'Champion Mindset',  skills:[{n:'Rain God',s:'★★★'},{n:'Race Start',s:'★★'}]},
+    {num:'4', name:'Norris',    team:'McLaren',     color:'#F47600',img:`${BASE}/L/LANNOR01_Lando_Norris/lannor01.png.transform/4col/image.png`,     rarity:'SPA',    rBg:'#060810',rC:'#00ccff',rB:'#00b8ff',s:{q:90,t:85,w:78,o:88},ovr:85,win:28,odds:3.8,pts:78,passive:'Orange Flash',  skills:[{n:'Overtake Machine',s:'★★★'},{n:'Tire Assassin',s:'★★'}]},
+    {num:'16',name:'Leclerc',   team:'Ferrari',     color:'#E8002D',img:`${BASE}/C/CHALEC01_Charles_Leclerc/chalec01.png.transform/4col/image.png`,  rarity:'SUZUKA', rBg:'#1a1a2e',rC:'#AFA9EC',rB:'#534AB7',s:{q:92,t:80,w:75,o:78},ovr:83,win:18,odds:5.5,pts:61,passive:'Son of Monaco',skills:[{n:'Quali Flyer',s:'★★★'},{n:'Street King',s:'★★★'}]},
+    {num:'44',name:'Hamilton',  team:'Ferrari',     color:'#E8002D',img:`${BASE}/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/4col/image.png`,   rarity:'MONACO', rBg:'#1e1400',rC:'#e8ff00',rB:'#BA7517',s:{q:88,t:90,w:95,o:82},ovr:89,win:15,odds:6.8,pts:52,passive:'7-Time Legend',  skills:[{n:'Rain God',s:'★★★'},{n:'Comeback Master',s:'★★★'}]},
+    {num:'63',name:'Russell',   team:'Mercedes',    color:'#27F4D2',img:`${BASE}/G/GEORUS01_George_Russell/georus01.png.transform/4col/image.png`,   rarity:'MONZA',  rBg:'#0d1a18',rC:'#27F4D2',rB:'#1D9E75',s:{q:87,t:78,w:80,o:76},ovr:79,win:8, odds:12, pts:44,passive:'Points Hunter',  skills:[{n:'Consistent Finisher',s:'★★★'},{n:'Pit Timing',s:'★★'}]},
+    {num:'81',name:'Piastri',   team:'McLaren',     color:'#F47600',img:`${BASE}/O/OSCPIA01_Oscar_Piastri/oscpia01.png.transform/4col/image.png`,    rarity:'MONZA',  rBg:'#0d1a18',rC:'#00ccff',rB:'#00b8ff',s:{q:88,t:84,w:76,o:82},ovr:82,win:12,odds:4.5,pts:72,passive:'Silent Killer',  skills:[{n:'Corner Master',s:'★★★'},{n:'Tire Management',s:'★★'}]},
   ];
 
   const SIZES = {
@@ -685,7 +602,7 @@ async function loadPage() {
 
       const artH = Math.round(s.h * 0.50);
       const statP = s.np;
-      const statRows = ['單圈','輪胎','雨戰','超車'].map((l,i)=>{
+      const statRows = ['SPD','TYR','WET','OVT'].map((l,i)=>{
         const v = [d.s.q,d.s.t,d.s.w,d.s.o][i];
         return `<div class="ds-row" style="padding:0 ${statP}px;">
           <span class="ds-l" style="font-size:${s.sl}px;width:${s.sl*3.2}px">${l}</span>
@@ -697,16 +614,16 @@ async function loadPage() {
       const ftPad = Math.round(s.w*.05);
       const hover = isCtr ? `
         <div class="dc-hover">
-          <div class="dh-t">本站數據 · 吉達</div>
-          <div class="dh-row"><span class="dh-l">勝率預測</span><span class="dh-v hi">${d.win}%</span></div>
-          <div class="dh-row"><span class="dh-l">市場賠率</span><span class="dh-v hi">${d.odds}x</span></div>
-          <div class="dh-row"><span class="dh-l">賽季積分</span><span class="dh-v">${d.pts} pts</span></div>
+          <div class="dh-t">Race Data · Jeddah</div>
+          <div class="dh-row"><span class="dh-l">Win Rate</span><span class="dh-v hi">${d.win}%</span></div>
+          <div class="dh-row"><span class="dh-l">Market Odds</span><span class="dh-v hi">${d.odds}x</span></div>
+          <div class="dh-row"><span class="dh-l">Season PTS</span><span class="dh-v">${d.pts} pts</span></div>
           <div style="margin-top:4px">
-            <div class="dh-t" style="margin-bottom:4px">技能</div>
-            <div class="dskill"><span class="dsk-n">${d.passive}</span><span class="dsk-s">被動</span></div>
+            <div class="dh-t" style="margin-bottom:4px">Skills</div>
+            <div class="dskill"><span class="dsk-n">${d.passive}</span><span class="dsk-s">Passive</span></div>
             ${d.skills.map(s=>`<div class="dskill"><span class="dsk-n">${s.n}</span><span class="dsk-s">${s.s}</span></div>`).join('')}
           </div>
-          <button class="dbet" style="background:${d.color};color:#fff" onclick="event.stopPropagation();location.href='/race'">押 ${d.name} →</button>
+          <button class="dbet" style="background:${d.color};color:#fff" onclick="event.stopPropagation();location.href='/race'">Bet ${d.name} →</button>
         </div>` : '';
 
       slot.innerHTML = `
@@ -734,20 +651,41 @@ async function loadPage() {
       track.appendChild(slot);
     }
 
+    // macOS Dock: continuous mousemove calculates each card's distance from cursor
     const slots = track.querySelectorAll('.cs');
-    slots.forEach((sl, si)=>{
-      sl.addEventListener('mouseenter', ()=>{
-        slots.forEach((s,sj)=>{
-          s.classList.remove('hself','hnear','hfar');
-          const d = Math.abs(si-sj);
-          if(d===0) s.classList.add('hself');
-          else if(d===1) s.classList.add('hnear');
-          else if(d===2) s.classList.add('hfar');
-        });
+    const DOCK_R = 170;   // px influence radius
+    const DOCK_MAX = 1.18; // max scale at cursor center
+    const DOCK_LIFT = 18;  // max lift (px) at cursor center
+
+    track.addEventListener('mousemove', e => {
+      const mx = e.clientX;
+      slots.forEach(sl => {
+        const r   = sl.getBoundingClientRect();
+        const cx  = (r.left + r.right) / 2;
+        const d   = Math.abs(mx - cx);
+        const dc  = sl.querySelector('.dc');
+        if (d < DOCK_R) {
+          const t = 1 - d / DOCK_R;
+          const sc = 1 + (DOCK_MAX - 1) * t * t;
+          const ly = -DOCK_LIFT * t * t;
+          dc.style.transform = `translateY(${ly}px) scale(${sc})`;
+          dc.style.opacity = '';
+          dc.style.zIndex  = Math.round(t * 20) + '';
+        } else {
+          dc.style.transform = '';
+          dc.style.opacity   = d > DOCK_R * 2.2 ? '0.4' : '';
+          dc.style.zIndex    = '';
+        }
       });
     });
-    track.addEventListener('mouseleave', ()=>{
-      slots.forEach(s=>s.classList.remove('hself','hnear','hfar'));
+    track.addEventListener('mouseleave', () => {
+      slots.forEach(sl => {
+        const dc = sl.querySelector('.dc');
+        dc.style.transform = '';
+        dc.style.opacity   = '';
+        dc.style.zIndex    = '';
+        sl.classList.remove('hself','hnear','hfar');
+      });
     });
 
     dots.innerHTML = '';
@@ -801,12 +739,12 @@ loadPage();
 
 // FEED
 const FEED=[
-  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'押注了 <span class="hi">Verstappen 奪冠</span> · 500 USDC',time:'剛剛'},
-  {u:'SpeedDemon', c:'#E8002D',i:'SD',t:'解鎖了 <span class="hi">SUZUKA 等級卡</span> · 連續命中5站',time:'1分鐘前'},
-  {u:'F1Expert',   c:'#F47600',i:'FE',t:'挑戰 MX · <span class="hi">Norris vs Hamilton</span> · 1,000 USDC',time:'2分鐘前'},
-  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'命中預測 <span class="hi">最快圈速 Norris</span> · +300 USDC',time:'3分鐘前'},
-  {u:'ApexHunter', c:'#534AB7',i:'AH',t:'獲得 <span class="hi">MONACO 傳奇卡</span> · 舒馬克2004版',time:'5分鐘前'},
-  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'押注了 <span class="hi">Ferrari 前三名組合</span> · 800 USDC',time:'7分鐘前'},
+  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'bet on <span class="hi">Verstappen to win</span> · 500 USDC',time:'just now'},
+  {u:'SpeedDemon', c:'#E8002D',i:'SD',t:'unlocked <span class="hi">SUZUKA tier card</span> · 5 consecutive hits',time:'1 min ago'},
+  {u:'F1Expert',   c:'#F47600',i:'FE',t:'challenged MX · <span class="hi">Norris vs Hamilton</span> · 1,000 USDC',time:'2 min ago'},
+  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'hit prediction <span class="hi">fastest lap Norris</span> · +300 USDC',time:'3 min ago'},
+  {u:'ApexHunter', c:'#534AB7',i:'AH',t:'claimed <span class="hi">MONACO legend card</span> · Schumacher 2004',time:'5 min ago'},
+  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'bet on <span class="hi">Ferrari top 3 combo</span> · 800 USDC',time:'7 min ago'},
 ];
 document.getElementById('feedList').innerHTML=FEED.map(f=>`
   <div class="feed-item">
@@ -817,7 +755,7 @@ document.getElementById('feedList').innerHTML=FEED.map(f=>`
 `).join('');
 
 let n=2847;
-setInterval(()=>{ n+=Math.floor(Math.random()*3+1); document.getElementById('liveCount').textContent=n.toLocaleString()+' 人正在下注'; },4000);
+setInterval(()=>{ n+=Math.floor(Math.random()*3+1); document.getElementById('liveCount').textContent=n.toLocaleString()+' placing bets'; },4000);
 
 let fi=0;
 setInterval(()=>{

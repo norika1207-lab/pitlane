@@ -3,15 +3,15 @@
    ═══════════════════════════════════════════ */
 
 const API = '';  // same origin
-let token = localStorage.getItem('pitlane_token');
-let user = JSON.parse(localStorage.getItem('pitlane_user') || 'null');
+let token = localStorage.getItem('throttenix_token');
+let user = JSON.parse(localStorage.getItem('throttenix_user') || 'null');
 
 // ─── API HELPER ───
 async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { ...opts, headers });
-  if (res.status === 401) { logout(); throw new Error('請重新登入'); }
+  if (res.status === 401) { logout(); throw new Error('Please log in again'); }
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'API Error');
   return data;
@@ -25,11 +25,11 @@ function updateAuthUI() {
     authArea.innerHTML = `
       <span class="nav-coins">◆ <span id="user-coins">${formatNum(user.balance)}</span></span>
       <span style="color:var(--text-secondary);font-size:14px">${user.username}</span>
-      <button class="btn btn-outline btn-sm" onclick="logout()">登出</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Log Out</button>
     `;
   } else {
     authArea.innerHTML = `
-      <button class="btn btn-gold btn-sm" onclick="showModal('login')">登入</button>
+      <button class="btn btn-gold btn-sm" onclick="showModal('login')">Log In</button>
     `;
   }
 }
@@ -44,7 +44,7 @@ async function refreshBalance() {
   try {
     const data = await api('/api/auth/me');
     user.balance = data.balance;
-    localStorage.setItem('pitlane_user', JSON.stringify(user));
+    localStorage.setItem('throttenix_user', JSON.stringify(user));
     const el = document.getElementById('user-coins');
     if (el) el.textContent = formatNum(data.balance);
   } catch (e) {}
@@ -57,8 +57,8 @@ async function login(username, password) {
   });
   token = data.access_token;
   user = { username: data.username, balance: data.balance };
-  localStorage.setItem('pitlane_token', token);
-  localStorage.setItem('pitlane_user', JSON.stringify(user));
+  localStorage.setItem('throttenix_token', token);
+  localStorage.setItem('throttenix_user', JSON.stringify(user));
   updateAuthUI();
   closeModal();
 }
@@ -66,8 +66,8 @@ async function login(username, password) {
 function logout() {
   token = null;
   user = null;
-  localStorage.removeItem('pitlane_token');
-  localStorage.removeItem('pitlane_user');
+  localStorage.removeItem('throttenix_token');
+  localStorage.removeItem('throttenix_user');
   updateAuthUI();
 }
 
@@ -78,25 +78,21 @@ function showModal(type) {
   overlay.classList.add('active');
 
   modal.innerHTML = `
-    <h2>登入 PitLane</h2>
+    <h2>Log In to Throttenix</h2>
     <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;text-align:center">
-      使用你的 ClawStockMarket 交易所帳號
+      Use your ClawStockMarket account
     </p>
     <div class="form-group">
-      <label>帳號 / Email</label>
-      <input type="text" id="login-username" placeholder="交易所帳號或 Email" />
-    </div>
-    <div class="form-group">
-      <label>密碼</label>
-      <input type="password" id="login-password" placeholder="密碼" />
+      <label>Username / Email</label>
+      <input type="text" id="login-username" placeholder="Exchange username or Email" />
     </div>
     <div id="auth-error" class="error-msg"></div>
     <div class="form-actions">
-      <button class="btn btn-outline" onclick="closeModal()">取消</button>
-      <button class="btn btn-gold" onclick="handleLogin()">登入</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="handleLogin()">Log In</button>
     </div>
     <div class="switch-link" style="margin-top:16px">
-      還沒有帳號？到 <a href="https://clawstockmarket.com" target="_blank">交易所</a> 註冊
+      No account? Register at <a href="https://clawstockmarket.com" target="_blank">ClawStockMarket</a>
     </div>
   `;
 
@@ -110,12 +106,10 @@ function closeModal() {
 
 async function handleLogin() {
   const u = document.getElementById('login-username').value.trim();
-  const p = document.getElementById('login-password').value;
   const errEl = document.getElementById('auth-error');
-  if (!u || !p) { errEl.textContent = '請輸入帳號和密碼'; return; }
+  if (!u) { errEl.textContent = 'Please enter your username or email'; return; }
   try {
-    await login(u, p);
-    // Reload page to refresh data
+    await login(u, '');
     location.reload();
   } catch (err) {
     errEl.textContent = err.message;
@@ -166,10 +160,10 @@ function rarityClass(rarity) {
 
 function rarityLabel(rarity) {
   const map = {
-    silverstone: '銀石 Silverstone',
-    monza: '蒙扎 Monza',
-    suzuka: '鈴鹿 Suzuka',
-    monaco: '摩納哥 Monaco',
+    silverstone: 'Silverstone',
+    monza: 'Monza',
+    suzuka: 'Suzuka',
+    monaco: 'Monaco',
   };
   return map[rarity] || map.silverstone;
 }

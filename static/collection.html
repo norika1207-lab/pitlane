@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Throttenix — Card Collection</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; min-height: 100vh; }
+.main { max-width: 1300px; margin: 0 auto; padding: 32px 24px 64px; }
+
+/* ─── PAGE HEADER ─── */
+.page-header { margin-bottom: 24px; }
+.page-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase; color: #e8ff00; margin-bottom: 6px; }
+.page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; color: #fff; }
+.page-sub { font-size: 13px; color: #555; margin-top: 4px; }
+
+/* ─── SEASON TABS ─── */
+.season-bar {
+  display: flex; align-items: center; gap: 0;
+  border-bottom: 1px solid #1e1e1e; margin-bottom: 32px; overflow-x: auto;
+}
+.s-tab {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: #555; font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+  font-weight: 700; letter-spacing: .06em; padding: 12px 20px;
+  cursor: pointer; white-space: nowrap; transition: all .18s;
+  text-transform: uppercase;
+}
+.s-tab:hover { color: #aaa; }
+.s-tab.active { color: #e8ff00; border-bottom-color: #e8ff00; }
+.s-tab .s-champ { font-size: 9px; color: #555; display: block; margin-top: 1px; font-weight: 400; letter-spacing: .04em; }
+.s-tab.active .s-champ { color: #888; }
+
+/* ─── STATS ROW ─── */
+.col-stats-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+.col-stat-pill { background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+  padding: 9px 16px; display: flex; flex-direction: column; gap: 2px; }
+.csp-num { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: #e8ff00; line-height: 1; }
+.csp-label { font-size: 9px; color: #555; letter-spacing: .08em; font-family: 'Barlow Condensed', sans-serif; }
+
+/* ─── ALBUM GRID ─── */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 64px 48px;
+  padding: 8px 0;
+}
+
+/* ─── LOADING ─── */
+.col-loading { grid-column: 1/-1; text-align: center; padding: 60px;
+  color: #444; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; letter-spacing: .1em; }
+
+/* ─── CARD UNIT ─── */
+.col-unit { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+
+/* ─── FRAME ─── */
+.col-frame { position: relative; margin: 16px; will-change: transform; transform-style: preserve-3d; }
+.col-frame::after {
+  content: ''; position: absolute; bottom: -22px; left: 8%; right: 8%;
+  height: 14px; background: radial-gradient(ellipse, rgba(0,0,0,.7), transparent 70%);
+  filter: blur(8px); z-index: -1; transition: all .5s;
+}
+.col-unit:hover .col-frame::after { bottom: -38px; left: 12%; right: 12%; opacity: .8; }
+
+/* ─── CARD BODY 260×420 ─── */
+.col-card {
+  width: 260px; height: 420px; border-radius: 10px; overflow: hidden;
+  position: relative; display: flex; flex-direction: column; z-index: 5;
+}
+
+/* ─── ACRYLIC PLATE ─── */
+.col-acrylic {
+  position: absolute; top: -14px; left: -14px; right: -14px; bottom: -14px;
+  border-radius: 7px; z-index: 10; pointer-events: none;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 18%,
+    rgba(255,255,255,.01) 42%, rgba(255,255,255,.01) 58%,
+    rgba(255,255,255,.05) 78%, rgba(255,255,255,.16) 100%);
+  border: 1px solid rgba(255,255,255,.38);
+  box-shadow: 0 8px 30px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.3),
+    inset 0 2px 0 rgba(255,255,255,.28), inset 2px 0 0 rgba(255,255,255,.10);
+}
+.col-acrylic::before {
+  content: ''; position: absolute; top: 4px; left: 20px; right: 20px; height: 6px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.28), transparent);
+  border-radius: 4px; filter: blur(1.5px);
+}
+.col-mag { position: absolute; width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #d8d8d8 0%, #b0b0b0 35%, #808080 65%, #505050 100%);
+  box-shadow: 0 1px 3px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.4); }
+.col-mag::after { content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); width: 3px; height: 3px; border-radius: 50%;
+  background: radial-gradient(#333, #111); }
+.col-mag.tl { top: 8px; left: 8px; }
+.col-mag.tr { top: 8px; right: 8px; }
+.col-mag.bl { bottom: 8px; left: 8px; }
+.col-mag.br { bottom: 8px; right: 8px; }
+
+/* ─── GLOW + SHINE ─── */
+.col-glow { position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
+  border-radius: 9px; pointer-events: none; z-index: -1; transition: opacity .4s; }
+.col-shine { position: absolute; inset: 0; z-index: 20; pointer-events: none;
+  border-radius: 10px; opacity: 0; transition: opacity .3s; }
+
+/* ─── OWNED BADGE ─── */
+.col-owned-badge {
+  position: absolute; top: -8px; right: -8px; z-index: 25;
+  background: #e8ff00; color: #000; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; font-weight: 900; letter-spacing: .06em;
+  padding: 2px 7px; border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(232,255,0,.5);
+}
+
+/* ─── SWEEP ─── */
+.col-sweep { position: absolute; inset: 0; z-index: 15; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.09) 50%, transparent 65%);
+  animation: col-sweep 7s ease-in-out infinite; }
+@keyframes col-sweep { 0%,100% { transform: translateX(-200%) } 50% { transform: translateX(300%) } }
+
+/* ─── CARD INTERIOR ─── */
+.col-bg  { position: absolute; inset: 0; opacity: .09; pointer-events: none; }
+.col-tb  { position: absolute; top: 0; left: 0; right: 0; height: 4px; z-index: 6; }
+.col-gr  { position: absolute; top: 10px; left: 12px; font-size: 9px; font-weight: 900;
+           letter-spacing: .12em; z-index: 6; font-family: 'Barlow Condensed', sans-serif; }
+.col-nm  { position: absolute; top: 4px; right: 10px; font-size: 64px; font-weight: 900;
+           opacity: .07; color: #fff; line-height: 1; z-index: 2; }
+
+/* ─── DRIVER PHOTO / PLACEHOLDER ─── */
+.col-art { height: 47%; overflow: hidden; position: relative; z-index: 3; flex-shrink: 0; }
+.col-driver-img { width: 100%; height: 100%; object-fit: cover; object-position: center 8%; display: block; }
+.col-driver-ph {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+}
+.col-driver-ph .ph-code { font-family: 'Barlow Condensed', sans-serif; font-size: 44px; font-weight: 900;
+  color: #fff; opacity: .7; line-height: 1; }
+.col-driver-ph .ph-pos  { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; opacity: .4; }
+
+.col-n   { font-size: 20px; font-weight: 900; color: #fff; padding: 6px 12px 2px; line-height: 1;
+           position: relative; z-index: 3; font-family: 'Barlow Condensed', sans-serif; }
+.col-t   { font-size: 11px; padding: 0 12px 5px; position: relative; z-index: 3;
+           font-family: 'Barlow Condensed', sans-serif; }
+.col-sts { padding: 0 12px; position: relative; z-index: 3; }
+.col-sr  { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.col-sl  { font-size: 10px; width: 28px; font-family: 'Barlow Condensed', sans-serif; }
+.col-sb  { flex: 1; height: 3px; border-radius: 2px; overflow: hidden; }
+.col-sf  { height: 100%; border-radius: 2px; }
+.col-sv  { font-size: 10px; font-weight: 700; width: 18px; text-align: right;
+           font-family: 'Barlow Condensed', sans-serif; }
+
+/* ─── STR / WK TAGS ─── */
+.col-sw  { padding: 5px 12px 3px; position: relative; z-index: 3;
+           border-top: 1px solid rgba(255,255,255,.06); margin-top: 3px; }
+.col-sw-row { display: flex; align-items: flex-start; gap: 5px; margin-bottom: 4px; }
+.col-sw-label { font-size: 8px; font-weight: 900; font-family: 'Barlow Condensed', sans-serif;
+                width: 10px; flex-shrink: 0; padding-top: 2px; }
+.col-sw-tags  { display: flex; flex-wrap: wrap; gap: 3px; }
+.col-sw-tag   { font-size: 9px; font-family: 'Barlow Condensed', sans-serif;
+                padding: 2px 6px; border-radius: 3px; letter-spacing: .02em; }
+.col-sw-tag.str { background: rgba(68,255,136,.1); color: #44ff88; border: 1px solid rgba(68,255,136,.25); }
+.col-sw-tag.wk  { background: rgba(255,80,80,.1);  color: #ff6060; border: 1px solid rgba(255,80,80,.25); }
+
+/* ─── BOTTOM BAR ─── */
+.col-bot { position: absolute; bottom: 0; left: 0; right: 0; padding: 7px 12px;
+           border-top: 1px solid rgba(255,255,255,.1);
+           display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; z-index: 3; }
+.col-bw  { font-size: 16px; font-weight: 900; color: #44ff88; line-height: 1;
+           font-family: 'Barlow Condensed', sans-serif; }
+.col-bwl { font-size: 8px; color: #555; font-family: 'Barlow Condensed', sans-serif; }
+.col-bov { font-size: 28px; font-weight: 900; line-height: 1; text-align: center;
+           font-family: 'Barlow Condensed', sans-serif; }
+.col-bovl{ font-size: 8px; color: #555; text-align: center; font-family: 'Barlow Condensed', sans-serif; }
+.col-bod { font-size: 16px; font-weight: 900; color: #e8ff00; line-height: 1; text-align: right;
+           font-family: 'Barlow Condensed', sans-serif; }
+.col-bodl{ font-size: 8px; color: #555; text-align: right; font-family: 'Barlow Condensed', sans-serif; }
+
+/* ─── TIER DECORATIONS ─── */
+.col-mo-r { position: absolute; inset: -60%;
+  background: conic-gradient(transparent 0deg, rgba(201,168,76,.12) 40deg,
+    transparent 120deg, rgba(201,168,76,.10) 200deg, transparent 360deg);
+  animation: col-spin 6s linear infinite; z-index: 1; pointer-events: none; }
+@keyframes col-spin { to { transform: rotate(360deg) } }
+.col-spa-rb { position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg,#ff0080,#ff8800,#ffff00,#00ff80,#00b8ff,#8800ff,#ff0080);
+  animation: col-rb 2s linear infinite; z-index: 10; }
+@keyframes col-rb { 0% { filter: hue-rotate(0deg) } 100% { filter: hue-rotate(360deg) } }
+
+/* ─── BELOW CARD ─── */
+.col-lv { text-align: center; }
+.col-lv-t { font-size: 9px; font-weight: 700; letter-spacing: .06em; margin-bottom: 4px;
+            font-family: 'Barlow Condensed', sans-serif; }
+.col-lv-bg { width: 200px; height: 4px; background: #222; border-radius: 2px; overflow: hidden; margin: 0 auto; }
+.col-lv-f  { height: 100%; border-radius: 2px; }
+.col-atag  { font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 4px 14px;
+             border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; }
+.col-alabel{ font-size: 11px; color: #444; letter-spacing: .06em; font-family: 'Barlow Condensed', sans-serif; }
+
+/* ─── EMPTY SLOT ─── */
+.col-empty { width: 260px; height: 420px; border-radius: 10px;
+  border: 1px dashed #222; display: flex; align-items: center;
+  justify-content: center; color: #2a2a2a; font-size: 32px; background: #0d0d0d; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>THROTTENIX</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/race">Race</a>
+      <a href="/cards">Cards</a>
+      <a href="/collection" class="active">Collection</a>
+      <a href="/battle">Battle</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/history">History</a>
+      <a href="/halloffame">Hall of Fame</a>
+      <a href="/car-explorer">Car Explorer</a>
+      <a href="/profile">Profile</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modal-overlay"><div class="modal" id="auth-modal"></div></div>
+
+<div class="main">
+
+  <div class="page-header">
+    <div class="page-eyebrow">Card Album · F1 Drivers</div>
+    <div class="page-title">Collection</div>
+    <div class="page-sub">Browse drivers by season · Earn cards by placing bets · Tier determined by championship standing</div>
+  </div>
+
+  <!-- SEASON TABS -->
+  <div class="season-bar" id="seasonBar"></div>
+
+  <!-- STATS ROW -->
+  <div class="col-stats-row" id="statsRow"></div>
+
+  <!-- ALBUM GRID -->
+  <div class="album-grid" id="albumGrid">
+    <div class="col-loading">LOADING DRIVERS…</div>
+  </div>
+
+</div>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════
+   COLLECTION — dynamic season browser
+════════════════════════════════════════════════════════ */
+
+/* ── Owned cards (hardcoded rich data) ── */
+const OWNED = {
+  'max_verstappen_2026': {
+    num:'1', name:'Verstappen', team:'Red Bull Racing', img:'verstappen.png', tier:'monaco',
+    tc:'#3671C6', s:{q:95,t:88,w:92,o:85}, ovr:91, win:42, odds:'2.1', lv:23, xp:1840, nxp:2000,
+    str:['Qualifying','Wet Weather','Race Craft'], wk:['Tyre Conservation','Street Pressure']
+  },
+  'norris_2026': {
+    num:'4', name:'Norris', team:'McLaren F1', img:'norris.png', tier:'spa',
+    tc:'#F47600', s:{q:90,t:85,w:78,o:88}, ovr:85, win:28, odds:'3.8', lv:15, xp:820, nxp:1200,
+    str:['High-Speed Corners','Tyre Management','Lap 1'], wk:['Wheel-to-Wheel','Wet Starts']
+  },
+  'russell_2026': {
+    num:'63', name:'Russell', team:'Mercedes-AMG', img:'russell.png', tier:'suzuka',
+    tc:'#27F4D2', s:{q:87,t:78,w:80,o:76}, ovr:79, win:8, odds:'12.0', lv:9, xp:540, nxp:800,
+    str:['Tyre Management','Consistency','Strategy'], wk:['Qualifying Pace','Overtaking']
+  },
+};
+
+/* ── Photo map (downloaded headshots) ── */
+const PHOTOS = {
+  'ver':'verstappen.png', 'nor':'norris.png', 'rus':'russell.png',
+  'max_verstappen':'verstappen.png', 'norris':'norris.png', 'russell':'russell.png',
+};
+
+/* ── Tier config ── */
+const TIER = {
+  monaco:     { label:'★ Legendary',     bg:'#050400', c:'#c9a84c', bc:'#c9a84c',
+                tb:'repeating-linear-gradient(90deg,#c9a84c 0,#c9a84c 7px,#050400 7px,#050400 14px)',
+                glow:'0 0 32px rgba(201,168,76,.6),0 0 64px rgba(201,168,76,.25)' },
+  spa:        { label:'Spa Holographic', bg:'#060810', c:'#00ccff', bc:'#00b8ff',
+                tb:'none',
+                glow:'0 0 28px rgba(0,180,255,.6),0 0 56px rgba(0,180,255,.25)' },
+  suzuka:     { label:'Suzuka Rare',     bg:'#0a0a18', c:'#AFA9EC', bc:'#534AB7',
+                tb:'linear-gradient(90deg,transparent,#7F77DD,transparent)',
+                glow:'0 0 20px rgba(127,119,221,.5),0 0 40px rgba(127,119,221,.22)' },
+  monza:      { label:'Monza',           bg:'#0a1020', c:'#6ab0ff', bc:'#1a3a6a',
+                tb:'linear-gradient(90deg,transparent,#3671C6,transparent)', glow:'' },
+  silverstone:{ label:'Silverstone',     bg:'#131318', c:'#888',    bc:'#333',
+                tb:'linear-gradient(90deg,transparent,#666,transparent)', glow:'' },
+};
+
+/* ── Season metadata (champions shown in tab) ── */
+const SEASON_META = {
+  2020: { champ:'Hamilton', races:17 },
+  2021: { champ:'Verstappen', races:22 },
+  2022: { champ:'Verstappen', races:22 },
+  2023: { champ:'Verstappen', races:22 },
+  2024: { champ:'Verstappen', races:24 },
+};
+
+/* ── Strengths/weaknesses bank by driver code ── */
+const SW_BANK = {
+  VER:{ str:['Qualifying','Wet Weather','Race Craft'],      wk:['Tyre Conservation','Street Pressure'] },
+  HAM:{ str:['Wet Weather','Starts','Race Pace'],           wk:['Tyre Management'] },
+  NOR:{ str:['High-Speed Corners','Tyre Mgmt','Lap 1'],     wk:['Wheel-to-Wheel','Wet Starts'] },
+  LEC:{ str:['Qualifying','Street Circuits','Lap 1'],       wk:['Tyre Management','Race Starts'] },
+  SAI:{ str:['Consistency','Tyre Management','Strategy'],   wk:['Qualifying Pace'] },
+  RUS:{ str:['Tyre Management','Consistency','Strategy'],   wk:['Qualifying Pace','Overtaking'] },
+  PIA:{ str:['High-Speed Corners','Race Pace'],             wk:['Qualifying','Experience'] },
+  ALO:{ str:['Race Craft','Overtaking','Dirty Air'],        wk:['Tyre Warm-up'] },
+  PER:{ str:['Tyre Management','Street Circuits'],          wk:['Qualifying','Pressure'] },
+  STR:{ str:['Rain Pace','Strategy'],                       wk:['Qualifying','Consistency'] },
+  GAS:{ str:['Qualifying Pace','Street Circuits'],          wk:['Race Starts','Tyre Wear'] },
+  OCO:{ str:['Qualifying','Street Circuits'],               wk:['Wheel-to-Wheel','Strategy'] },
+  BOT:{ str:['Qualifying Pace','Clean Air Pace'],           wk:['Race Craft','Wet Weather'] },
+  TSU:{ str:['Wet Weather','Overtaking'],                   wk:['Consistency','Strategy'] },
+  HUL:{ str:['Tyre Management','Race Craft'],               wk:['Qualifying','Team Orders'] },
+  MAG:{ str:['Aggression','Dirty Air Defence'],             wk:['Tyre Wear','Consistency'] },
+  ALB:{ str:['Consistency','Smooth Driving'],               wk:['Qualifying Pace','Overtaking'] },
+  ZHO:{ str:['Tyre Management'],                            wk:['Qualifying','Race Pace'] },
+  DEV:{ str:['Simulator Pace','Strategy'],                  wk:['Race Craft','Wet Weather'] },
+  SAR:{ str:['Smooth Driving'],                             wk:['Qualifying','Consistency'] },
+};
+const SW_DEFAULT = { str:['Race Pace','Consistency'], wk:['Qualifying'] };
+
+/* ── Derive stats from position/wins/pts ── */
+function deriveStats(pos, wins, pts, maxPts, totalRaces) {
+  const f = Math.max(0, Math.min(1, pts / Math.max(maxPts, 1)));
+  const winRate = wins / Math.max(totalRaces, 1);
+  const q  = Math.round(50 + f * 45 + (pos === 1 ? 4 : 0));
+  const t  = Math.round(48 + f * 42 + (wins > 5 ? 3 : 0));
+  const w  = Math.round(52 + f * 38 + (winRate > 0.3 ? 5 : 0));
+  const o  = Math.round(50 + winRate * 120 + f * 30);
+  return {
+    q: Math.min(99, q), t: Math.min(99, t),
+    w: Math.min(99, w), o: Math.min(99, o),
+  };
+}
+
+/* ── Assign tier by championship position ── */
+function posTier(pos) {
+  if (pos === 1) return 'monaco';
+  if (pos <= 3)  return 'spa';
+  if (pos <= 8)  return 'suzuka';
+  if (pos <= 15) return 'monza';
+  return 'silverstone';
+}
+
+/* ── Render one card ── */
+function buildCard(d) {
+  const t   = TIER[d.tier] || TIER.silverstone;
+  const pct = Math.round((d.xp || 0) / Math.max(d.nxp || 100, 1) * 100);
+  const isMonaco = d.tier === 'monaco';
+  const isSpa    = d.tier === 'spa';
+  const sw  = d.str && d.wk ? d : null;
+
+  const artHTML = d.img
+    ? `<img class="col-driver-img" src="/static/assets/drivers/${d.img}" alt="${d.name}">`
+    : `<div class="col-driver-ph" style="background:linear-gradient(160deg,${t.bg},${d.tc}22)">
+         <div class="ph-code" style="color:${t.c}">${d.code || d.name.split(' ').pop().slice(0,3).toUpperCase()}</div>
+         <div class="ph-pos" style="color:${t.c}">P${d.num || '?'}</div>
+       </div>`;
+
+  const swHTML = sw ? `
+    <div class="col-sw">
+      <div class="col-sw-row">
+        <span class="col-sw-label" style="color:#44ff88">▲</span>
+        <div class="col-sw-tags">${sw.str.map(s=>`<span class="col-sw-tag str">${s}</span>`).join('')}</div>
+      </div>
+      <div class="col-sw-row">
+        <span class="col-sw-label" style="color:#ff6060">▼</span>
+        <div class="col-sw-tags">${sw.wk.map(w=>`<span class="col-sw-tag wk">${w}</span>`).join('')}</div>
+      </div>
+    </div>` : '';
+
+  return `
+  <div class="col-unit">
+    <div class="col-atag" style="background:${t.bg};color:${t.c};border:1px solid ${t.bc}44;box-shadow:0 2px 8px rgba(0,0,0,.5)">${t.label}</div>
+    <div class="col-frame">
+      ${t.glow ? `<div class="col-glow" style="box-shadow:${t.glow}"></div>` : ''}
+      <div class="col-acrylic">
+        <div class="col-mag tl"></div><div class="col-mag tr"></div>
+        <div class="col-mag bl"></div><div class="col-mag br"></div>
+      </div>
+      ${d.owned ? '<div class="col-owned-badge">OWNED</div>' : ''}
+      <div class="col-card" style="background:${t.bg}">
+        ${isMonaco ? '<div class="col-mo-r"></div>' : ''}
+        <div class="col-bg" style="background:linear-gradient(135deg,${t.c},transparent)"></div>
+        ${isSpa    ? '<div class="col-spa-rb"></div>' : ''}
+        <div class="col-tb" style="background:${t.tb === 'none' ? 'transparent' : t.tb}"></div>
+        <div class="col-gr" style="color:${t.c}">${d.tier.toUpperCase()}</div>
+        <div class="col-nm">${d.num}</div>
+        <div class="col-art">${artHTML}</div>
+        <div class="col-n">${d.name}</div>
+        <div class="col-t" style="color:${d.tc}">${d.team}</div>
+        <div class="col-sts">
+          ${['SPD','TYR','WET','OVT'].map((l,i) => {
+            const v = [d.s.q, d.s.t, d.s.w, d.s.o][i];
+            return `<div class="col-sr">
+              <span class="col-sl" style="color:${t.c}">${l}</span>
+              <div class="col-sb"><div class="col-sf" style="width:${v}%;background:${t.c}"></div></div>
+              <span class="col-sv" style="color:${t.c}">${v}</span>
+            </div>`;
+          }).join('')}
+        </div>
+        ${swHTML}
+        <div class="col-bot">
+          <div><div class="col-bw">${d.win}%</div><div class="col-bwl">WIN</div></div>
+          <div><div class="col-bov" style="color:${t.c}">${d.ovr}</div><div class="col-bovl">OVR</div></div>
+          <div><div class="col-bod">${d.odds}x</div><div class="col-bodl">ODDS</div></div>
+        </div>
+        <div class="col-shine"></div>
+        <div class="col-sweep"></div>
+      </div>
+    </div>
+    ${d.lv ? `
+    <div class="col-lv">
+      <div class="col-lv-t" style="color:${t.c}">Lv.${d.lv} · ${pct}%</div>
+      <div class="col-lv-bg"><div class="col-lv-f" style="width:${pct}%;background:linear-gradient(90deg,${t.c}88,${t.c})"></div></div>
+    </div>` : ''}
+    <div class="col-alabel">${d.tier.charAt(0).toUpperCase()+d.tier.slice(1)} · ${d.pts != null ? d.pts+' pts' : (d.lv < 15 ? 'Unlock at Lv.15' : 'Skill unlocked')}</div>
+  </div>`;
+}
+
+/* ── Load current season (2026) ── */
+async function loadCurrent() {
+  const res  = await fetch('/api/drivers');
+  const data = await res.json();
+  const drivers = (data.drivers || []);
+
+  /* Sort by championship_pos (0 = unset → push to back) */
+  drivers.sort((a,b) => {
+    const pa = a.championship_pos || 99, pb = b.championship_pos || 99;
+    return pa - pb || a.name.localeCompare(b.name);
+  });
+
+  const cards = drivers.map((d, i) => {
+    const ownedKey = `${d.driver_id}_2026`;
+    const owned = OWNED[ownedKey];
+    if (owned) return { ...owned, owned: true, pts: null };
+
+    const pos = d.championship_pos || (i + 1);
+    const tc  = d.team_colour ? `#${d.team_colour}` : '#888';
+    const code = d.name.split(' ').pop().slice(0,3).toUpperCase();
+    const sw  = SW_BANK[code] || SW_DEFAULT;
+    const s   = deriveStats(pos, d.wins || 0, d.points || 0, 400, 24);
+    const ovr = Math.round((s.q + s.t + s.w + s.o) / 4);
+
+    return {
+      num: d.number || String(pos), name: d.name, team: d.team || '',
+      img: PHOTOS[d.driver_id], code, tier: posTier(pos),
+      tc, s, ovr,
+      win: Math.round((d.wins || 0) / 24 * 100),
+      odds: pos === 1 ? '2.0' : pos <= 3 ? '4.0' : pos <= 8 ? '10.0' : '25.0',
+      lv: 0, xp: 0, nxp: 100,
+      str: sw.str, wk: sw.wk, pts: d.points || 0, owned: false,
+    };
+  });
+
+  renderStats(cards, '2026 Season');
+  renderGrid(cards);
+}
+
+/* ── Load historical season ── */
+async function loadHistorical(year) {
+  const res  = await fetch(`/api/history/standings/${year}`);
+  const data = await res.json();
+  const standings = data.standings || [];
+  const meta = SEASON_META[year] || { races: 22 };
+
+  /* max pts for normalization */
+  const maxPts = standings.length ? standings[0].pts : 400;
+
+  const cards = standings.map(d => {
+    const sw  = SW_BANK[d.code] || SW_DEFAULT;
+    const tc  = d.color || '#888';
+    const s   = deriveStats(d.pos, d.wins, d.pts, maxPts, meta.races);
+    const ovr = Math.round((s.q + s.t + s.w + s.o) / 4);
+    const winPct = Math.round(d.wins / meta.races * 100);
+
+    return {
+      num: String(d.pos), name: d.name, team: d.team, code: d.code,
+      img: PHOTOS[d.driver_id] || PHOTOS[d.code?.toLowerCase()],
+      tier: posTier(d.pos), tc, s, ovr,
+      win: winPct,
+      odds: d.pos === 1 ? '1.5' : d.pos <= 3 ? '3.5' : d.pos <= 8 ? '9.0' : '22.0',
+      lv: 0, xp: 0, nxp: 100,
+      str: sw.str, wk: sw.wk, pts: d.pts, owned: false,
+    };
+  });
+
+  renderStats(cards, `${year} Season`);
+  renderGrid(cards);
+}
+
+/* ── Render stats pills ── */
+function renderStats(cards, label) {
+  const owned    = cards.filter(c => c.owned).length;
+  const monaco   = cards.filter(c => c.tier === 'monaco').length;
+  const spa      = cards.filter(c => c.tier === 'spa').length;
+  const suzuka   = cards.filter(c => c.tier === 'suzuka').length;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="col-stat-pill"><div class="csp-num">${cards.length}</div><div class="csp-label">${label.toUpperCase()}</div></div>
+    <div class="col-stat-pill"><div class="csp-num" style="color:#c9a84c">${monaco}</div><div class="csp-label">LEGENDARY</div></div>
+    <div class="col-stat-pill"><div class="csp-num" style="color:#00ccff">${spa}</div><div class="csp-label">HOLOGRAPHIC</div></div>
+    <div class="col-stat-pill"><div class="csp-num" style="color:#AFA9EC">${suzuka}</div><div class="csp-label">RARE</div></div>
+    ${owned ? `<div class="col-stat-pill" style="margin-left:auto"><div class="csp-num" style="color:#e8ff00">${owned}</div><div class="csp-label">OWNED</div></div>` : ''}
+  `;
+}
+
+/* ── Render card grid ── */
+function renderGrid(cards) {
+  document.getElementById('albumGrid').innerHTML = cards.map(buildCard).join('');
+  attachTilt();
+}
+
+/* ── Season tabs ── */
+async function buildTabs() {
+  const res  = await fetch('/api/history/seasons');
+  const data = await res.json();
+  const seasons = (data.seasons || []).sort((a,b) => b.year - a.year);
+
+  const bar = document.getElementById('seasonBar');
+  bar.innerHTML = `<button class="s-tab active" data-season="current" onclick="switchSeason('current',this)">
+    2026 Season<span class="s-champ">Current</span>
+  </button>` + seasons.map(s => `
+    <button class="s-tab" data-season="${s.year}" onclick="switchSeason(${s.year},this)">
+      ${s.year}<span class="s-champ">Champion: ${s.champion}</span>
+    </button>`).join('');
+}
+
+function switchSeason(year, el) {
+  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('albumGrid').innerHTML = '<div class="col-loading">LOADING DRIVERS…</div>';
+  if (year === 'current') loadCurrent();
+  else loadHistorical(year);
+}
+
+/* ── 3D Tilt ── */
+const MAX_TILT = 25, PERSPECTIVE = 550;
+function attachTilt() {
+  document.querySelectorAll('.col-unit').forEach(unit => {
+    const frame = unit.querySelector('.col-frame');
+    const shine = unit.querySelector('.col-shine');
+    const glow  = unit.querySelector('.col-glow');
+    if (!frame) return;
+    let raf = null;
+    unit.addEventListener('mousemove', e => {
+      const r  = frame.getBoundingClientRect();
+      const dx = ((e.clientX - r.left) / r.width  - 0.5) * 2;
+      const dy = ((e.clientY - r.top)  / r.height - 0.5) * 2;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        frame.style.transition = 'transform .08s ease';
+        frame.style.transform  = `perspective(${PERSPECTIVE}px) rotateY(${dx*MAX_TILT}deg) rotateX(${-dy*MAX_TILT}deg) translateY(-18px) scale(1.07)`;
+        if (shine) {
+          shine.style.background = `radial-gradient(circle at ${((dx+1)/2*100).toFixed()}% ${((dy+1)/2*100).toFixed()}%, rgba(255,255,255,.28) 0%, rgba(255,255,255,.06) 40%, transparent 65%)`;
+          shine.style.opacity = '1';
+        }
+        if (glow) glow.style.opacity = '1.4';
+      });
+    });
+    unit.addEventListener('mouseleave', () => {
+      cancelAnimationFrame(raf);
+      frame.style.transition = 'transform .55s cubic-bezier(.25,.8,.25,1)';
+      frame.style.transform  = '';
+      if (shine) shine.style.opacity = '0';
+      if (glow)  glow.style.opacity  = '';
+    });
+  });
+}
+
+/* ── Init ── */
+buildTabs().then(() => loadCurrent());
+</script>
+</body>
+</html>

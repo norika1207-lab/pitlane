@@ -91,10 +91,13 @@ a:hover { color: var(--gold-light); }
 }
 .nav-inner {
   max-width: 1200px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 56px;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; height: 56px;
 }
+.nav-links  { grid-column: 2; }
+.nav-auth   { grid-column: 3; justify-self: end; }
 .nav-brand {
+  grid-column: 1;
   display: flex; align-items: center; gap: 10px;
   font-family: var(--font-hud);
   font-size: 1.1rem; font-weight: 900; color: var(--gold);

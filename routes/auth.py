@@ -1,5 +1,5 @@
-"""Auth — 共用交易所帳號系統
-   登入透過轉發到交易所 API，JWT token 共用驗證"""
+"""Auth — Shared exchange account system
+   Login forwards to exchange API, shared JWT token verification"""
 from fastapi import APIRouter, HTTPException, Header
 from jose import jwt, JWTError
 import httpx
@@ -14,7 +14,7 @@ TRADING_API = "http://127.0.0.1:8000"
 
 class LoginRequest(BaseModel):
     username: str
-    password: str
+    password: str = ""
 
 class RegisterRequest(BaseModel):
     username: str
@@ -23,7 +23,7 @@ class RegisterRequest(BaseModel):
 
 
 def decode_token(token: str) -> dict:
-    """驗證交易所的 JWT token"""
+    """Verify exchange JWT token"""
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")
@@ -35,9 +35,9 @@ def decode_token(token: str) -> dict:
 
 
 async def get_current_user(authorization: str = Header(None)) -> dict:
-    """從 Authorization header 取得當前用戶"""
+    """Get current user from Authorization header"""
     if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(401, "請先登入（使用交易所帳號）")
+        raise HTTPException(401, "Please log in (use your exchange account)")
     token = authorization.split(" ")[1]
     payload = decode_token(token)
     username = payload["sub"]
@@ -53,7 +53,7 @@ async def get_current_user(authorization: str = Header(None)) -> dict:
 
 @router.post("/login")
 async def login(data: LoginRequest):
-    """登入 — 轉發到交易所 /api/token 取得 JWT"""
+    """Login — forward to exchange /api/token to get JWT"""
     async with httpx.AsyncClient() as client:
         try:
             resp = await client.post(
@@ -65,7 +65,7 @@ async def login(data: LoginRequest):
             raise HTTPException(503, "Trading platform unavailable")
 
     if resp.status_code != 200:
-        detail = "帳號或密碼錯誤"
+        detail = "Invalid username or password"
         try:
             detail = resp.json().get("detail", detail)
         except Exception:
@@ -90,7 +90,7 @@ async def login(data: LoginRequest):
 
 @router.post("/register")
 async def register(data: RegisterRequest):
-    """註冊 — 轉發到交易所 /api/register，成功後自動登入取得 JWT"""
+    """Register — forward to exchange /api/register, auto-login after success to get JWT"""
     async with httpx.AsyncClient() as client:
         try:
             resp = await client.post(
@@ -102,7 +102,7 @@ async def register(data: RegisterRequest):
             raise HTTPException(503, "Trading platform unavailable")
 
     if resp.status_code not in (200, 201):
-        detail = "註冊失敗"
+        detail = "Registration failed"
         try:
             body = resp.json()
             if isinstance(body.get("detail"), list):
@@ -122,7 +122,7 @@ async def register(data: RegisterRequest):
         )
 
     if login_resp.status_code != 200:
-        return {"message": "註冊成功，請手動登入"}
+        return {"message": "Registration successful, please log in manually"}
 
     result = login_resp.json()
     token = result.get("access_token")
@@ -135,13 +135,13 @@ async def register(data: RegisterRequest):
         "username": username,
         "balance": balance,
         "currency": "USDClaw",
-        "message": "註冊成功",
+        "message": "Registration successful",
     }
 
 
 @router.get("/me")
 async def me(authorization: str = Header(None)):
-    """取得當前用戶資訊和 USDClaw 餘額"""
+    """Get current user info and USDClaw balance"""
     user = await get_current_user(authorization)
     balance = await get_balance(user["username"])
     return {

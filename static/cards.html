@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PitLane — 卡牌收藏</title>
+<title>Throttenix — Card Collection</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -38,17 +38,20 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 .sort-btn.active{border-color:#e8ff00;color:#e8ff00;background:#1a1a00;}
 
 /* 卡牌網格 */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:20px;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,260px));gap:24px;justify-content:start;}
+.card{width:260px;}
 
 /* ── 共用卡片基礎 ── */
 .card{border-radius:16px;overflow:visible;position:relative;cursor:pointer;transition:transform 0.3s cubic-bezier(.25,.8,.25,1);}
 .card:hover{transform:translateY(-12px) scale(1.04);}
 .card-inner{border-radius:16px;overflow:hidden;position:relative;width:100%;height:420px;display:flex;flex-direction:column;padding-bottom:56px;}
-.c-num{position:absolute;top:6px;right:10px;font-size:55px;font-weight:900;line-height:1;z-index:2;pointer-events:none;font-family:'Barlow Condensed',sans-serif;}
+/* Background number: z-index 1 — behind all card content */
+.c-num{position:absolute;top:4px;right:8px;font-size:52px;font-weight:900;line-height:1;z-index:1;pointer-events:none;font-family:'Barlow Condensed',sans-serif;opacity:0.07;color:#fff;}
 .c-rarity{position:absolute;top:10px;left:12px;font-size:8px;font-weight:900;letter-spacing:0.12em;z-index:10;font-family:'Barlow Condensed',sans-serif;}
-.c-art{height:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:5;margin-top:24px;}
+.c-art{height:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:3;margin-top:24px;}
 .c-emoji{font-size:52px;}
-.c-info{padding:0 12px;position:relative;z-index:5;}
+/* flex:1 fills the middle so there's no empty gap between stats and the bottom bar */
+.c-info{padding:0 12px;position:relative;z-index:3;flex:1;}
 .c-name{font-size:20px;font-weight:900;color:#fff;line-height:1;font-family:'Barlow Condensed',sans-serif;}
 .c-team{font-size:8px;letter-spacing:0.06em;margin-top:1px;margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;}
 .c-stats{display:flex;flex-direction:column;gap:4px;}
@@ -129,56 +132,61 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 2
 <body>
 
 <nav>
-  <div class="nav-logo"><div class="logo-dot"></div>PITLANE</div>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div>THROTTENIX</a>
   <div class="nav-links">
-    <a href="/">首頁</a>
-    <a href="/race">賽事</a>
-    <a href="/cards" class="active">卡牌</a>
-    <a href="/battle">對戰</a>
-    <a href="/leaderboard">排行榜</a>
-    <a href="/profile">個人</a>
+    <a href="/">Home</a>
+    <a href="/race">Race</a>
+    <a href="/cards" class="active">Cards</a>
+    <a href="/collection">Collection</a>
+    <a href="/battle">Battle</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/history">History</a>
+    <a href="/halloffame">Hall of Fame</a>
+    <a href="/car-explorer">Car Explorer</a>
+    <a href="/profile">Profile</a>
   </div>
   <div class="nav-actions" id="nav-auth">
-    <button class="btn-login" onclick="location.href='/'">登入</button>
+    <button class="btn-login" onclick="location.href='/'">Log In</button>
   </div>
 </nav>
 
 <div class="main">
   <div class="page-header">
-    <div class="page-title">本季車手卡牌</div>
-    <div class="page-sub">數值來自真實賽事數據 · 每站更新 · 解鎖更高等級卡面</div>
+    <div class="page-title">Season Driver Cards</div>
+    <div class="page-sub">Stats from real race data · Updated each race · Unlock higher tier cards</div>
   </div>
 
   <div class="tier-bar">
-    <div class="tier-pill active" style="background:#1a1a22;color:#888;border-color:#333" onclick="filterTier('all',this)">全部</div>
-    <div class="tier-pill" style="background:#2a2a35;color:#ccc;border-color:#444" onclick="filterTier('silverstone',this)">銀石 · 入門</div>
-    <div class="tier-pill" style="background:#0a1628;color:#6ab0ff;border-color:#1a3a6a" onclick="filterTier('monza',this)">蒙扎 · 進階</div>
-    <div class="tier-pill" style="background:#0a0a18;color:#AFA9EC;border-color:#534AB7" onclick="filterTier('suzuka',this)">鈴鹿 · 稀有</div>
-    <div class="tier-pill" style="background:#060810;color:#00ccff;border-color:#00b8ff" onclick="filterTier('spa',this)">Spa · 超稀有</div>
-    <div class="tier-pill" style="background:#0a0800;color:#c9a84c;border-color:#c9a84c" onclick="filterTier('monaco',this)">摩納哥 · 傳奇</div>
+    <div class="tier-pill active" style="background:#1a1a22;color:#888;border-color:#333" onclick="filterTier('all',this)">All</div>
+    <div class="tier-pill" style="background:#2a2a35;color:#ccc;border-color:#444" onclick="filterTier('silverstone',this)">Silverstone · Beginner</div>
+    <div class="tier-pill" style="background:#0a1628;color:#6ab0ff;border-color:#1a3a6a" onclick="filterTier('monza',this)">Monza · Intermediate</div>
+    <div class="tier-pill" style="background:#0a0a18;color:#AFA9EC;border-color:#534AB7" onclick="filterTier('suzuka',this)">Suzuka · Rare</div>
+    <div class="tier-pill" style="background:#060810;color:#00ccff;border-color:#00b8ff" onclick="filterTier('spa',this)">Spa · Ultra Rare</div>
+    <div class="tier-pill" style="background:#0a0800;color:#c9a84c;border-color:#c9a84c" onclick="filterTier('monaco',this)">Monaco · Legendary</div>
   </div>
 
   <!-- 排序列 -->
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#555;letter-spacing:0.1em">排序</span>
-    <button class="sort-btn active" onclick="sortCards('ovr',this)">綜合 ▼</button>
-    <button class="sort-btn" onclick="sortCards('win',this)">勝率</button>
-    <button class="sort-btn" onclick="sortCards('odds',this)">賠率</button>
-    <button class="sort-btn" onclick="sortCards('q',this)">單圈速度</button>
-    <button class="sort-btn" onclick="sortCards('t',this)">輪胎管理</button>
-    <button class="sort-btn" onclick="sortCards('w',this)">雨戰</button>
-    <button class="sort-btn" onclick="sortCards('o',this)">超車能力</button>
-    <button class="sort-btn" onclick="sortCards('team',this)">車隊</button>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:#555;letter-spacing:0.1em">SORT</span>
+    <button class="sort-btn active" onclick="sortCards('ovr',this)">Overall ▼</button>
+    <button class="sort-btn" onclick="sortCards('win',this)">Win Rate</button>
+    <button class="sort-btn" onclick="sortCards('odds',this)">Odds</button>
+    <button class="sort-btn" onclick="sortCards('q',this)">Lap Speed</button>
+    <button class="sort-btn" onclick="sortCards('t',this)">Tire Mgmt</button>
+    <button class="sort-btn" onclick="sortCards('w',this)">Wet Weather</button>
+    <button class="sort-btn" onclick="sortCards('o',this)">Overtaking</button>
+    <button class="sort-btn" onclick="sortCards('team',this)">Team</button>
   </div>
 
   <div class="cards-grid" id="cardsGrid"></div>
+
 </div>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
 let DRIVERS = [];
 let currentSort = 'ovr';
-let sortAsc = false; // false = 高到低（預設）
+let sortAsc = false; // false = high to low (default)
 let currentTierFilter = 'all';
 
 // Load real drivers from API + 2024 historical stats
@@ -242,7 +250,7 @@ async function loadDrivers() {
 
     renderCards();
   } catch(e) {
-    document.getElementById('cardsGrid').innerHTML = '<p style="color:#888;text-align:center;padding:40px">載入中...</p>';
+    document.getElementById('cardsGrid').innerHTML = '<p style="color:#888;text-align:center;padding:40px">Loading...</p>';
   }
 }
 loadDrivers();
@@ -397,7 +405,7 @@ function buildCard(d) {
       <div class="card-inner">
         ${extras}
         <span class="c-rarity" style="${rarityTop}color:${t.ovrColor};${d.tier==='monaco'?'text-shadow:0 0 10px rgba(201,168,76,1);':''}">${t.label}</span>
-        <span class="c-num" style="color:${d.color}0a;">${d.num}</span>
+        <span class="c-num">${d.num}</span>
         <div class="c-art" style="z-index:5;${monacoArtStyle}">
           ${glowCircle}
           ${d.headshot ? `<img src="${d.headshot}" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid ${d.color};filter:${emojiFilter};${emojiAnim}" onerror="this.outerHTML='<span class=c-emoji style=filter:${emojiFilter}>${d.emoji}</span>'">` : `<span class="c-emoji" style="filter:${emojiFilter};${emojiAnim}">${d.emoji}</span>`}
