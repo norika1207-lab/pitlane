@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Throttenix — Hall of Fame</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700;900&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+/* ═══════════════════════════════════════
+   HALL OF FAME — PREMIUM PAGE STYLES
+   ═══════════════════════════════════════ */
+
+/* ─── HERO SECTION ─── */
+.hof-hero {
+  padding: 100px 0 64px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hof-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,168,67,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 50%, rgba(192,57,43,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 50%, rgba(52,152,219,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hof-hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: 20px;
+  background: rgba(212,168,67,0.1); border: 1px solid rgba(212,168,67,0.3);
+  font-family: var(--font-hud); font-size: 11px; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hof-hero-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.hof-title {
+  font-family: 'Orbitron', var(--font-hud), sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, var(--gold) 40%, #d4a843 70%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  text-shadow: none;
+  position: relative;
+}
+.hof-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  max-width: 480px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+/* ─── PROGRESS BAR ─── */
+.hof-progress-wrap {
+  max-width: 640px;
+  margin: 0 auto 56px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 28px;
+}
+.hof-progress-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.hof-progress-label {
+  font-family: var(--font-hud); font-size: 12px; font-weight: 700;
+  color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.hof-progress-value {
+  font-family: var(--font-hud); font-size: 14px; font-weight: 700;
+  color: var(--gold);
+}
+.hof-progress-bar-bg {
+  width: 100%; height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px; overflow: hidden;
+  margin-bottom: 10px;
+}
+.hof-progress-bar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+  box-shadow: 0 0 12px rgba(232,255,0,0.4);
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.hof-progress-next {
+  font-size: 12px; color: var(--text-muted);
+}
+.hof-progress-next span { color: var(--text-secondary); font-weight: 600; }
+.hof-login-hint {
+  text-align: center; color: var(--text-muted); font-size: 13px;
+  padding: 16px;
+}
+.hof-login-hint a { color: var(--gold); }
+
+/* ─── SECTION HEADERS ─── */
+.hof-section {
+  margin-bottom: 64px;
+}
+.hof-section-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 36px;
+}
+.hof-section-header h2 {
+  font-family: var(--font-hud); font-size: 1rem; font-weight: 700;
+  color: var(--text-primary); letter-spacing: 0.1em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.hof-section-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+}
+.hof-section-count {
+  font-family: var(--font-hud); font-size: 11px; font-weight: 700;
+  color: var(--text-muted); letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  padding: 3px 10px; border-radius: 20px;
+}
+
+/* ─── CARD GRID ─── */
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+  justify-items: center;
+}
+
+/* ═══════════════════════════════════════
+   LEGEND CARD — THE CENTREPIECE
+   ═══════════════════════════════════════ */
+.legend-card-wrap {
+  width: 280px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.legend-card {
+  width: 280px;
+  height: 420px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease, box-shadow 0.3s ease;
+  will-change: transform;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* Gradient background (set via inline style) */
+.legend-card-bg {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  z-index: 0;
+}
+
+/* Holographic shimmer overlay */
+.legend-card::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2;
+  border-radius: 16px;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255,255,255,0.03) 30%,
+    rgba(255,255,255,0.08) 38%,
+    rgba(255,255,255,0.12) 40%,
+    rgba(255,255,255,0.08) 42%,
+    rgba(255,255,255,0.03) 50%,
+    transparent 60%
+  );
+  background-size: 300% 100%;
+  animation: shimmer 4s linear infinite;
+  pointer-events: none;
+}
+
+/* Foil/grain texture */
+.legend-card::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 3;
+  border-radius: 16px;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 3px,
+    rgba(255,255,255,0.015) 3px,
+    rgba(255,255,255,0.015) 4px
+  );
+  pointer-events: none;
+}
+
+/* Claimed cards get extra glow animation */
+.legend-card.is-claimed {
+  animation: legend-glow 3s ease-in-out infinite;
+}
+
+/* MYTH tier cards float */
+.legend-card-wrap.tier-myth .legend-card:not(.is-locked) {
+  animation: float 5s ease-in-out infinite;
+}
+.legend-card-wrap.tier-myth .legend-card.is-claimed {
+  animation: float 5s ease-in-out infinite, legend-glow 3s ease-in-out infinite;
+}
+
+/* ─── CARD BORDER (glow) ─── */
+.legend-card-border {
+  position: absolute; inset: 0; z-index: 4;
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  pointer-events: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.legend-card.is-claimed .legend-card-border {
+  border-color: rgba(255,255,255,0.35);
+}
+
+/* ─── CARD CONTENT ─── */
+.legend-card-content {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; flex-direction: column;
+  padding: 16px;
+  pointer-events: none;
+}
+
+/* Top bar: flag + era + tier badge */
+.legend-card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.legend-flag-era {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.legend-flag {
+  font-size: 22px; line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.legend-era {
+  font-family: var(--font-hud); font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.6); letter-spacing: 0.1em;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 6px; border-radius: 4px;
+  text-transform: uppercase;
+}
+.legend-tier-badge {
+  font-family: var(--font-hud); font-size: 9px; font-weight: 900;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px;
+}
+.legend-tier-badge.tier-legend {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.85);
+}
+.legend-tier-badge.tier-myth {
+  background: linear-gradient(135deg, rgba(212,168,67,0.25), rgba(212,168,67,0.1));
+  border: 1px solid rgba(212,168,67,0.5);
+  color: #f5d76e;
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+
+/* Championship count — the BIG number */
+.legend-championships {
+  text-align: center;
+  padding: 8px 0 4px;
+  flex: 0 0 auto;
+}
+.legend-champ-num {
+  font-family: 'Orbitron', var(--font-hud), sans-serif;
+  font-size: 56px; font-weight: 900; line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.5);
+  letter-spacing: -0.02em;
+}
+.legend-champ-label {
+  font-family: var(--font-hud); font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.6); letter-spacing: 0.15em; text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Quote */
+.legend-quote {
+  font-size: 10px; font-style: italic;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  padding: 8px 4px;
+  line-height: 1.5;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Stats row */
+.legend-stats {
+  display: flex; justify-content: space-around;
+  padding: 10px 0 8px;
+}
+.legend-stat {
+  text-align: center;
+}
+.legend-stat-val {
+  font-family: 'Orbitron', var(--font-hud), sans-serif;
+  font-size: 18px; font-weight: 900; color: #fff;
+  line-height: 1;
+}
+.legend-stat-lbl {
+  font-family: var(--font-hud); font-size: 8px; font-weight: 700;
+  color: rgba(255,255,255,0.5); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-top: 3px;
+}
+
+/* Driver name */
+.legend-name-row {
+  text-align: center;
+  padding: 6px 0 2px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.legend-name {
+  font-family: 'Orbitron', var(--font-hud), sans-serif;
+  font-size: 13px; font-weight: 900; color: #fff;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  line-height: 1.2;
+}
+.legend-fullname {
+  font-family: var(--font-hud); font-size: 8px;
+  color: rgba(255,255,255,0.45); letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+/* ─── LOCK OVERLAY ─── */
+.legend-lock-overlay {
+  position: absolute; inset: 0; z-index: 10;
+  border-radius: 16px;
+  /* dark gradient only at bottom — card art fully visible above */
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.08) 0%,
+    rgba(0,0,0,0.15) 55%,
+    rgba(0,0,0,0.82) 100%
+  );
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding-bottom: 20px;
+  gap: 6px;
+}
+.legend-lock-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+  animation: pulse 2s ease-in-out infinite;
+}
+.legend-lock-text {
+  font-family: var(--font-hud); font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.65); letter-spacing: 0.1em;
+  text-transform: uppercase; text-align: center; line-height: 1.6;
+}
+.legend-lock-count {
+  font-family: 'Orbitron', var(--font-hud), sans-serif;
+  font-size: 22px; font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 16px rgba(212,168,67,0.9), 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* ─── CLAIMED BADGE ─── */
+.legend-claimed-badge {
+  position: absolute; top: 12px; right: 12px; z-index: 11;
+  display: flex; align-items: center; gap: 5px;
+  background: linear-gradient(135deg, rgba(212,168,67,0.9), rgba(212,168,67,0.7));
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-family: var(--font-hud); font-size: 9px; font-weight: 900;
+  color: #000; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 0 16px rgba(212,168,67,0.5);
+}
+
+/* ─── CLAIM BUTTON OVERLAY (eligible, unclaimed) ─── */
+.legend-claim-overlay {
+  position: absolute; inset: 0; z-index: 10;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.0);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.legend-card-wrap:hover .legend-claim-overlay {
+  opacity: 1;
+  pointer-events: all;
+}
+.btn-claim {
+  padding: 10px 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: #000; font-family: var(--font-hud); font-size: 13px; font-weight: 900;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(212,168,67,0.5);
+  transition: all 0.2s;
+  pointer-events: all;
+}
+.btn-claim:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(212,168,67,0.7);
+}
+.btn-claim:active { transform: translateY(0); }
+
+/* ─── ANIMATIONS ─── */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes legend-glow {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,67,0.2), 0 0 20px rgba(212,168,67,0.15);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,67,0.5), 0 0 40px rgba(212,168,67,0.3);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  33%       { transform: translateY(-6px); }
+  66%       { transform: translateY(-3px); }
+}
+
+@keyframes claim-pop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── TEAMS LIST ─── */
+.legend-teams {
+  font-family: var(--font-hud); font-size: 8px;
+  color: rgba(255,255,255,0.4); letter-spacing: 0.05em;
+  text-align: center; margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ─── TOAST ─── */
+.hof-toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px);
+  z-index: 9999;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 10px;
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(212,168,67,0.15);
+  font-size: 14px; color: var(--text-primary);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  opacity: 0;
+  white-space: nowrap;
+}
+.hof-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.hof-toast-icon { font-size: 20px; }
+
+/* ─── EMPTY STATE ─── */
+.hof-empty {
+  text-align: center; padding: 48px 24px;
+  color: var(--text-muted); font-size: 14px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .legend-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .hof-title { font-size: 3.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- SCANLINE -->
+<div class="scanline-overlay"></div>
+
+<!-- ─── NAV ─── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>THROTTENIX</a>
+    <div class="nav-links">
+
+      <a href="/race">Race</a>
+      <a href="/cards">Cards</a>
+      <a href="/collection">Collection</a>
+    <a href="/battle">Battle</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/history">History</a>
+      <a href="/halloffame" class="active">Hall of Fame</a>
+      <a href="/car-explorer">Car Explorer</a>
+      <a href="/profile">Profile</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<!-- TOAST -->
+<div class="hof-toast" id="hof-toast">
+  <span class="hof-toast-icon" id="toast-icon">🏆</span>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- ─── HERO ─── -->
+<div class="hof-hero">
+  <div class="container">
+    <div class="hof-hero-badge">
+      <span class="dot"></span>
+      LEGEND COLLECTION
+    </div>
+    <h1 class="hof-title">Hall of Fame</h1>
+    <p class="hof-subtitle">
+      The greatest drivers in Formula 1 history. Earn your bets, claim the legends.
+    </p>
+
+    <!-- Progress bar -->
+    <div id="progress-section"></div>
+  </div>
+</div>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="page-body">
+  <div class="container">
+
+    <!-- Eligible / Claimed section -->
+    <div class="hof-section" id="section-unlocked" style="display:none">
+      <div class="hof-section-header">
+        <h2>⚡ Eligible &amp; Collected</h2>
+        <div class="hof-section-line"></div>
+        <div class="hof-section-count" id="count-unlocked">0</div>
+      </div>
+      <div class="legend-grid" id="grid-unlocked"></div>
+    </div>
+
+    <!-- Locked section -->
+    <div class="hof-section" id="section-locked">
+      <div class="hof-section-header">
+        <h2>🔒 Not Yet Unlocked</h2>
+        <div class="hof-section-line"></div>
+        <div class="hof-section-count" id="count-locked">0</div>
+      </div>
+      <div class="legend-grid" id="grid-locked"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   HALL OF FAME — CLIENT SCRIPT
+   ═══════════════════════════════════════ */
+
+const TOKEN_KEY = 'throttenix_token';
+
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+}
+
+// ─── TOAST ───────────────────────────────
+function showToast(msg, icon = '🏆', duration = 3500) {
+  const toast = document.getElementById('hof-toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// ─── NAV AUTH: handled by app.js ─────────
+function initNav() { /* app.js updateAuthUI() handles nav-auth */ }
+
+// ─── RENDER PROGRESS ─────────────────────
+function renderProgress(userBets, legends, authed) {
+  const wrap = document.getElementById('progress-section');
+  if (!authed) {
+    wrap.innerHTML = `
+      <div class="hof-login-hint">
+        <a href="/">Log in</a> to view your collection progress
+      </div>`;
+    return;
+  }
+
+  // Find next unlock
+  const locked = legends
+    .filter(l => !l.claimed && !l.eligible)
+    .sort((a, b) => a.unlock_bets - b.unlock_bets);
+  const nextUnlock = locked[0];
+  const pct = nextUnlock
+    ? Math.min(100, (userBets / nextUnlock.unlock_bets) * 100).toFixed(1)
+    : 100;
+
+  wrap.innerHTML = `
+    <div class="hof-progress-wrap">
+      <div class="hof-progress-header">
+        <span class="hof-progress-label">Your Total Bets</span>
+        <span class="hof-progress-value">${userBets.toLocaleString()} bets</span>
+      </div>
+      <div class="hof-progress-bar-bg">
+        <div class="hof-progress-bar-fill" id="prog-fill" style="width: 0%"></div>
+      </div>
+      <div class="hof-progress-next">
+        ${nextUnlock
+          ? `<span>${(nextUnlock.unlock_bets - userBets).toLocaleString()}</span> bets away from claiming <span>${nextUnlock.name}</span> (requires ${nextUnlock.unlock_bets} total)`
+          : `<span>All legends are now unlockable!</span>`}
+      </div>
+    </div>`;
+
+  // Animate bar fill
+  setTimeout(() => {
+    const fill = document.getElementById('prog-fill');
+    if (fill) fill.style.width = pct + '%';
+  }, 100);
+}
+
+// ─── RENDER ONE CARD ─────────────────────
+function renderCard(legend) {
+  const wrap = document.createElement('div');
+  wrap.className = `legend-card-wrap tier-${legend.tier}`;
+  wrap.dataset.id = legend.id;
+
+  const isLocked = !legend.claimed && !legend.eligible;
+  const isClaimed = legend.claimed;
+  const isEligible = legend.eligible && !legend.claimed;
+
+  // Build accent box-shadow for glow border
+  const accent = legend.accent || legend.color_primary;
+  const glowStyle = isClaimed
+    ? `box-shadow: 0 8px 48px rgba(0,0,0,0.6), 0 0 0 1.5px ${accent}66, 0 0 32px ${accent}44;`
+    : isEligible
+      ? `box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1.5px ${accent}55;`
+      : `box-shadow: 0 4px 20px rgba(0,0,0,0.4);`;
+
+  // Championship years label
+  const champYears = legend.championship_years.join(', ');
+
+  // Teams (shorten)
+  const teamsStr = legend.teams.slice(0, 3).join(' · ');
+
+  wrap.innerHTML = `
+    <div class="legend-card ${isClaimed ? 'is-claimed' : ''} ${isLocked ? 'is-locked' : ''}"
+         style="${glowStyle}">
+      <!-- Gradient background -->
+      <div class="legend-card-bg" style="background: ${legend.bg_style};"></div>
+
+      <!-- Noise grain overlay (subtle) -->
+      <div style="
+        position:absolute;inset:0;z-index:1;border-radius:16px;
+        background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E&quot;);
+        pointer-events:none;opacity:0.5;
+      "></div>
+
+      <!-- Card content -->
+      <div class="legend-card-content">
+        <!-- TOP ROW -->
+        <div class="legend-card-top">
+          <div class="legend-flag-era">
+            <div class="legend-flag">${legend.flag}</div>
+            <div class="legend-era">${legend.era}</div>
+          </div>
+          <div class="legend-tier-badge tier-${legend.tier}">
+            ${legend.tier.toUpperCase()}
+          </div>
+        </div>
+
+        <!-- CHAMPIONSHIP COUNT -->
+        <div class="legend-championships">
+          <div class="legend-champ-num" style="color:${accent};">${legend.championships}×</div>
+          <div class="legend-champ-label">World Champion · ${champYears}</div>
+        </div>
+
+        <!-- QUOTE -->
+        <div class="legend-quote">"${legend.quote}"</div>
+
+        <!-- STATS -->
+        <div class="legend-stats">
+          <div class="legend-stat">
+            <div class="legend-stat-val">${legend.wins}</div>
+            <div class="legend-stat-lbl">Wins</div>
+          </div>
+          <div class="legend-stat">
+            <div class="legend-stat-val">${legend.poles}</div>
+            <div class="legend-stat-lbl">Poles</div>
+          </div>
+          <div class="legend-stat">
+            <div class="legend-stat-val">${legend.podiums}</div>
+            <div class="legend-stat-lbl">Podiums</div>
+          </div>
+        </div>
+
+        <!-- NAME -->
+        <div class="legend-name-row">
+          <div class="legend-name">${legend.name}</div>
+          <div class="legend-teams">${teamsStr}</div>
+        </div>
+      </div>
+
+      <!-- LOCK OVERLAY -->
+      ${isLocked ? `
+        <div class="legend-lock-overlay">
+          <div class="legend-lock-count">${legend.unlock_bets.toLocaleString()}</div>
+          <div class="legend-lock-text">bets to unlock</div>
+          <div class="legend-lock-icon">🔒</div>
+        </div>
+      ` : ''}
+
+      <!-- CLAIMED BADGE -->
+      ${isClaimed ? `
+        <div class="legend-claimed-badge">
+          ✓ COLLECTED
+        </div>
+      ` : ''}
+
+      <!-- ELIGIBLE CLAIM BUTTON OVERLAY -->
+      ${isEligible ? `
+        <div class="legend-claim-overlay">
+          <button class="btn-claim" onclick="claimLegend('${legend.id}', event)">
+            ⚡ CLAIM NOW
+          </button>
+        </div>
+      ` : ''}
+
+      <!-- BORDER GLOW -->
+      <div class="legend-card-border" style="
+        ${isClaimed ? `box-shadow: inset 0 0 0 1px ${accent}44; border-color: ${accent}55;` : ''}
+        ${isEligible ? `border-color: ${accent}44;` : ''}
+      "></div>
+    </div>
+  `;
+
+  // 3D tilt on mousemove
+  const card = wrap.querySelector('.legend-card');
+  wrap.addEventListener('mousemove', (e) => {
+    if (isLocked) return;
+    const rect = wrap.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const tiltX = ((y - cy) / cy) * -10;
+    const tiltY = ((x - cx) / cx) * 10;
+    card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+  });
+  wrap.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+
+  return wrap;
+}
+
+// ─── CLAIM ───────────────────────────────
+async function claimLegend(legendId, event) {
+  event.stopPropagation();
+  const token = getToken();
+  if (!token) {
+    showToast('Please log in first', '⚠️');
+    return;
+  }
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Claiming…';
+  try {
+    const r = await fetch(`/api/halloffame/claim/${legendId}`, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token },
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      showToast(data.detail || 'Claim failed', '❌');
+      btn.disabled = false;
+      btn.textContent = '⚡ CLAIM NOW';
+      return;
+    }
+    showToast(`🏆 ${data.legend.name} collected!`, '🏆');
+    // Re-render
+    await loadAndRender();
+  } catch (e) {
+    showToast('Network error, please try again', '❌');
+    btn.disabled = false;
+    btn.textContent = '⚡ CLAIM NOW';
+  }
+}
+
+// ─── LOAD & RENDER ───────────────────────
+async function loadAndRender() {
+  const token = getToken();
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+
+  let data;
+  try {
+    const r = await fetch('/api/halloffame', { headers });
+    data = await r.json();
+  } catch (e) {
+    document.getElementById('grid-locked').innerHTML =
+      '<div class="hof-empty">Failed to load, please refresh the page</div>';
+    return;
+  }
+
+  const { legends, user_bets, authenticated } = data;
+
+  // Render progress
+  renderProgress(user_bets, legends, authenticated);
+
+  // Split into unlocked (claimed or eligible) and locked
+  const unlocked = legends.filter(l => l.claimed || l.eligible);
+  const locked = legends.filter(l => !l.claimed && !l.eligible);
+
+  // Sort: claimed first, then eligible, then by unlock_bets
+  unlocked.sort((a, b) => {
+    if (a.claimed && !b.claimed) return -1;
+    if (!a.claimed && b.claimed) return 1;
+    return a.unlock_bets - b.unlock_bets;
+  });
+  locked.sort((a, b) => a.unlock_bets - b.unlock_bets);
+
+  // Update section counts
+  document.getElementById('count-unlocked').textContent = unlocked.length;
+  document.getElementById('count-locked').textContent = locked.length;
+
+  // Show/hide unlocked section
+  const sectionUnlocked = document.getElementById('section-unlocked');
+  sectionUnlocked.style.display = unlocked.length > 0 ? 'block' : 'none';
+
+  // Render unlocked grid
+  const gridUnlocked = document.getElementById('grid-unlocked');
+  gridUnlocked.innerHTML = '';
+  for (const legend of unlocked) {
+    gridUnlocked.appendChild(renderCard(legend));
+  }
+
+  // Render locked grid
+  const gridLocked = document.getElementById('grid-locked');
+  gridLocked.innerHTML = '';
+  for (const legend of locked) {
+    gridLocked.appendChild(renderCard(legend));
+  }
+
+  if (locked.length === 0 && unlocked.length > 0) {
+    document.getElementById('section-locked').style.display = 'none';
+  }
+}
+
+// ─── INIT ────────────────────────────────
+initNav();
+loadAndRender();
+</script>
+<script src="/static/assets/js/app.js"></script>
+</body>
+</html>

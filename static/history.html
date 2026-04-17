@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PitLane — 歷史賽季</title>
+<title>Throttenix — Past Seasons</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
 <style>
@@ -270,6 +270,29 @@
   width: 1px; height: 40px; background: var(--border); flex-shrink: 0;
 }
 
+/* ─── STANDINGS PANEL ─── */
+.standing-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 16px; font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.standing-row:hover { background: var(--bg-secondary); }
+.standing-pos {
+  width: 20px; text-align: center;
+  font-size: 12px; font-weight: 700; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.standing-pos.p1 { color: var(--gold); }
+.standing-pos.p2 { color: #c0c0c0; }
+.standing-pos.p3 { color: #cd7f32; }
+.standing-name { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.standing-pts { font-size: 12px; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+.standing-wins { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+
+/* ─── RACE HIST CARD ─── */
+.race-hist-team { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
   .page-header h1 { font-size: 2rem; }
@@ -280,6 +303,8 @@
   .legendary-grid, .race-cards-grid, .unlock-grid {
     grid-template-columns: 1fr;
   }
+  #season-detail-wrap { flex-direction: column; }
+  #standings-panel { width: 100% !important; flex: none !important; }
 }
 </style>
 </head>
@@ -288,14 +313,18 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <a href="/" class="nav-brand"><span class="dot"></span>THROTTENIX</a>
     <div class="nav-links">
-      <a href="/">首頁</a>
-      <a href="/race">賽事</a>
-      <a href="/cards">卡牌</a>
-      <a href="/leaderboard">排行榜</a>
-      <a href="/history" class="active">歷史</a>
-      <a href="/profile">戰績</a>
+
+      <a href="/race">Race</a>
+      <a href="/cards">Cards</a>
+      <a href="/collection">Collection</a>
+    <a href="/battle">Battle</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/history" class="active">History</a>
+      <a href="/halloffame">Hall of Fame</a>
+      <a href="/car-explorer">Car Explorer</a>
+      <a href="/profile">Profile</a>
     </div>
     <div id="nav-auth" class="nav-auth"></div>
   </div>
@@ -311,10 +340,10 @@
   <div class="container">
     <div class="hero-badge" style="margin-bottom:16px">
       <span class="dot" style="width:6px;height:6px"></span>
-      F1 歷史回顧
+      F1 Historical Archive
     </div>
-    <h1>歷史賽季</h1>
-    <p>重溫 F1 經典賽季，解鎖傳奇卡牌</p>
+    <h1>Past Seasons</h1>
+    <p>Relive F1 classic seasons and unlock legend cards</p>
   </div>
 </div>
 
@@ -335,33 +364,33 @@
     <div class="season-info-bar" id="season-info-bar">
       <div class="season-info-stat">
         <span class="val" id="info-year">2024</span>
-        <span class="lbl">賽季</span>
+        <span class="lbl">Season</span>
       </div>
       <div class="season-divider"></div>
       <div class="season-info-stat">
         <span class="val" id="info-champion">—</span>
-        <span class="lbl">年度冠軍</span>
+        <span class="lbl">Champion</span>
       </div>
       <div class="season-divider"></div>
       <div class="season-info-stat">
         <span class="val" id="info-races">—</span>
-        <span class="lbl">總站數</span>
+        <span class="lbl">Rounds</span>
       </div>
       <div class="season-divider"></div>
       <div class="season-info-stat">
         <span class="val" id="info-constructor">—</span>
-        <span class="lbl">車隊冠軍</span>
+        <span class="lbl">Constructor</span>
       </div>
       <div class="season-divider"></div>
       <div class="season-info-stat">
         <span class="val" id="info-points">—</span>
-        <span class="lbl">冠軍積分</span>
+        <span class="lbl">Champion PTS</span>
       </div>
     </div>
 
     <!-- LEGENDARY SEASONS -->
     <div class="legendary-section">
-      <h2>👑 傳奇賽季</h2>
+      <h2>👑 Legendary Seasons</h2>
       <div class="legendary-grid">
 
         <!-- 2004 Schumacher -->
@@ -372,25 +401,25 @@
           </div>
           <div class="legend-card-body">
             <div class="legend-driver-name">Michael Schumacher</div>
-            <div class="legend-subtitle">Ferrari · 最強統治年 · 13 勝</div>
+            <div class="legend-subtitle">Ferrari · Year of Domination · 13 Wins</div>
             <div class="legend-stats">
               <div class="legend-stat">
                 <span class="legend-stat-val">13</span>
-                <span class="legend-stat-label">勝場</span>
+                <span class="legend-stat-label">Wins</span>
               </div>
               <div class="legend-stat">
                 <span class="legend-stat-val">148</span>
-                <span class="legend-stat-label">積分</span>
+                <span class="legend-stat-label">Points</span>
               </div>
               <div class="legend-stat">
                 <span class="legend-stat-val">18</span>
-                <span class="legend-stat-label">站數</span>
+                <span class="legend-stat-label">Rounds</span>
               </div>
             </div>
             <div class="legend-unlock">
               <div class="legend-unlock-text">
-                完成 2004 賽季 →<br>
-                <strong>解鎖 Schumacher 傳奇卡</strong>
+                Complete 2004 Season →<br>
+                <strong>Unlock Schumacher Legend Card</strong>
               </div>
               <span class="rarity-badge rarity-monaco">Monaco</span>
             </div>
@@ -405,25 +434,25 @@
           </div>
           <div class="legend-card-body">
             <div class="legend-driver-name">Lewis Hamilton</div>
-            <div class="legend-subtitle">Mercedes · 六冠之年 · 11 勝</div>
+            <div class="legend-subtitle">Mercedes · Year of the 6th Title · 11 Wins</div>
             <div class="legend-stats">
               <div class="legend-stat">
                 <span class="legend-stat-val">11</span>
-                <span class="legend-stat-label">勝場</span>
+                <span class="legend-stat-label">Wins</span>
               </div>
               <div class="legend-stat">
                 <span class="legend-stat-val">413</span>
-                <span class="legend-stat-label">積分</span>
+                <span class="legend-stat-label">Points</span>
               </div>
               <div class="legend-stat">
                 <span class="legend-stat-val">21</span>
-                <span class="legend-stat-label">站數</span>
+                <span class="legend-stat-label">Rounds</span>
               </div>
             </div>
             <div class="legend-unlock">
               <div class="legend-unlock-text">
-                完成 2019 賽季 →<br>
-                <strong>解鎖 Hamilton 傳奇卡</strong>
+                Complete 2019 Season →<br>
+                <strong>Unlock Hamilton Legend Card</strong>
               </div>
               <span class="rarity-badge rarity-monaco">Monaco</span>
             </div>
@@ -438,25 +467,25 @@
           </div>
           <div class="legend-card-body">
             <div class="legend-driver-name">Sebastian Vettel</div>
-            <div class="legend-subtitle">Red Bull · 最戲劇性爭冠 · 5 勝</div>
+            <div class="legend-subtitle">Red Bull · Most Dramatic Title Fight · 5 Wins</div>
             <div class="legend-stats">
               <div class="legend-stat">
                 <span class="legend-stat-val">5</span>
-                <span class="legend-stat-label">勝場</span>
+                <span class="legend-stat-label">Wins</span>
               </div>
               <div class="legend-stat">
                 <span class="legend-stat-val">281</span>
-                <span class="legend-stat-label">積分</span>
+                <span class="legend-stat-label">Points</span>
               </div>
               <div class="legend-stat">
                 <span class="legend-stat-val">20</span>
-                <span class="legend-stat-label">站數</span>
+                <span class="legend-stat-label">Rounds</span>
               </div>
             </div>
             <div class="legend-unlock">
               <div class="legend-unlock-text">
-                完成 2012 賽季 →<br>
-                <strong>解鎖 Vettel 傳奇卡</strong>
+                Complete 2012 Season →<br>
+                <strong>Unlock Vettel Legend Card</strong>
               </div>
               <span class="rarity-badge rarity-monaco">Monaco</span>
             </div>
@@ -466,94 +495,92 @@
       </div>
     </div>
 
-    <!-- RACE CARDS FOR SELECTED SEASON -->
-    <div class="races-section" id="races-section">
-      <h2>🏁 <span id="race-section-year">2024</span> 賽季賽程</h2>
+    <!-- SEASON DETAIL: standings + races -->
+    <div id="season-detail-wrap" style="display:flex;gap:24px;margin-bottom:48px;align-items:flex-start;flex-wrap:wrap">
 
-      <div class="coming-soon-wrap">
-        <!-- Blurred placeholder grid -->
-        <div class="coming-soon-blur race-cards-grid" id="races-placeholder" aria-hidden="true">
-          <!-- Placeholder cards -->
-          <div class="race-hist-card" style="min-height:140px"></div>
-          <div class="race-hist-card" style="min-height:140px"></div>
-          <div class="race-hist-card" style="min-height:140px"></div>
-          <div class="race-hist-card" style="min-height:140px"></div>
-          <div class="race-hist-card" style="min-height:140px"></div>
-          <div class="race-hist-card" style="min-height:140px"></div>
-        </div>
-
-        <!-- Coming Soon Overlay -->
-        <div class="coming-soon-overlay">
-          <div class="coming-soon-icon">🚧</div>
-          <div class="coming-soon-title">歷史數據準備中</div>
-          <p class="coming-soon-desc">Ergast API 暫時停止服務，歷史賽季數據正在從其他來源重建，敬請期待！</p>
-          <span class="coming-soon-badge">即將開放</span>
+      <!-- Standings sidebar -->
+      <div id="standings-panel" style="flex:0 0 220px;min-width:180px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 0;overflow:hidden">
+        <div style="padding:0 16px 12px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)">Standings Top 10</div>
+        <div id="standings-list" style="padding:8px 0">
+          <!-- filled by JS -->
         </div>
       </div>
+
+      <!-- Race cards grid -->
+      <div style="flex:1;min-width:0">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          🏁 <span id="race-section-year">2024</span> Season Results
+          <span id="races-loading" style="font-size:12px;color:var(--text-muted);font-weight:400;display:none">Loading...</span>
+        </div>
+        <div class="race-cards-grid" id="races-grid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
     </div>
 
     <!-- UNLOCK CARDS SECTION -->
     <div class="unlock-section">
-      <h2>🔓 解鎖獎勵</h2>
+      <h2>🔓 Unlock Rewards</h2>
       <div class="unlock-grid">
 
         <div class="unlock-card locked">
           <div class="unlock-icon monaco">👑</div>
           <div class="unlock-info">
-            <div class="unlock-title">Schumacher 傳奇卡</div>
-            <div class="unlock-condition">完成 2004 賽季全部 18 站歷史回顧</div>
-            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco 傳奇</span>
-            <div class="lock-status coming-soon">🔒 歷史模式開放後解鎖</div>
+            <div class="unlock-title">Schumacher Legend Card</div>
+            <div class="unlock-condition">Complete all 18 rounds of the 2004 season</div>
+            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco Legend</span>
+            <div class="lock-status coming-soon">🔒 Unlocks when History Mode launches</div>
           </div>
         </div>
 
         <div class="unlock-card locked">
           <div class="unlock-icon monaco">👑</div>
           <div class="unlock-info">
-            <div class="unlock-title">Hamilton 傳奇卡</div>
-            <div class="unlock-condition">完成 2019 賽季全部 21 站歷史回顧</div>
-            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco 傳奇</span>
-            <div class="lock-status coming-soon">🔒 歷史模式開放後解鎖</div>
+            <div class="unlock-title">Hamilton Legend Card</div>
+            <div class="unlock-condition">Complete all 21 rounds of the 2019 season</div>
+            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco Legend</span>
+            <div class="lock-status coming-soon">🔒 Unlocks when History Mode launches</div>
           </div>
         </div>
 
         <div class="unlock-card locked">
           <div class="unlock-icon monaco">👑</div>
           <div class="unlock-info">
-            <div class="unlock-title">Vettel 傳奇卡</div>
-            <div class="unlock-condition">完成 2012 賽季全部 20 站歷史回顧</div>
-            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco 傳奇</span>
-            <div class="lock-status coming-soon">🔒 歷史模式開放後解鎖</div>
+            <div class="unlock-title">Vettel Legend Card</div>
+            <div class="unlock-condition">Complete all 20 rounds of the 2012 season</div>
+            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco Legend</span>
+            <div class="lock-status coming-soon">🔒 Unlocks when History Mode launches</div>
           </div>
         </div>
 
         <div class="unlock-card locked">
           <div class="unlock-icon suzuka">🌀</div>
           <div class="unlock-info">
-            <div class="unlock-title">Senna 經典卡</div>
-            <div class="unlock-condition">完成任意歷史賽季 10 站以上</div>
-            <span class="rarity-badge rarity-suzuka" style="margin-bottom:8px;display:inline-flex">Suzuka 經典</span>
-            <div class="lock-status coming-soon">🔒 歷史模式開放後解鎖</div>
+            <div class="unlock-title">Senna Classic Card</div>
+            <div class="unlock-condition">Complete 10+ rounds in any historical season</div>
+            <span class="rarity-badge rarity-suzuka" style="margin-bottom:8px;display:inline-flex">Suzuka Classic</span>
+            <div class="lock-status coming-soon">🔒 Unlocks when History Mode launches</div>
           </div>
         </div>
 
         <div class="unlock-card locked">
           <div class="unlock-icon suzuka">🌀</div>
           <div class="unlock-info">
-            <div class="unlock-title">Verstappen 王朝卡</div>
-            <div class="unlock-condition">完成 2022、2023 兩個賽季</div>
-            <span class="rarity-badge rarity-suzuka" style="margin-bottom:8px;display:inline-flex">Suzuka 經典</span>
-            <div class="lock-status coming-soon">🔒 歷史模式開放後解鎖</div>
+            <div class="unlock-title">Verstappen Dynasty Card</div>
+            <div class="unlock-condition">Complete both the 2022 and 2023 seasons</div>
+            <span class="rarity-badge rarity-suzuka" style="margin-bottom:8px;display:inline-flex">Suzuka Classic</span>
+            <div class="lock-status coming-soon">🔒 Unlocks when History Mode launches</div>
           </div>
         </div>
 
         <div class="unlock-card locked">
           <div class="unlock-icon monaco">👑</div>
           <div class="unlock-info">
-            <div class="unlock-title">時光旅人成就卡</div>
-            <div class="unlock-condition">完成 5 個以上歷史賽季</div>
-            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco 傳奇</span>
-            <div class="lock-status coming-soon">🔒 歷史模式開放後解鎖</div>
+            <div class="unlock-title">Time Traveler Achievement Card</div>
+            <div class="unlock-condition">Complete 5 or more historical seasons</div>
+            <span class="rarity-badge rarity-monaco" style="margin-bottom:8px;display:inline-flex">Monaco Legend</span>
+            <div class="lock-status coming-soon">🔒 Unlocks when History Mode launches</div>
           </div>
         </div>
 
@@ -566,71 +593,221 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 數據來自 OpenF1 & Ergast</p>
+    <p>Throttenix — F1 Prediction Card Platform · USDClaw Virtual Currency · Data from OpenF1 & Jolpica</p>
   </div>
 </footer>
 
 <script src="/static/assets/js/app.js"></script>
 <script>
 /* ═══════════════════════════════════════
-   HISTORY PAGE JS
+   HISTORY PAGE JS  — 5-year real data
 ═══════════════════════════════════════ */
 
-const SEASON_DATA = {
-  2020: { champion: 'Hamilton', constructor: 'Mercedes', races: 17, points: 347 },
-  2021: { champion: 'Verstappen', constructor: 'Red Bull',  races: 22, points: 395 },
-  2022: { champion: 'Verstappen', constructor: 'Red Bull',  races: 22, points: 454 },
-  2023: { champion: 'Verstappen', constructor: 'Red Bull',  races: 22, points: 575 },
-  2024: { champion: 'Verstappen', constructor: 'Red Bull',  races: 24, points: 437 },
-  2004: { champion: 'Schumacher', constructor: 'Ferrari',   races: 18, points: 148 },
-  2012: { champion: 'Vettel',     constructor: 'Red Bull',  races: 20, points: 281 },
-  2019: { champion: 'Hamilton',   constructor: 'Mercedes',  races: 21, points: 413 },
+// Fallback meta (shown instantly before API resolves)
+const SEASON_META_FALLBACK = {
+  2020: { champion: 'Hamilton',   champion_team: 'Mercedes',       total_races: 17, champion_pts: 347, constructor_champion: 'Mercedes'    },
+  2021: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 22, champion_pts: 395.5, constructor_champion: 'Mercedes' },
+  2022: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 22, champion_pts: 454, constructor_champion: 'Red Bull Racing' },
+  2023: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 22, champion_pts: 575, constructor_champion: 'Red Bull Racing' },
+  2024: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 24, champion_pts: 437, constructor_champion: 'McLaren'     },
+};
+
+// Flag emoji per nationality
+const FLAGS = {
+  British:'🇬🇧', German:'🇩🇪', Dutch:'🇳🇱', Finnish:'🇫🇮', Spanish:'🇪🇸',
+  French:'🇫🇷', Australian:'🇦🇺', Mexican:'🇲🇽', Monegasque:'🇲🇨', Canadian:'🇨🇦',
+  Thai:'🇹🇭', Danish:'🇩🇰', Chinese:'🇨🇳', American:'🇺🇸', Italian:'🇮🇹',
+  Japanese:'🇯🇵', Brazilian:'🇧🇷', Austrian:'🇦🇹', Argentinian:'🇦🇷',
+};
+
+// Country → flag for race circuit country
+const COUNTRY_FLAG = {
+  Bahrain:'🇧🇭', 'Saudi Arabia':'🇸🇦', Australia:'🇦🇺', Japan:'🇯🇵', China:'🇨🇳',
+  USA:'🇺🇸', 'United States':'🇺🇸', Italy:'🇮🇹', Monaco:'🇲🇨', Canada:'🇨🇦',
+  Spain:'🇪🇸', Austria:'🇦🇹', UK:'🇬🇧', 'United Kingdom':'🇬🇧', Hungary:'🇭🇺',
+  Belgium:'🇧🇪', Netherlands:'🇳🇱', Azerbaijan:'🇦🇿', Singapore:'🇸🇬',
+  Mexico:'🇲🇽', Brazil:'🇧🇷', 'Abu Dhabi':'🇦🇪', UAE:'🇦🇪', Qatar:'🇶🇦',
+  'Las Vegas':'🇺🇸', Miami:'🇺🇸',
 };
 
 let currentSeason = 2024;
+const seasonCache = {};
+
+// ─── HELPER ───
+async function apiFetch(path) {
+  const token = localStorage.getItem('throttenix_token');
+  const res = await fetch(path, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+// ─── UPDATE INFO BAR ───
+function updateInfoBar(year, meta) {
+  document.getElementById('info-year').textContent = year;
+  document.getElementById('info-champion').textContent = meta.champion || '—';
+  document.getElementById('info-races').textContent = meta.total_races || '—';
+  document.getElementById('info-constructor').textContent = meta.constructor_champion || meta.champion_team || '—';
+  document.getElementById('info-points').textContent = meta.champion_pts ? meta.champion_pts + ' pts' : '—';
+}
+
+// ─── RENDER STANDINGS ───
+function renderStandings(standings) {
+  const list = document.getElementById('standings-list');
+  if (!standings || !standings.length) {
+    list.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">No data available</div>';
+    return;
+  }
+  list.innerHTML = standings.map((s, i) => {
+    // support both our normalized format and Jolpica raw format
+    const pos = s.pos || s.position || (i + 1);
+    const posClass = pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : '';
+    const driverName = s.name || (s.Driver ? `${s.Driver.givenName} ${s.Driver.familyName}` : '—');
+    // show last name only to save space
+    const lastName = driverName.split(' ').slice(-1)[0];
+    const code = s.code || '';
+    const pts = parseFloat(s.pts || s.points || 0).toFixed(0);
+    const wins = s.wins ? `<span class="standing-wins">${s.wins}W</span>` : '';
+    const color = s.color || '';
+    return `<div class="standing-row">
+      <span class="standing-pos ${posClass}">${pos}</span>
+      <span class="standing-name" style="${color ? `color:${color}` : ''}" title="${driverName}">${code || lastName}</span>
+      ${wins}
+      <span class="standing-pts">${pts}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── RENDER SKELETON ───
+function renderSkeleton(count) {
+  const grid = document.getElementById('races-grid');
+  grid.innerHTML = Array.from({ length: count }, (_, i) => `
+    <div class="race-hist-card" style="min-height:140px;animation:pulse 1.2s ease infinite alternate">
+      <div class="race-hist-round" style="opacity:.4">R${i+1}</div>
+      <div style="background:var(--bg-secondary);height:14px;border-radius:4px;width:65%;margin:8px 0 6px"></div>
+      <div style="background:var(--bg-secondary);height:12px;border-radius:4px;width:40%"></div>
+    </div>
+  `).join('');
+}
+
+// ─── RENDER RACES ───
+function renderRaces(races) {
+  const grid = document.getElementById('races-grid');
+  if (!races || !races.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">No race data available</div>';
+    return;
+  }
+  grid.innerHTML = races.map(r => {
+    const round = r.round || r.Round || '?';
+    // our API uses r.name; Jolpica raw uses r.raceName
+    const name = r.name || r.raceName || r.race_name || '—';
+    const country = r.country || r.Circuit?.Location?.country || '';
+    const cflag = COUNTRY_FLAG[country] || '';
+    const winner = r.winner || (r.Results?.[0] ? `${r.Results[0].Driver?.givenName} ${r.Results[0].Driver?.familyName}` : null) || '—';
+    const winnerTeam = r.winner_team || r.Results?.[0]?.Constructor?.name || '';
+    const winnerColor = r.winner_color || '';
+    const date = r.date ? r.date.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3') : '';
+    const circuit = r.circuit || r.Circuit?.circuitName || '';
+    // top 3 podium dots
+    const podium = (r.top5 || []).slice(0, 3).map(p =>
+      `<span style="font-size:11px;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,0.05);color:var(--text-secondary)">${p.code}</span>`
+    ).join(' ');
+    return `<div class="race-hist-card">
+      <div class="race-hist-round">R${round}</div>
+      <div class="race-hist-name">${name}</div>
+      <div class="race-hist-country">${cflag} ${country}${circuit ? ` · ${circuit}` : ''}</div>
+      <div class="race-hist-winner">
+        <span class="winner-label">Winner</span>
+        <span class="winner-name" style="${winnerColor ? `color:${winnerColor}` : ''}">${winner}</span>
+      </div>
+      ${winnerTeam ? `<div class="race-hist-team">${winnerTeam}</div>` : ''}
+      ${podium ? `<div style="margin-top:6px;display:flex;gap:4px">${podium}</div>` : ''}
+      ${date ? `<div class="race-hist-date">${date}</div>` : ''}
+    </div>`;
+  }).join('');
+}
 
 // ─── SEASON SELECTION ───
-function selectSeason(year, btnEl) {
-  currentSeason = year;
+async function selectSeason(year, btnEl) {
+  // Clamp: only 2020-2024 have real data
+  const supported = [2020, 2021, 2022, 2023, 2024];
 
-  // Update button states
+  currentSeason = year;
+  document.getElementById('race-section-year').textContent = year;
+
+  // Update active button
+  document.querySelectorAll('.season-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === String(year));
+  });
   if (btnEl) {
     document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
     btnEl.classList.add('active');
   }
 
-  // Update info bar
-  const info = SEASON_DATA[year] || {};
-  document.getElementById('info-year').textContent = year;
-  document.getElementById('info-champion').textContent = info.champion || '—';
-  document.getElementById('info-races').textContent = info.races || '—';
-  document.getElementById('info-constructor').textContent = info.constructor || '—';
-  document.getElementById('info-points').textContent = info.points ? info.points + ' pts' : '—';
-  document.getElementById('race-section-year').textContent = year;
+  // Show fallback meta instantly
+  const fallback = SEASON_META_FALLBACK[year];
+  if (fallback) updateInfoBar(year, fallback);
+  else {
+    document.getElementById('info-year').textContent = year;
+    document.getElementById('info-champion').textContent = '—';
+    document.getElementById('info-races').textContent = '—';
+    document.getElementById('info-constructor').textContent = '—';
+    document.getElementById('info-points').textContent = '—';
+  }
 
-  // Always show Coming Soon for historical data
-  showComingSoon(year);
+  // Only fetch real data for supported years
+  if (!supported.includes(year)) {
+    document.getElementById('standings-list').innerHTML =
+      '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">Legendary season data<br>coming soon</div>';
+    document.getElementById('races-grid').innerHTML =
+      '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Legendary season data coming soon</div>';
+    return;
+  }
+
+  // Use cache
+  if (seasonCache[year]) {
+    const c = seasonCache[year];
+    updateInfoBar(year, c.meta);
+    renderStandings(c.standings);
+    renderRaces(c.races);
+    return;
+  }
+
+  // Show loading skeleton
+  const meta = fallback || {};
+  renderSkeleton(meta.total_races || 10);
+  document.getElementById('races-loading').style.display = 'inline';
+  document.getElementById('standings-list').innerHTML =
+    '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">Loading...</div>';
+
+  try {
+    const data = await apiFetch(`/api/history/season/${year}`);
+    seasonCache[year] = data;
+    updateInfoBar(year, data.meta || fallback || {});
+    renderStandings(data.standings || []);
+    renderRaces(data.races || []);
+  } catch (e) {
+    // Fallback: show fallback races from /api/races/history if year=2024
+    if (year === 2024) {
+      try {
+        const h = await apiFetch('/api/races/history?limit=24');
+        renderRaces(h.races || []);
+      } catch {}
+    } else {
+      document.getElementById('races-grid').innerHTML =
+        '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Failed to load data, please try again later</div>';
+    }
+    if (fallback) renderStandings([
+      { Driver: { familyName: fallback.champion }, points: fallback.champion_pts, wins: '' },
+    ]);
+  } finally {
+    document.getElementById('races-loading').style.display = 'none';
+  }
 }
 
-function showComingSoon(year) {
-  const placeholder = document.getElementById('races-placeholder');
-
-  // Fill placeholder with dummy cards for the blurred background
-  const info = SEASON_DATA[year] || {};
-  const count = info.races || 8;
-  const dummyCards = Array.from({ length: Math.min(count, 12) }, (_, i) => `
-    <div class="race-hist-card">
-      <div class="race-hist-round">R${i + 1}</div>
-      <div class="race-hist-name" style="background:var(--bg-secondary);height:16px;border-radius:4px;width:70%"></div>
-      <div class="race-hist-country" style="background:var(--bg-secondary);height:12px;border-radius:4px;width:40%;margin-top:8px"></div>
-      <div class="race-hist-winner" style="margin-top:12px;opacity:0.4">
-        <span class="winner-label">冠軍</span>
-        <span class="winner-name">—</span>
-      </div>
-    </div>
-  `).join('');
-  placeholder.innerHTML = dummyCards;
-}
+// ─── PULSE ANIMATION ───
+const styleEl = document.createElement('style');
+styleEl.textContent = `@keyframes pulse { from { opacity:.7 } to { opacity:1 } }`;
+document.head.appendChild(styleEl);
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', () => {

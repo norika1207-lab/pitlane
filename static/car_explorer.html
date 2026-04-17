@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Throttenix — Car Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0d0d0d;
+  color: #fff;
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+}
+
+/* ─── PAGE HEADER ─── */
+.explorer-header {
+  padding: 100px 0 36px;
+  text-align: center;
+}
+.explorer-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--accent, #e8ff00);
+  margin-bottom: 10px;
+}
+.explorer-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 900; letter-spacing: -.01em;
+  color: #fff; margin-bottom: 8px;
+}
+.explorer-title span { color: var(--accent, #e8ff00); }
+.explorer-sub {
+  color: rgba(255,255,255,0.45); font-size: 14px;
+}
+
+/* ─── TEAM SWITCHER ─── */
+.team-switcher {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  padding: 0 20px 40px;
+}
+.team-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 10px 22px; border-radius: 4px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.55);
+  cursor: pointer; transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.team-btn::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--tc);
+  opacity: 0; transition: opacity 0.2s;
+}
+.team-btn:hover { border-color: var(--tc); color: #fff; }
+.team-btn:hover::before { opacity: 1; }
+.team-btn.active {
+  border-color: var(--tc);
+  background: color-mix(in srgb, var(--tc) 14%, transparent);
+  color: #fff;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--tc) 30%, transparent);
+}
+.team-btn.active::before { opacity: 1; }
+
+/* ─── STAGE ─── */
+.stage-wrap {
+  max-width: 1100px; margin: 0 auto; padding: 0 20px 60px;
+}
+.stage {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 0 80px rgba(0,0,0,0.6);
+  /* subtle team glow on border */
+  transition: box-shadow 0.4s ease;
+}
+.stage::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--tc) 6%, transparent) 0%, transparent 65%);
+  pointer-events: none; z-index: 1;
+  transition: background 0.4s ease;
+}
+
+/* Grid lines overlay */
+.stage-grid {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.07;
+  background-image:
+    linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Car image */
+.car-img {
+  display: block; width: 100%;
+  aspect-ratio: 16/7;
+  object-fit: contain;
+  padding: 4% 6%;
+  position: relative; z-index: 2;
+  transition: opacity 0.3s ease;
+  background: #0d0d0d;
+}
+.car-img.switching { opacity: 0; }
+
+/* ─── HOTSPOT LAYER ─── */
+.hotspot-layer {
+  position: absolute; inset: 0; z-index: 10;
+  pointer-events: none;
+}
+
+.hotspot-ring {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--tc);
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ring-pulse 2.4s ease-out infinite;
+  opacity: 0;
+}
+.hotspot-ring:nth-child(2) { animation-delay: 0.8s; }
+
+.hotspot-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--tc, #e8ff00);
+  border: 2px solid #0d0d0d;
+  box-shadow: 0 0 10px var(--tc, #e8ff00), 0 0 20px color-mix(in srgb, var(--tc, #e8ff00) 40%, transparent);
+  position: relative; z-index: 2;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: dot-glow 2.4s ease-in-out infinite;
+}
+.hotspot:hover .hotspot-dot {
+  transform: scale(1.6);
+  box-shadow: 0 0 18px var(--tc), 0 0 36px color-mix(in srgb, var(--tc) 60%, transparent);
+}
+
+@keyframes ring-pulse {
+  0%   { width: 10px; height: 10px; opacity: 0.8; }
+  100% { width: 44px; height: 44px; opacity: 0; }
+}
+@keyframes dot-glow {
+  0%, 100% { box-shadow: 0 0 10px var(--tc), 0 0 20px color-mix(in srgb, var(--tc) 40%, transparent); }
+  50%       { box-shadow: 0 0 16px var(--tc), 0 0 32px color-mix(in srgb, var(--tc) 60%, transparent); }
+}
+
+/* ─── TOOLTIP ─── */
+.hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+  cursor: pointer;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  transform-origin: bottom center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  width: 240px;
+}
+.hotspot:hover .tooltip { opacity: 1; transform: translateX(-50%) scale(1); }
+/* Near top — tooltip goes below */
+.tooltip.tt-below {
+  bottom: auto; top: calc(100% + 14px);
+  transform-origin: top center;
+  transform: translateX(-50%) scale(0.9);
+}
+.hotspot:hover .tooltip.tt-below { transform: translateX(-50%) scale(1); }
+/* Near right edge */
+.tooltip.tt-right {
+  left: auto; right: 0;
+  transform: scale(0.9); transform-origin: bottom right;
+}
+.hotspot:hover .tooltip.tt-right { transform: scale(1); }
+/* Near left edge */
+.tooltip.tt-left {
+  left: 0;
+  transform: scale(0.9); transform-origin: bottom left;
+}
+.hotspot:hover .tooltip.tt-left { transform: scale(1); }
+
+.tooltip-inner {
+  background: rgba(14, 14, 18, 0.96);
+  border: 1px solid var(--tc);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);
+}
+.tooltip-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--tc); margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.tooltip-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.tooltip-row:last-child { margin-bottom: 0; }
+.tooltip-key {
+  color: rgba(255,255,255,0.45); white-space: nowrap;
+}
+.tooltip-val {
+  color: #fff; font-weight: 600; text-align: right;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+}
+.tooltip-val.highlight { color: var(--tc); }
+
+/* Caret */
+.tooltip-caret {
+  width: 0; height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid var(--tc);
+  margin: 0 auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+.tt-below .tooltip-caret {
+  border-top: none;
+  border-bottom: 7px solid var(--tc);
+  order: -1;
+}
+.tooltip-inner-wrap {
+  display: flex; flex-direction: column;
+}
+
+/* ─── PART LEGEND ROW ─── */
+.part-legend {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  padding: 0 20px 48px;
+  max-width: 1100px; margin: 0 auto;
+}
+.part-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 600; letter-spacing: .06em;
+  padding: 5px 12px; border-radius: 3px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  cursor: default;
+  transition: all 0.15s;
+}
+.part-tag:hover {
+  border-color: var(--tc);
+  color: var(--tc);
+}
+
+/* ─── SPEC TABLE PANEL ─── */
+.spec-panel {
+  max-width: 1100px; margin: 0 auto 60px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.spec-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 16px 18px;
+  transition: border-color 0.2s;
+}
+.spec-card:hover { border-color: rgba(255,255,255,0.14); }
+.spec-card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--tc);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.spec-card-row {
+  display: flex; justify-content: space-between;
+  font-size: 13px; margin-bottom: 7px;
+  gap: 8px;
+}
+.spec-card-row:last-child { margin-bottom: 0; }
+.spec-card-key { color: rgba(255,255,255,0.45); }
+.spec-card-val { color: #fff; font-weight: 600; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; text-align: right; }
+.spec-card-val.accent { color: var(--tc); }
+
+/* ─── FOOTER ─── */
+.explorer-footer {
+  text-align: center; padding: 20px;
+  font-size: 12px; color: rgba(255,255,255,0.2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand"><span class="dot"></span>THROTTENIX</a>
+    <div class="nav-links">
+
+      <a href="/race">Race</a>
+      <a href="/cards">Cards</a>
+      <a href="/collection">Collection</a>
+      <a href="/battle">Battle</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/history">History</a>
+      <a href="/halloffame">Hall of Fame</a>
+      <a href="/car-explorer" class="active">Car Explorer</a>
+      <a href="/profile">Profile</a>
+    </div>
+    <div id="nav-auth" class="nav-auth"></div>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="auth-modal"></div>
+</div>
+
+<!-- HEADER -->
+<div class="explorer-header">
+  <div class="explorer-eyebrow">2024 Season · Technical Breakdown</div>
+  <h1 class="explorer-title">F1 <span id="title-team">McLaren</span> Explorer</h1>
+  <p class="explorer-sub">Hover over the hotspots to explore real-car specifications</p>
+</div>
+
+<!-- TEAM SWITCHER -->
+<div class="team-switcher" id="team-switcher"></div>
+
+<!-- STAGE -->
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="stage-grid"></div>
+    <img class="car-img" id="car-img" src="/static/assets/cars/car_orange.png" alt="McLaren MCL38">
+
+    <!-- HOTSPOT LAYER (filled by JS) -->
+    <div class="hotspot-layer" id="hotspot-layer"></div>
+  </div>
+</div>
+
+<!-- PART LEGEND -->
+<div class="part-legend" id="part-legend"></div>
+
+<!-- SPEC PANEL -->
+<div class="spec-panel" id="spec-panel"></div>
+
+<div class="explorer-footer">
+  Throttenix · F1 Car Explorer · Specs for educational purposes · 2024 Season Data
+</div>
+
+<script src="/static/assets/js/app.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   CAR EXPLORER JS
+═══════════════════════════════════════════════════ */
+
+const TEAMS = {
+  mclaren:  { name: 'McLaren',      color: '#F47600', car: '/static/assets/cars/car_orange.png', engine: 'Mercedes AMG F1 M15' },
+  redbull:  { name: 'Red Bull',     color: '#3671C6', car: '/static/assets/cars/car_blue.png',   engine: 'Honda RBPTH002' },
+  ferrari:  { name: 'Ferrari',      color: '#E8002D', car: '/static/assets/cars/car_red.png',    engine: 'Ferrari 066/12' },
+  mercedes: { name: 'Mercedes',     color: '#27F4D2', car: '/static/assets/cars/car_teal.png',   engine: 'Mercedes AMG F1 M15' },
+  aston:    { name: 'Aston Martin', color: '#358C75', car: '/static/assets/cars/car_green.png',  engine: 'Mercedes AMG F1 M15' },
+};
+
+// Hotspot positions calibrated: car renders at L=13.1% T=4% R=86.9% B=96%
+const HOTSPOTS = [
+  {
+    id: 'front-wing',
+    label: 'Front Wing',
+    left: 18, top: 70,
+    specs: (t) => [
+      { k: 'Material',    v: 'Carbon Fibre Composite' },
+      { k: 'Downforce',   v: '+185 kg (circuit set)', hi: true },
+      { k: 'Flap Count',  v: '5 adjustable' },
+      { k: 'Weight',      v: '~7 kg' },
+    ],
+  },
+  {
+    id: 'nose-cone',
+    label: 'Nose Cone',
+    left: 26, top: 56,
+    specs: (t) => [
+      { k: 'Structure',   v: 'CF Monocoque tip' },
+      { k: 'Crash test',  v: '60g deceleration', hi: true },
+      { k: 'Function',    v: 'Aero transition' },
+      { k: 'Weight',      v: '~4 kg' },
+    ],
+  },
+  {
+    id: 'front-tyre',
+    label: 'Front Tyre',
+    left: 32, top: 76,
+    specs: (t) => [
+      { k: 'Brand',       v: 'Pirelli P Zero' },
+      { k: 'Start',       v: 'Soft compound', hi: true },
+      { k: 'Pit window',  v: 'Lap 20–25' },
+      { k: 'Work temp',   v: '90–110 °C' },
+    ],
+  },
+  {
+    id: 'brakes',
+    label: 'Brakes',
+    left: 36, top: 67,
+    specs: (t) => [
+      { k: 'Brand',       v: 'Brembo' },
+      { k: 'Max temp',    v: '1,200 °C', hi: true },
+      { k: 'Material',    v: 'Carbon ceramic disc' },
+      { k: 'Heaviest pt', v: 'Turn 13' },
+    ],
+  },
+  {
+    id: 'cockpit',
+    label: 'Cockpit',
+    left: 50, top: 36,
+    specs: (t) => [
+      { k: 'Halo load',   v: '12 tonnes', hi: true },
+      { k: 'Chassis',     v: 'CF Monocoque' },
+      { k: 'Max G-force', v: '6.5 G' },
+      { k: 'Escape time', v: '< 5 seconds' },
+    ],
+  },
+  {
+    id: 'sidepod',
+    label: 'Engine / Sidepod',
+    left: 58, top: 58,
+    specs: (t) => [
+      { k: 'Engine',      v: TEAMS[t].engine, hi: true },
+      { k: 'Est. power',  v: '1,000 hp+' },
+      { k: 'ERS (MGU-K)', v: '161 hp boost' },
+      { k: 'Max RPM',     v: '15,000 rpm' },
+    ],
+  },
+  {
+    id: 'rear-tyre',
+    label: 'Rear Tyre',
+    left: 67, top: 76,
+    specs: (t) => [
+      { k: 'Brand',       v: 'Pirelli P Zero' },
+      { k: 'Race stint',  v: 'Medium compound', hi: true },
+      { k: 'Pit window',  v: 'Lap 20–25' },
+      { k: 'Work temp',   v: '90–110 °C' },
+    ],
+  },
+  {
+    id: 'rear-wing',
+    label: 'Rear Wing / DRS',
+    left: 78, top: 32,
+    specs: (t) => [
+      { k: 'DRS gain',    v: '+12–15 km/h', hi: true },
+      { k: 'DRS zones',   v: '3 (this circuit)' },
+      { k: 'Angle',       v: 'Low drag (Jeddah)' },
+      { k: 'Material',    v: 'Carbon fibre' },
+    ],
+  },
+];
+
+// Spec panel summary per part (full specs shown below stage)
+const SPEC_CARDS = [
+  {
+    title: 'Power Unit',
+    rows: (t) => [
+      { k: 'Engine',    v: TEAMS[t].engine, hi: true },
+      { k: 'Est. Power', v: '~1,000 hp (combined)' },
+      { k: 'MGU-K',     v: '161 hp (deploy)' },
+      { k: 'Max RPM',   v: '15,000 rpm' },
+      { k: 'Fuel flow', v: '100 kg/h (max)' },
+    ],
+  },
+  {
+    title: 'Aerodynamics',
+    rows: (t) => [
+      { k: 'Front downforce', v: '+185 kg', hi: true },
+      { k: 'Rear downforce',  v: '+300 kg (est.)' },
+      { k: 'DRS gain',        v: '+12–15 km/h' },
+      { k: 'DRS zones',       v: '3 (Jeddah)' },
+      { k: 'Drag coefficient',v: '~0.75 Cd' },
+    ],
+  },
+  {
+    title: 'Tyres & Strategy',
+    rows: (t) => [
+      { k: 'Supplier',    v: 'Pirelli P Zero' },
+      { k: 'Start',       v: 'Soft compound', hi: true },
+      { k: 'Race stint',  v: 'Medium compound' },
+      { k: 'Work temp',   v: '90–110 °C' },
+      { k: 'Predicted pit', v: 'Lap 20–25' },
+    ],
+  },
+  {
+    title: 'Braking System',
+    rows: (t) => [
+      { k: 'Supplier',    v: 'Brembo' },
+      { k: 'Max temp',    v: '1,200 °C', hi: true },
+      { k: 'Disc material', v: 'Carbon ceramic' },
+      { k: 'Heaviest pt', v: 'Turn 13' },
+      { k: 'Pedal travel', v: '~18 mm' },
+    ],
+  },
+  {
+    title: 'Safety',
+    rows: (t) => [
+      { k: 'Halo',        v: '12-tonne load rated', hi: true },
+      { k: 'Chassis',     v: 'CF Monocoque' },
+      { k: 'Max G-force', v: '6.5 G' },
+      { k: 'Escape time', v: '< 5 seconds' },
+      { k: 'Crash struct.', v: 'FIA compliant (6 tests)' },
+    ],
+  },
+  {
+    title: 'Dimensions',
+    rows: (t) => [
+      { k: 'Weight (min)', v: '798 kg (car+driver)', hi: true },
+      { k: 'Length',       v: '~5.6 m' },
+      { k: 'Width',        v: '2.0 m (max)' },
+      { k: 'Top speed',    v: '~340 km/h' },
+      { k: '0–200 km/h',  v: '~4.0 sec' },
+    ],
+  },
+];
+
+/* ─── STATE ─── */
+let currentTeam = 'mclaren';
+
+/* ─── CSS VAR HELPER ─── */
+function setTeamColor(color) {
+  document.documentElement.style.setProperty('--tc', color);
+}
+
+/* ─── BUILD TEAM BUTTONS ─── */
+function buildTeamSwitcher() {
+  const wrap = document.getElementById('team-switcher');
+  Object.entries(TEAMS).forEach(([id, t]) => {
+    const btn = document.createElement('button');
+    btn.className = 'team-btn' + (id === currentTeam ? ' active' : '');
+    btn.style.setProperty('--tc', t.color);
+    btn.textContent = t.name;
+    btn.onclick = () => switchTeam(id);
+    wrap.appendChild(btn);
+  });
+}
+
+/* ─── SWITCH TEAM ─── */
+function switchTeam(id) {
+  if (id === currentTeam) return;
+  currentTeam = id;
+  const t = TEAMS[id];
+
+  setTeamColor(t.color);
+
+  // Update button states
+  document.querySelectorAll('.team-btn').forEach((b, i) => {
+    b.classList.toggle('active', Object.keys(TEAMS)[i] === id);
+  });
+
+  // Swap car image with fade
+  const img = document.getElementById('car-img');
+  img.classList.add('switching');
+  setTimeout(() => {
+    img.src = t.car;
+    img.alt = t.name + ' F1 2024';
+    img.classList.remove('switching');
+  }, 200);
+
+  // Update title
+  document.getElementById('title-team').textContent = t.name;
+
+  // Re-render hotspots & spec panel (tooltips re-bind to new team)
+  buildHotspots();
+  buildSpecPanel();
+}
+
+/* ─── BUILD HOTSPOTS ─── */
+function buildHotspots() {
+  const layer = document.getElementById('hotspot-layer');
+  layer.innerHTML = '';
+  const legend = document.getElementById('part-legend');
+  legend.innerHTML = '';
+
+  HOTSPOTS.forEach((hp) => {
+    // Hotspot element
+    const el = document.createElement('div');
+    el.className = 'hotspot';
+    el.style.left = hp.left + '%';
+    el.style.top  = hp.top  + '%';
+
+    const ring1 = document.createElement('div');
+    ring1.className = 'hotspot-ring';
+    const ring2 = document.createElement('div');
+    ring2.className = 'hotspot-ring';
+    const dot = document.createElement('div');
+    dot.className = 'hotspot-dot';
+
+    // Tooltip — pure CSS hover, no inline style overrides
+    const tt = document.createElement('div');
+    // Determine tooltip direction from position
+    const ttBelow = hp.top < 40;            // near top → tooltip goes down
+    const ttRight = hp.left > 72;           // near right → anchor right
+    const ttLeft  = hp.left < 25;           // near left → anchor left
+    let ttClass = 'tooltip';
+    if (ttBelow) ttClass += ' tt-below';
+    else if (ttRight) ttClass += ' tt-right';
+    else if (ttLeft)  ttClass += ' tt-left';
+    tt.className = ttClass;
+
+    const specs = hp.specs(currentTeam);
+    const caretUp   = `<div class="tooltip-caret"></div>`;
+    const caretDown = `<div class="tooltip-caret tt-caret-down"></div>`;
+    tt.innerHTML = `
+      <div class="tooltip-inner-wrap">
+        ${ttBelow ? caretDown : ''}
+        <div class="tooltip-inner">
+          <div class="tooltip-label">${hp.label}</div>
+          ${specs.map(s => `
+            <div class="tooltip-row">
+              <span class="tooltip-key">${s.k}</span>
+              <span class="tooltip-val${s.hi ? ' highlight' : ''}">${s.v}</span>
+            </div>`).join('')}
+        </div>
+        ${!ttBelow ? caretUp : ''}
+      </div>
+    `;
+
+    el.appendChild(ring1);
+    el.appendChild(ring2);
+    el.appendChild(dot);
+    el.appendChild(tt);
+    layer.appendChild(el);
+
+    // Part legend tag
+    const tag = document.createElement('div');
+    tag.className = 'part-tag';
+    tag.textContent = hp.label;
+    tag.onclick = () => {
+      el.querySelector('.tooltip').style.opacity = '1';
+      setTimeout(() => el.querySelector('.tooltip').style.opacity = '', 1800);
+    };
+    legend.appendChild(tag);
+  });
+}
+
+/* ─── BUILD SPEC PANEL ─── */
+function buildSpecPanel() {
+  const panel = document.getElementById('spec-panel');
+  panel.innerHTML = '';
+  SPEC_CARDS.forEach(sc => {
+    const card = document.createElement('div');
+    card.className = 'spec-card';
+    card.innerHTML = `
+      <div class="spec-card-title">${sc.title}</div>
+      ${sc.rows(currentTeam).map(r => `
+        <div class="spec-card-row">
+          <span class="spec-card-key">${r.k}</span>
+          <span class="spec-card-val${r.hi ? ' accent' : ''}">${r.v}</span>
+        </div>`).join('')}
+    `;
+    panel.appendChild(card);
+  });
+}
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  // Preload all car images so team switch is instant
+  Object.values(TEAMS).forEach(t => { const img = new Image(); img.src = t.car; });
+
+  setTeamColor(TEAMS[currentTeam].color);
+  buildTeamSwitcher();
+  buildHotspots();
+  buildSpecPanel();
+});
+</script>
+</body>
+</html>

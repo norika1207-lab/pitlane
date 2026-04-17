@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PitLane — 排行榜</title>
+<title>Throttenix — Leaderboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
 <style>
@@ -291,14 +291,18 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <a href="/" class="nav-brand"><span class="dot"></span>THROTTENIX</a>
     <div class="nav-links">
-      <a href="/">首頁</a>
-      <a href="/race">賽事</a>
-      <a href="/cards">卡牌</a>
-      <a href="/leaderboard" class="active">排行榜</a>
-      <a href="/history">歷史</a>
-      <a href="/profile">戰績</a>
+
+      <a href="/race">Race</a>
+      <a href="/cards">Cards</a>
+      <a href="/collection">Collection</a>
+    <a href="/battle">Battle</a>
+      <a href="/leaderboard" class="active">Leaderboard</a>
+      <a href="/history">History</a>
+      <a href="/halloffame">Hall of Fame</a>
+      <a href="/car-explorer">Car Explorer</a>
+      <a href="/profile">Profile</a>
     </div>
     <div id="nav-auth" class="nav-auth"></div>
   </div>
@@ -314,10 +318,10 @@
   <div class="container">
     <div class="hero-badge" style="margin-bottom:16px">
       <span class="dot" style="width:6px;height:6px"></span>
-      2025 賽季即時更新
+      2025 Season Live Updates
     </div>
-    <h1>排行榜</h1>
-    <p>用戶戰績、F1 車手積分、本站賠率一覽</p>
+    <h1>Leaderboard</h1>
+    <p>User stats, F1 driver standings, and current race odds</p>
   </div>
 </div>
 
@@ -327,9 +331,9 @@
 
     <!-- TAB BAR -->
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('users')">🏆 用戶排行榜</button>
-      <button class="tab-btn" onclick="switchTab('drivers')">🏎 賽季積分榜</button>
-      <button class="tab-btn" onclick="switchTab('odds')">📊 本站賠率</button>
+      <button class="tab-btn active" onclick="switchTab('users')">🏆 User Leaderboard</button>
+      <button class="tab-btn" onclick="switchTab('drivers')">🏎 Season Standings</button>
+      <button class="tab-btn" onclick="switchTab('odds')">📊 Current Odds</button>
     </div>
 
     <!-- TAB: USERS -->
@@ -337,7 +341,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="user-search" placeholder="搜尋用戶名稱..." oninput="filterUsers(this.value)">
+          <input type="text" id="user-search" placeholder="Search username..." oninput="filterUsers(this.value)">
         </div>
         <div style="font-size:13px;color:var(--text-muted)" id="user-count"></div>
       </div>
@@ -345,15 +349,15 @@
       <!-- Header -->
       <div class="lb-table">
         <div class="lb-header">
-          <div>排名</div>
-          <div>用戶</div>
-          <div class="col-bets" style="text-align:right">總預測</div>
-          <div style="text-align:right">勝場</div>
-          <div style="text-align:right">勝率</div>
-          <div class="col-payout" style="text-align:right">總回報</div>
+          <div>Rank</div>
+          <div>User</div>
+          <div class="col-bets" style="text-align:right">Total Bets</div>
+          <div style="text-align:right">Wins</div>
+          <div style="text-align:right">Win Rate</div>
+          <div class="col-payout" style="text-align:right">Total Payout</div>
         </div>
         <div id="users-list">
-          <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+          <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
         </div>
       </div>
     </div>
@@ -361,7 +365,7 @@
     <!-- TAB: DRIVER STANDINGS -->
     <div class="tab-panel" id="panel-drivers">
       <div id="standings-list" class="standings-grid">
-        <div class="loading"><div class="spinner"></div><p>載入車手積分榜...</p></div>
+        <div class="loading"><div class="spinner"></div><p>Loading driver standings...</p></div>
       </div>
     </div>
 
@@ -371,13 +375,13 @@
       <div class="odds-table">
         <div class="odds-row odds-header">
           <div>#</div>
-          <div>車手</div>
-          <div style="text-align:right">賠率</div>
-          <div class="col-implied" style="text-align:right">隱含機率</div>
-          <div style="text-align:right">操作</div>
+          <div>Driver</div>
+          <div style="text-align:right">Odds</div>
+          <div class="col-implied" style="text-align:right">Implied %</div>
+          <div style="text-align:right">Action</div>
         </div>
         <div id="odds-list">
-          <div class="loading"><div class="spinner"></div><p>載入賠率資料...</p></div>
+          <div class="loading"><div class="spinner"></div><p>Loading odds...</p></div>
         </div>
       </div>
     </div>
@@ -388,7 +392,7 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 數據來自 OpenF1 & Ergast</p>
+    <p>Throttenix — F1 Prediction Card Platform · USDClaw Virtual Currency · Data from OpenF1 & Jolpica</p>
   </div>
 </footer>
 
@@ -443,20 +447,20 @@ async function loadUserLeaderboard() {
     const data = await api('/api/profile/leaderboard');
     allUsers = data.leaderboard || data.users || data || [];
     if (!Array.isArray(allUsers) || !allUsers.length) {
-      listEl.innerHTML = `<div class="empty-state"><div class="icon">🏆</div><p>暫無排行榜資料</p></div>`;
+      listEl.innerHTML = `<div class="empty-state"><div class="icon">🏆</div><p>No leaderboard data yet</p></div>`;
       return;
     }
     renderUsers(allUsers);
-    document.getElementById('user-count').textContent = `共 ${allUsers.length} 位用戶`;
+    document.getElementById('user-count').textContent = `${allUsers.length} users`;
   } catch (e) {
-    listEl.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>無法載入排行榜：${e.message}</p></div>`;
+    listEl.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load leaderboard: ${e.message}</p></div>`;
   }
 }
 
 function renderUsers(list) {
   const listEl = document.getElementById('users-list');
   if (!list.length) {
-    listEl.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>找不到符合的用戶</p></div>`;
+    listEl.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>No matching users found</p></div>`;
     return;
   }
 
@@ -481,7 +485,7 @@ function renderUsers(list) {
         </div>
         <div class="lb-user">
           <div class="lb-avatar ${isMedal ? avatarClass[rank-1] : ''}">${nameInitial}</div>
-          <span class="lb-username">${u.username || '匿名'}</span>
+          <span class="lb-username">${u.username || 'Anonymous'}</span>
         </div>
         <div class="lb-stat muted col-bets" style="text-align:right">
           <span class="count-up" data-count="${u.total_bets || 0}">${u.total_bets || 0}</span>
@@ -529,7 +533,7 @@ async function loadDriverStandings() {
     const data = await api('/api/drivers');
     const drivers = data.drivers || [];
     if (!drivers.length) {
-      el.innerHTML = `<div class="empty-state"><div class="icon">🏎</div><p>暫無積分榜資料</p></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="icon">🏎</div><p>No standings data available</p></div>`;
       return;
     }
 
@@ -549,7 +553,7 @@ async function loadDriverStandings() {
           <div class="standing-pos ${pc}">${i + 1}</div>
           ${photoEl}
           <div class="standing-info">
-            <div class="standing-name">${d.name || d.full_name || '未知'}</div>
+            <div class="standing-name">${d.name || d.full_name || 'Unknown'}</div>
             <div class="standing-team">${d.team || d.constructor || ''} · ${d.nationality || ''}</div>
             <div class="standing-pts">
               <span class="count-up" data-count="${d.points || 0}">${d.points || 0}</span>
@@ -562,7 +566,7 @@ async function loadDriverStandings() {
 
     requestAnimationFrame(animateCounts);
   } catch (e) {
-    el.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>無法載入積分榜：${e.message}</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load standings: ${e.message}</p></div>`;
   }
 }
 
@@ -574,16 +578,16 @@ async function loadOdds() {
     // Get current race first
     const race = await api('/api/races/current').catch(() => null);
     const raceId = race?.race_id || race?.session_key || 'current';
-    const raceName = race?.race_name || '當前賽事';
-    const raceDate = race?.date ? new Date(race.date).toLocaleDateString('zh-TW', { month:'long', day:'numeric', weekday:'short' }) : '';
+    const raceName = race?.race_name || 'Current Race';
+    const raceDate = race?.date ? new Date(race.date).toLocaleDateString('en-US', { month:'long', day:'numeric', weekday:'short' }) : '';
 
     bannerEl.innerHTML = `
       <div class="odds-banner">
         <div>
           <h3>🏁 ${raceName}</h3>
-          <p>${raceDate ? '賽事時間：' + raceDate + ' · ' : ''}本站即時賠率</p>
+          <p>${raceDate ? 'Race date: ' + raceDate + ' · ' : ''}Live odds</p>
         </div>
-        <a href="/race" class="btn btn-gold btn-sm">前往下注</a>
+        <a href="/race" class="btn btn-gold btn-sm">Place Bet</a>
       </div>
     `;
 
@@ -591,7 +595,7 @@ async function loadOdds() {
     const odds = data.odds || data.drivers || data || [];
 
     if (!odds.length) {
-      listEl.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>暫無賠率資料</p></div>`;
+      listEl.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>No odds data available</p></div>`;
       return;
     }
 
@@ -606,13 +610,13 @@ async function loadOdds() {
         <div class="odds-row">
           <div class="odds-pos">${i + 1}</div>
           <div>
-            <div class="odds-driver">${item.driver_name || item.name || '未知車手'}</div>
+            <div class="odds-driver">${item.driver_name || item.name || 'Unknown Driver'}</div>
             <div class="odds-team-small">${item.team || item.constructor || ''}</div>
           </div>
           <div class="odds-val ${oddsClass}">x${oddsVal.toFixed(2)}</div>
           <div class="implied-prob col-implied">${impliedPct}%</div>
           <div class="bet-now-link">
-            <a href="/race" class="btn btn-outline btn-sm">下注</a>
+            <a href="/race" class="btn btn-outline btn-sm">Bet Now</a>
           </div>
         </div>
       `;
@@ -620,7 +624,7 @@ async function loadOdds() {
 
   } catch (e) {
     bannerEl.innerHTML = '';
-    listEl.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>無法載入賠率資料：${e.message}</p></div>`;
+    listEl.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load odds: ${e.message}</p></div>`;
   }
 }
 

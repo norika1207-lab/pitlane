@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PitLane — 對賭競技場</title>
+<title>Throttenix — Battle Arena</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/assets/css/style.css">
 <style>
@@ -344,13 +344,18 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-brand"><span class="dot"></span>PITLANE</a>
+    <a href="/" class="nav-brand"><span class="dot"></span>THROTTENIX</a>
     <div class="nav-links">
-      <a href="/">首頁</a>
-      <a href="/race">賽事</a>
-      <a href="/cards">卡牌</a>
-      <a href="/battle" class="active">對賭</a>
-      <a href="/profile">戰績</a>
+
+      <a href="/race">Race</a>
+      <a href="/cards">Cards</a>
+      <a href="/collection">Collection</a>
+      <a href="/battle" class="active">Battle</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/history">History</a>
+      <a href="/halloffame">Hall of Fame</a>
+      <a href="/car-explorer">Car Explorer</a>
+      <a href="/profile">Profile</a>
     </div>
     <div id="nav-auth" class="nav-auth"></div>
   </div>
@@ -367,9 +372,9 @@
 <!-- HERO -->
 <div class="battle-hero">
   <div class="container">
-    <div class="hero-badge">⚔️ 競技對賭 · P2P 市場</div>
-    <h1>對賭競技場</h1>
-    <p>挑戰其他玩家，用預測實力一決高下</p>
+    <div class="hero-badge">⚔️ Competitive Betting · P2P Market</div>
+    <h1>Battle Arena</h1>
+    <p>Challenge other players and prove your prediction skills</p>
   </div>
 </div>
 
@@ -379,8 +384,8 @@
 
     <!-- TABS -->
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('p2p')">📈 P2P 對賭市場</button>
-      <button class="tab-btn" onclick="switchTab('challenge')">🏁 朋友挑戰</button>
+      <button class="tab-btn active" onclick="switchTab('p2p')">📈 P2P Betting Market</button>
+      <button class="tab-btn" onclick="switchTab('challenge')">🏁 Friend Challenge</button>
     </div>
 
     <!-- ══════════ P2P TAB ══════════ -->
@@ -390,59 +395,59 @@
       <div style="margin-bottom:20px">
         <button class="form-toggle-btn" onclick="toggleP2PForm()">
           <span id="p2p-form-icon">＋</span>
-          <span id="p2p-form-label">開新單</span>
+          <span id="p2p-form-label">Place Order</span>
         </button>
       </div>
 
       <div class="form-panel" id="p2p-form" style="display:none">
-        <h3>➕ 開新對賭單</h3>
+        <h3>➕ Place New Bet Order</h3>
         <div class="form-row">
           <div class="form-group">
-            <label>選擇賽事</label>
+            <label>Select Race</label>
             <select id="p2p-race">
-              <option value="">載入賽程中...</option>
+              <option value="">Loading schedule...</option>
             </select>
           </div>
           <div class="form-group">
-            <label>預測冠軍</label>
+            <label>Predict Winner</label>
             <select id="p2p-driver">
-              <option value="">載入車手中...</option>
+              <option value="">Loading drivers...</option>
             </select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>你開的賠率（1.1 – 50）</label>
-            <input type="number" id="p2p-odds" value="2.0" min="1.1" max="50" step="0.1" placeholder="例：2.0">
+            <label>Your Odds (1.1 – 50)</label>
+            <input type="number" id="p2p-odds" value="2.0" min="1.1" max="50" step="0.1" placeholder="e.g. 2.0">
           </div>
           <div class="form-group">
-            <label>下注金額（◆ USDClaw）</label>
-            <input type="number" id="p2p-amount" value="500" min="100" placeholder="最少 100">
+            <label>Bet Amount (◆ USDClaw)</label>
+            <input type="number" id="p2p-amount" value="500" min="100" placeholder="min 100">
           </div>
         </div>
         <div id="p2p-create-result"></div>
         <div class="form-actions-row">
-          <button class="btn btn-outline btn-sm" onclick="toggleP2PForm()">取消</button>
-          <button class="btn btn-gold btn-sm" onclick="createP2POrder()">開單送出</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleP2PForm()">Cancel</button>
+          <button class="btn btn-gold btn-sm" onclick="createP2POrder()">Submit Order</button>
         </div>
       </div>
 
       <!-- Available Orders -->
       <div class="section-title">
-        市場掛單
+        Market Orders
         <span class="badge" id="available-count">0</span>
       </div>
       <div class="order-list" id="available-orders">
-        <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+        <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
       </div>
 
       <!-- My Orders -->
       <div class="section-title" style="margin-top:36px">
-        我的對賭
+        My Bets
         <span class="badge" id="my-orders-count">0</span>
       </div>
       <div class="order-list" id="my-orders">
-        <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+        <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
       </div>
 
     </div><!-- /tab-p2p -->
@@ -454,70 +459,70 @@
       <div style="margin-bottom:20px">
         <button class="form-toggle-btn" onclick="toggleChallengeForm()">
           <span id="ch-form-icon">＋</span>
-          <span id="ch-form-label">建立挑戰房間</span>
+          <span id="ch-form-label">Create Challenge Room</span>
         </button>
       </div>
 
       <div class="form-panel" id="ch-form" style="display:none">
-        <h3>🏁 建立挑戰房間</h3>
+        <h3>🏁 Create Challenge Room</h3>
         <div class="form-row three">
           <div class="form-group">
-            <label>選擇賽事</label>
+            <label>Select Race</label>
             <select id="ch-race">
-              <option value="">載入中...</option>
+              <option value="">Loading...</option>
             </select>
           </div>
           <div class="form-group">
-            <label>你的預測冠軍</label>
+            <label>Your Predicted Winner</label>
             <select id="ch-driver">
-              <option value="">載入中...</option>
+              <option value="">Loading...</option>
             </select>
           </div>
           <div class="form-group">
-            <label>下注金額（◆ USDClaw）</label>
-            <input type="number" id="ch-amount" value="500" min="100" placeholder="最少 100">
+            <label>Bet Amount (◆ USDClaw)</label>
+            <input type="number" id="ch-amount" value="500" min="100" placeholder="min 100">
           </div>
         </div>
         <div id="ch-create-result"></div>
         <div class="form-actions-row">
-          <button class="btn btn-outline btn-sm" onclick="toggleChallengeForm()">取消</button>
-          <button class="btn btn-gold btn-sm" onclick="createChallenge()">產生挑戰碼</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleChallengeForm()">Cancel</button>
+          <button class="btn btn-gold btn-sm" onclick="createChallenge()">Generate Challenge Code</button>
         </div>
 
         <!-- Generated Code -->
         <div class="code-share-box" id="code-share-box">
-          <p>挑戰房間已建立！分享邀請碼給朋友：</p>
-          <div class="big-code" id="generated-code" onclick="copyCode()" title="點擊複製">——————</div>
+          <p>Challenge room created! Share the invite code with a friend:</p>
+          <div class="big-code" id="generated-code" onclick="copyCode()" title="Click to copy">——————</div>
           <div class="code-copied" id="code-copied-msg"></div>
-          <p style="margin-top:8px">朋友輸入邀請碼接受挑戰後，對賭即刻開始</p>
+          <p style="margin-top:8px">The battle starts once your friend enters the invite code</p>
         </div>
       </div>
 
       <!-- Join by Invite Code -->
-      <div class="section-title">輸入邀請碼加入</div>
+      <div class="section-title">Enter Invite Code to Join</div>
       <div class="invite-row">
         <input type="text" id="invite-code-input" maxlength="8"
-               placeholder="輸入 8 位邀請碼..."
+               placeholder="Enter 8-character invite code..."
                oninput="this.value=this.value.toUpperCase()"
                onkeydown="if(event.key==='Enter') joinChallenge()">
-        <button class="btn btn-gold" onclick="joinChallenge()">接受挑戰</button>
+        <button class="btn btn-gold" onclick="joinChallenge()">Join Challenge</button>
       </div>
       <div id="join-result"></div>
 
       <!-- Battle Arena -->
-      <div class="section-title" style="margin-top:32px">⚔️ 對戰舞台</div>
+      <div class="section-title" style="margin-top:32px">⚔️ Battle Stage</div>
       <div class="battle-arena" id="battle-arena">
         <div class="sparkle-container" id="sparkle-container"></div>
         <div class="arena-idle" id="arena-idle">
           <div class="arena-icon">⚔️</div>
-          <p>建立或接受挑戰後，對戰卡牌將在此飛入</p>
+          <p>Create or join a challenge and battle cards will fly in here</p>
         </div>
         <div class="battle-stage" id="battle-stage" style="display:none">
           <div class="battle-fighter fighter-left" id="fighter-left">
             <div class="battle-fighter-card" id="left-card">
               <div class="f-number" id="left-num">#00</div>
               <div class="f-name" id="left-name">—</div>
-              <div class="f-user" id="left-user">玩家</div>
+              <div class="f-user" id="left-user">Player</div>
             </div>
             <div id="left-label"></div>
           </div>
@@ -526,7 +531,7 @@
             <div class="battle-fighter-card" id="right-card">
               <div class="f-number" id="right-num">#00</div>
               <div class="f-name" id="right-name">—</div>
-              <div class="f-user" id="right-user">對手</div>
+              <div class="f-user" id="right-user">Opponent</div>
             </div>
             <div id="right-label"></div>
           </div>
@@ -535,11 +540,11 @@
 
       <!-- My Challenges -->
       <div class="section-title" style="margin-top:36px">
-        我的挑戰
+        My Challenges
         <span class="badge" id="my-challenges-count">0</span>
       </div>
       <div class="challenge-list" id="my-challenges">
-        <div class="loading"><div class="spinner"></div><p>載入中...</p></div>
+        <div class="loading"><div class="spinner"></div><p>Loading...</p></div>
       </div>
 
     </div><!-- /tab-challenge -->
@@ -549,7 +554,7 @@
 
 <footer class="footer">
   <div class="container">
-    <p>PitLane — 賽車預測卡牌平台 · USDClaw 虛擬幣 · 數據來自 OpenF1 &amp; Ergast</p>
+    <p>Throttenix — F1 Prediction Card Platform · USDClaw Virtual Currency · Data from OpenF1 &amp; Jolpica</p>
   </div>
 </footer>
 
@@ -578,7 +583,7 @@ function toggleP2PForm() {
   p2pFormOpen = !p2pFormOpen;
   document.getElementById('p2p-form').style.display = p2pFormOpen ? 'block' : 'none';
   document.getElementById('p2p-form-icon').textContent  = p2pFormOpen ? '✕' : '＋';
-  document.getElementById('p2p-form-label').textContent = p2pFormOpen ? '收起' : '開新單';
+  document.getElementById('p2p-form-label').textContent = p2pFormOpen ? 'Collapse' : 'Place Order';
   if (p2pFormOpen) document.getElementById('p2p-create-result').innerHTML = '';
 }
 
@@ -586,7 +591,7 @@ function toggleChallengeForm() {
   chFormOpen = !chFormOpen;
   document.getElementById('ch-form').style.display = chFormOpen ? 'block' : 'none';
   document.getElementById('ch-form-icon').textContent  = chFormOpen ? '✕' : '＋';
-  document.getElementById('ch-form-label').textContent = chFormOpen ? '收起' : '建立挑戰房間';
+  document.getElementById('ch-form-label').textContent = chFormOpen ? 'Collapse' : 'Create Challenge Room';
   if (chFormOpen) {
     document.getElementById('ch-create-result').innerHTML = '';
     document.getElementById('code-share-box').classList.remove('visible');
@@ -600,11 +605,11 @@ async function loadFormData() {
     races = (data.races || []).filter(r => r.date >= new Date().toISOString().slice(0, 10));
     const opts = races.length
       ? races.map(r => `<option value="${r.race_id || r.round}">${r.race_name} (R${r.round})</option>`).join('')
-      : '<option value="">暫無賽程</option>';
+      : '<option value="">No upcoming races</option>';
     document.querySelectorAll('#p2p-race, #ch-race').forEach(el => { el.innerHTML = opts; });
   } catch (e) {
     document.querySelectorAll('#p2p-race, #ch-race').forEach(el => {
-      el.innerHTML = '<option value="">無法載入賽程</option>';
+      el.innerHTML = '<option value="">Failed to load schedule</option>';
     });
   }
 
@@ -617,7 +622,7 @@ async function loadFormData() {
     document.querySelectorAll('#p2p-driver, #ch-driver').forEach(el => { el.innerHTML = opts; });
   } catch (e) {
     document.querySelectorAll('#p2p-driver, #ch-driver').forEach(el => {
-      el.innerHTML = '<option value="">無法載入車手</option>';
+      el.innerHTML = '<option value="">Failed to load drivers</option>';
     });
   }
 }
@@ -630,12 +635,12 @@ async function loadAvailableOrders() {
     const orders = data.orders || data || [];
     document.getElementById('available-count').textContent = orders.length;
     if (!orders.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>目前市場無掛單，率先開單吧！</p></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No open orders in market — be the first to place one!</p></div>`;
       return;
     }
     el.innerHTML = orders.map(o => orderCardHTML(o, 'available')).join('');
   } catch (e) {
-    el.innerHTML = `<div class="empty-state"><p>無法載入市場掛單</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>Failed to load market orders</p></div>`;
   }
 }
 
@@ -643,7 +648,7 @@ async function loadAvailableOrders() {
 async function loadMyOrders() {
   const el = document.getElementById('my-orders');
   if (!user) {
-    el.innerHTML = `<div class="empty-state"><p>請先登入查看你的對賭單</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>Please log in to view your bets</p></div>`;
     return;
   }
   try {
@@ -651,39 +656,39 @@ async function loadMyOrders() {
     const orders = data.orders || data || [];
     document.getElementById('my-orders-count').textContent = orders.length;
     if (!orders.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>你還沒有對賭單，開新單試試！</p></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>No bets yet — try placing an order!</p></div>`;
       return;
     }
     el.innerHTML = orders.map(o => orderCardHTML(o, 'my')).join('');
   } catch (e) {
-    el.innerHTML = `<div class="empty-state"><p>無法載入你的對賭單</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>Failed to load your bets</p></div>`;
   }
 }
 
 function orderCardHTML(o, type) {
   const statusMap = {
-    open:      { cls: 'status-open',      label: '開單中' },
-    matched:   { cls: 'status-matched',   label: '已匹配' },
-    settled:   { cls: 'status-settled',   label: '已結算' },
-    cancelled: { cls: 'status-cancelled', label: '已取消' },
+    open:      { cls: 'status-open',      label: 'Open' },
+    matched:   { cls: 'status-matched',   label: 'Matched' },
+    settled:   { cls: 'status-settled',   label: 'Settled' },
+    cancelled: { cls: 'status-cancelled', label: 'Cancelled' },
   };
   const s = statusMap[o.status] || statusMap.open;
   const isOwn = type === 'my';
   const canAccept = type === 'available' && o.status === 'open';
   return `
     <div class="order-card ${isOwn ? 'my-order' : ''}">
-      <div class="order-creator">${isOwn ? '我' : (o.creator_username || o.creator || '匿名')}</div>
-      <div class="order-prediction">預測 <span>${o.prediction_name || o.prediction || '—'}</span> 奪冠<br>
+      <div class="order-creator">${isOwn ? 'Me' : (o.creator_username || o.creator || 'Anonymous')}</div>
+      <div class="order-prediction">Predicts <span>${o.prediction_name || o.prediction || '—'}</span> to win<br>
         <small style="color:var(--text-muted);font-size:11px">${o.race_name || ''}</small>
       </div>
       <div class="order-odds">x${Number(o.odds || 1).toFixed(2)}</div>
       <div class="order-amount">
         ◆ ${formatNum(o.amount)}<br>
-        <small style="font-size:11px;color:var(--text-muted)">接單需 ◆${formatNum(Math.floor((o.amount || 0) / (o.odds || 1)))}</small>
+        <small style="font-size:11px;color:var(--text-muted)">To accept: ◆${formatNum(Math.floor((o.amount || 0) / (o.odds || 1)))}</small>
       </div>
       <div class="order-actions">
         ${canAccept
-          ? `<button class="btn btn-gold btn-sm" onclick="acceptOrder('${o.order_id || o.id}')">接單</button>`
+          ? `<button class="btn btn-gold btn-sm" onclick="acceptOrder('${o.order_id || o.id}')">Accept</button>`
           : `<span class="status-badge ${s.cls}">${s.label}</span>`
         }
       </div>
@@ -700,9 +705,9 @@ async function createP2POrder() {
   const amtVal    = parseInt(document.getElementById('p2p-amount').value);
   const resultEl  = document.getElementById('p2p-create-result');
 
-  if (!raceVal || !driverVal) { resultEl.innerHTML = '<div class="result-msg err">請選擇賽事和車手</div>'; return; }
-  if (!oddsVal || oddsVal < 1.1 || oddsVal > 50) { resultEl.innerHTML = '<div class="result-msg err">賠率需在 1.1 到 50 之間</div>'; return; }
-  if (!amtVal || amtVal < 100) { resultEl.innerHTML = '<div class="result-msg err">最低下注金額 ◆ 100</div>'; return; }
+  if (!raceVal || !driverVal) { resultEl.innerHTML = '<div class="result-msg err">Please select a race and driver</div>'; return; }
+  if (!oddsVal || oddsVal < 1.1 || oddsVal > 50) { resultEl.innerHTML = '<div class="result-msg err">Odds must be between 1.1 and 50</div>'; return; }
+  if (!amtVal || amtVal < 100) { resultEl.innerHTML = '<div class="result-msg err">Minimum bet is ◆ 100</div>'; return; }
 
   const raceObj = races.find(r => String(r.race_id || r.round) === String(raceVal));
   const driverObj = drivers.find(d => String(d.driver_id) === String(driverVal));
@@ -719,9 +724,9 @@ async function createP2POrder() {
         amount: amtVal,
       }),
     });
-    resultEl.innerHTML = `<div class="result-msg ok">✓ 開單成功！等待其他玩家接單。</div>`;
+    resultEl.innerHTML = `<div class="result-msg ok">✓ Order placed! Waiting for another player to accept.</div>`;
     toggleP2PForm();
-    showToast('對賭單已掛出，等待接手！', 'success');
+    showToast('Bet order placed, waiting for a taker!', 'success');
     loadAvailableOrders();
     loadMyOrders();
     refreshBalance();
@@ -738,7 +743,7 @@ async function acceptOrder(orderId) {
       method: 'POST',
       body: JSON.stringify({ order_id: orderId }),
     });
-    showToast('接單成功！對賭已確認。', 'success');
+    showToast('Order accepted! Bet confirmed.', 'success');
     loadAvailableOrders();
     loadMyOrders();
     refreshBalance();
@@ -755,8 +760,8 @@ async function createChallenge() {
   const amtVal    = parseInt(document.getElementById('ch-amount').value);
   const resultEl  = document.getElementById('ch-create-result');
 
-  if (!raceVal || !driverVal) { resultEl.innerHTML = '<div class="result-msg err">請選擇賽事和車手</div>'; return; }
-  if (!amtVal || amtVal < 100) { resultEl.innerHTML = '<div class="result-msg err">最低下注金額 ◆ 100</div>'; return; }
+  if (!raceVal || !driverVal) { resultEl.innerHTML = '<div class="result-msg err">Please select a race and driver</div>'; return; }
+  if (!amtVal || amtVal < 100) { resultEl.innerHTML = '<div class="result-msg err">Minimum bet is ◆ 100</div>'; return; }
 
   const raceObj   = races.find(r => String(r.race_id || r.round) === String(raceVal));
   const driverObj = drivers.find(d => String(d.driver_id) === String(driverVal));
@@ -782,7 +787,7 @@ async function createChallenge() {
       leftUser: user.username,
       rightName: '?',
       rightNum: '?',
-      rightUser: '等待對手',
+      rightUser: 'Waiting for opponent',
       winner: null,
     });
     loadMyChallenges();
@@ -796,7 +801,7 @@ function copyCode() {
   const code = document.getElementById('generated-code').textContent.trim();
   navigator.clipboard.writeText(code).then(() => {
     const msg = document.getElementById('code-copied-msg');
-    msg.textContent = '✓ 已複製！';
+    msg.textContent = '✓ Copied!';
     setTimeout(() => { msg.textContent = ''; }, 2000);
   }).catch(() => {});
 }
@@ -806,7 +811,7 @@ async function joinChallenge() {
   if (!user) { showModal('login'); return; }
   const code = document.getElementById('invite-code-input').value.trim().toUpperCase();
   const resultEl = document.getElementById('join-result');
-  if (code.length < 4) { resultEl.innerHTML = '<div class="result-msg err" style="margin-top:12px">請輸入有效邀請碼</div>'; return; }
+  if (code.length < 4) { resultEl.innerHTML = '<div class="result-msg err" style="margin-top:12px">Please enter a valid invite code</div>'; return; }
 
   try {
     const res = await api('/api/challenge/join', {
@@ -814,12 +819,12 @@ async function joinChallenge() {
       body: JSON.stringify({ invite_code: code }),
     });
     document.getElementById('invite-code-input').value = '';
-    resultEl.innerHTML = `<div class="result-msg ok" style="margin-top:12px">✓ 已加入挑戰！對戰即將開始。</div>`;
+    resultEl.innerHTML = `<div class="result-msg ok" style="margin-top:12px">✓ Challenge joined! Battle is about to begin.</div>`;
 
     showBattleStage({
       leftName:  res.creator_prediction_name || res.creator_prediction || '—',
       leftNum:   res.creator_driver_number || '??',
-      leftUser:  res.creator_username || '對手',
+      leftUser:  res.creator_username || 'Opponent',
       rightName: res.joiner_prediction_name || res.joiner_prediction || '—',
       rightNum:  res.joiner_driver_number || '??',
       rightUser: user.username,
@@ -827,7 +832,7 @@ async function joinChallenge() {
     });
     loadMyChallenges();
     refreshBalance();
-    showToast('成功加入挑戰！', 'success');
+    showToast('Successfully joined the challenge!', 'success');
   } catch (e) {
     resultEl.innerHTML = `<div class="result-msg err" style="margin-top:12px">${e.message}</div>`;
   }
@@ -837,7 +842,7 @@ async function joinChallenge() {
 async function loadMyChallenges() {
   const el = document.getElementById('my-challenges');
   if (!user) {
-    el.innerHTML = `<div class="empty-state"><p>請先登入查看你的挑戰</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>Please log in to view your challenges</p></div>`;
     return;
   }
   try {
@@ -845,21 +850,21 @@ async function loadMyChallenges() {
     const challenges = data.challenges || data || [];
     document.getElementById('my-challenges-count').textContent = challenges.length;
     if (!challenges.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏁</div><p>你還沒有挑戰記錄，建立或加入一個吧！</p></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏁</div><p>No challenges yet — create or join one!</p></div>`;
       return;
     }
     el.innerHTML = challenges.map(c => challengeRowHTML(c)).join('');
   } catch (e) {
-    el.innerHTML = `<div class="empty-state"><p>無法載入挑戰記錄</p></div>`;
+    el.innerHTML = `<div class="empty-state"><p>Failed to load challenges</p></div>`;
   }
 }
 
 function challengeRowHTML(c) {
   const statusMap = {
-    waiting:  { cls: 'status-open',    label: '等待加入' },
-    active:   { cls: 'status-matched', label: '進行中' },
-    settled:  { cls: 'status-settled', label: '已結算' },
-    expired:  { cls: 'status-cancelled', label: '已過期' },
+    waiting:  { cls: 'status-open',    label: 'Waiting' },
+    active:   { cls: 'status-matched', label: 'Active' },
+    settled:  { cls: 'status-settled', label: 'Settled' },
+    expired:  { cls: 'status-cancelled', label: 'Expired' },
   };
   const s = statusMap[c.status] || statusMap.waiting;
   const isCreator = c.creator_username === (user?.username);
@@ -867,26 +872,26 @@ function challengeRowHTML(c) {
     ? (c.creator_prediction_name || c.creator_prediction)
     : (c.joiner_prediction_name  || c.joiner_prediction);
   const vsUser = isCreator
-    ? (c.joiner_username || '等待對手')
-    : (c.creator_username || '對手');
+    ? (c.joiner_username || 'Waiting for opponent')
+    : (c.creator_username || 'Opponent');
 
   return `
     <div class="challenge-row">
       <div class="challenge-code" onclick="copyChallengeCode('${c.invite_code}')"
-           title="點擊複製邀請碼">${c.invite_code || '——'}</div>
+           title="Click to copy invite code">${c.invite_code || '——'}</div>
       <div class="challenge-info">
-        <div class="ch-race">${c.race_name || '未知賽事'}</div>
+        <div class="ch-race">${c.race_name || 'Unknown Race'}</div>
         <div class="ch-meta">
-          我押 <strong style="color:var(--gold)">${myPrediction || '—'}</strong>
+          My pick: <strong style="color:var(--gold)">${myPrediction || '—'}</strong>
           · vs ${vsUser}
           · ◆ ${formatNum(c.amount)}
         </div>
       </div>
       <span class="status-badge ${s.cls}">${s.label}</span>
       ${c.status === 'active' || c.status === 'settled'
-        ? `<button class="btn btn-outline btn-sm" onclick="viewBattle('${c.challenge_id || c.id}')">查看對戰</button>`
+        ? `<button class="btn btn-outline btn-sm" onclick="viewBattle('${c.challenge_id || c.id}')">View Battle</button>`
         : (c.status === 'waiting' && !c.joiner_username
-            ? `<button class="btn btn-outline btn-sm" onclick="copyChallengeCode('${c.invite_code}')">複製邀請碼</button>`
+            ? `<button class="btn btn-outline btn-sm" onclick="copyChallengeCode('${c.invite_code}')">Copy Invite Code</button>`
             : '')
       }
     </div>
@@ -895,7 +900,7 @@ function challengeRowHTML(c) {
 
 function copyChallengeCode(code) {
   if (!code || code === '——') return;
-  navigator.clipboard.writeText(code).then(() => showToast(`邀請碼 ${code} 已複製`, 'success')).catch(() => {});
+  navigator.clipboard.writeText(code).then(() => showToast(`Invite code ${code} copied`, 'success')).catch(() => {});
 }
 
 // ─── VIEW BATTLE ───
@@ -905,17 +910,17 @@ async function viewBattle(challengeId) {
     showBattleStage({
       leftName:  c.creator_prediction_name || c.creator_prediction || '—',
       leftNum:   c.creator_driver_number || '??',
-      leftUser:  c.creator_username || '玩家 1',
+      leftUser:  c.creator_username || 'Player 1',
       rightName: c.joiner_prediction_name  || c.joiner_prediction  || '—',
       rightNum:  c.joiner_driver_number || '??',
-      rightUser: c.joiner_username  || '玩家 2',
+      rightUser: c.joiner_username  || 'Player 2',
       winner:    c.winner_username || null,
     });
     // Switch to challenge tab and scroll to arena
     switchTab('challenge');
     document.getElementById('battle-arena').scrollIntoView({ behavior: 'smooth', block: 'center' });
   } catch (e) {
-    showToast('無法載入對戰資訊', 'error');
+    showToast('Failed to load battle info', 'error');
   }
 }
 
@@ -964,14 +969,14 @@ function revealWinner(winnerUsername, leftUser, rightUser) {
   if (winnerUsername === leftUser) {
     leftCard.classList.add('winner');
     rightCard.classList.add('loser');
-    leftLabel.innerHTML  = '<span class="winner-label">🏆 勝利</span>';
-    rightLabel.innerHTML = '<span style="color:var(--text-muted);font-size:12px">落敗</span>';
+    leftLabel.innerHTML  = '<span class="winner-label">🏆 Winner</span>';
+    rightLabel.innerHTML = '<span style="color:var(--text-muted);font-size:12px">Defeated</span>';
     spawnSparkles('left-card');
   } else if (winnerUsername === rightUser) {
     rightCard.classList.add('winner');
     leftCard.classList.add('loser');
-    rightLabel.innerHTML = '<span class="winner-label">🏆 勝利</span>';
-    leftLabel.innerHTML  = '<span style="color:var(--text-muted);font-size:12px">落敗</span>';
+    rightLabel.innerHTML = '<span class="winner-label">🏆 Winner</span>';
+    leftLabel.innerHTML  = '<span style="color:var(--text-muted);font-size:12px">Defeated</span>';
     spawnSparkles('right-card');
   }
 }
