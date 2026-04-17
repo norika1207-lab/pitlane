@@ -55,18 +55,70 @@ function showProfileDashboard() {
           <div class="pd-bal-lbl">USDClaw 餘額</div>
           <div class="pd-bal-amt">◆ ${formatNum(user.balance)}</div>
         </div>
+
         <div class="pd-menu">
+          <!-- 帳戶概覽 -->
           <div class="pd-menu-item ${_pdTab==='overview'?'active':''}" onclick="pdSwitch('overview',this)">🏆 帳戶概覽</div>
-          <div class="pd-menu-group">
-            <div class="pd-menu-label">🏎 F1 賽事成績</div>
+
+          <!-- F1 主選單（預設展開） -->
+          <div class="pd-acc-head" onclick="pdToggleGroup(this)">
+            <span>🏎 F1 賽事成績</span>
+            <span class="pd-acc-row-right">
+              <a class="pd-ext-link" href="https://throttenix.com" target="_blank" onclick="event.stopPropagation()" title="前往 Throttenix">↗</a>
+              <span class="pd-chevron">▾</span>
+            </span>
+          </div>
+          <div class="pd-acc-body open">
             <div class="pd-menu-item pd-sub ${_pdTab==='bets'?'active':''}" onclick="pdSwitch('bets',this)">📋 下注紀錄</div>
             <div class="pd-menu-item pd-sub ${_pdTab==='dist'?'active':''}" onclick="pdSwitch('dist',this)">📊 下注分布圖</div>
             <div class="pd-menu-item pd-sub ${_pdTab==='pnl'?'active':''}" onclick="pdSwitch('pnl',this)">💰 總收益</div>
             <div class="pd-menu-item pd-sub ${_pdTab==='active'?'active':''}" onclick="pdSwitch('active',this)">⏳ 進行中下注</div>
           </div>
+
           <div class="pd-menu-item ${_pdTab==='cards'?'active':''}" onclick="pdSwitch('cards',this)">🃏 卡牌收藏</div>
           <div class="pd-menu-item ${_pdTab==='rank'?'active':''}" onclick="pdSwitch('rank',this)">🏅 排行榜</div>
+
+          <!-- 其他賽事（預設收合） -->
+          <div class="pd-section-divider">其他賽事平台</div>
+
+          <div class="pd-acc-head" onclick="pdToggleGroup(this)">
+            <span>🐎 賽馬 Turfenix</span>
+            <span class="pd-acc-row-right">
+              <a class="pd-ext-link" href="https://turfenix.com" target="_blank" onclick="event.stopPropagation()" title="前往 Turfenix">↗</a>
+              <span class="pd-chevron collapsed">▸</span>
+            </span>
+          </div>
+          <div class="pd-acc-body">
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://turfenix.com" target="_blank">🏁 前往賽馬下注</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://turfenix.com/leaderboard" target="_blank">🏅 賽馬排行榜</a>
+          </div>
+
+          <div class="pd-acc-head" onclick="pdToggleGroup(this)">
+            <span>🎮 電競 Esports</span>
+            <span class="pd-acc-row-right">
+              <a class="pd-ext-link" href="http://31.97.221.240:8003" target="_blank" onclick="event.stopPropagation()" title="前往 Esports">↗</a>
+              <span class="pd-chevron collapsed">▸</span>
+            </span>
+          </div>
+          <div class="pd-acc-body">
+            <a class="pd-menu-item pd-sub pd-ext-item" href="http://31.97.221.240:8003" target="_blank">🏁 前往電競下注</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="http://31.97.221.240:8003/leaderboard" target="_blank">🏅 電競排行榜</a>
+          </div>
+
+          <!-- 股市放最下面 -->
+          <div class="pd-acc-head" onclick="pdToggleGroup(this)">
+            <span>🏦 股市 ClawStockMarket</span>
+            <span class="pd-acc-row-right">
+              <a class="pd-ext-link" href="https://clawstockmarket.com" target="_blank" onclick="event.stopPropagation()" title="前往 ClawStockMarket">↗</a>
+              <span class="pd-chevron collapsed">▸</span>
+            </span>
+          </div>
+          <div class="pd-acc-body">
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://clawstockmarket.com" target="_blank">📈 前往股市交易</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://clawstockmarket.com/dashboard" target="_blank">💎 購入 Diamond</a>
+          </div>
         </div>
+
         <button class="pd-logout-btn" onclick="logout();closeProfileDashboard()">登出</button>
       </div>
       <div class="pd-content" id="pd-content">
@@ -81,6 +133,17 @@ function showProfileDashboard() {
 
 function closeProfileDashboard() {
   document.getElementById('pd-overlay')?.remove();
+}
+
+function pdToggleGroup(head) {
+  const body = head.nextElementSibling;
+  const chevron = head.querySelector('.pd-chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (chevron) {
+    chevron.textContent = isOpen ? '▸' : '▾';
+    chevron.classList.toggle('collapsed', isOpen);
+  }
 }
 
 function pdSwitch(tab, el) {
