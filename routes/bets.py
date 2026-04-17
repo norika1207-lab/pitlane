@@ -1,4 +1,4 @@
-"""Bets — 用 USDClaw 下注預測 F1 比賽結果"""
+"""Bets — Place USDClaw bets predicting F1 race results"""
 from fastapi import APIRouter, HTTPException, Header
 from models import BetCreate
 from database import get_db
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/bets", tags=["bets"])
 
 @router.post("")
 async def place_bet(bet: BetCreate, authorization: str = Header(None)):
-    """用 USDClaw 下注預測"""
+    """Place a bet using USDClaw"""
     user = await get_current_user(authorization)
     username = user["username"]
 
@@ -21,20 +21,20 @@ async def place_bet(bet: BetCreate, authorization: str = Header(None)):
 
     balance = await get_balance(username)
     if balance < bet.amount:
-        raise HTTPException(400, f"USDClaw 餘額不足。目前餘額: {balance:,.0f}")
+        raise HTTPException(400, f"Insufficient USDClaw balance. Current balance: {balance:,.0f}")
 
     # Calculate odds
     stats = await calculate_driver_card(bet.prediction)
     odds = calculate_odds(stats)
 
     # Deduct USDClaw via trading platform's token system
-    ref_id = f"pitlane_bet:{bet.race_id}:{bet.prediction}"
+    ref_id = f"throttenix_bet:{bet.race_id}:{bet.prediction}"
     try:
-        await debit(username, bet.amount, "pitlane_bet", ref_id)
+        await debit(username, bet.amount, "throttenix_bet", ref_id)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
-    # Record bet in PitLane's SQLite
+    # Record bet in Throttenix's SQLite
     db = await get_db()
     try:
         await db.execute(
@@ -59,7 +59,7 @@ async def place_bet(bet: BetCreate, authorization: str = Header(None)):
 
 @router.get("/my")
 async def my_bets(authorization: str = Header(None)):
-    """取得下注記錄"""
+    """Get bet history"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:
@@ -84,7 +84,7 @@ async def my_bets(authorization: str = Header(None)):
 
 @router.get("/{race_id}/result")
 async def bet_result(race_id: str, authorization: str = Header(None)):
-    """查看某站的下注結果"""
+    """View bet results for a specific race"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:

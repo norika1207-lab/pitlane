@@ -104,6 +104,15 @@ async def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
+        CREATE TABLE IF NOT EXISTS halloffame_collection (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            legend_id TEXT NOT NULL,
+            claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(username, legend_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_hof_username ON halloffame_collection(username);
+
         CREATE INDEX IF NOT EXISTS idx_bets_username ON bets(username);
         CREATE INDEX IF NOT EXISTS idx_bets_race ON bets(race_id);
         CREATE INDEX IF NOT EXISTS idx_p2p_status ON p2p_orders(status);

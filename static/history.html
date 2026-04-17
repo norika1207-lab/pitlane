@@ -291,7 +291,93 @@
 .standing-wins { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
 
 /* ─── RACE HIST CARD ─── */
+.race-hist-card { cursor: pointer; overflow: visible; }
 .race-hist-team { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+.race-expand-btn {
+  font-size: 11px; color: var(--text-muted); margin-top: 8px;
+  text-align: right; user-select: none;
+  transition: color 0.15s;
+}
+.race-hist-card:hover .race-expand-btn { color: var(--gold); }
+.race-detail-panel {
+  display: none; margin-top: 12px;
+  border-top: 1px solid var(--border); padding-top: 12px;
+}
+.race-detail-panel.open { display: block; }
+.top5-header, .top5-row {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 0; font-size: 11px;
+}
+.top5-header { color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 4px; }
+.top5-row { border-bottom: 1px solid rgba(255,255,255,.03); }
+.top5-pos { width: 18px; text-align: center; font-weight: 700; flex-shrink: 0; }
+.top5-pos.p1 { color: var(--gold); }
+.top5-pos.p2 { color: #c0c0c0; }
+.top5-pos.p3 { color: #cd7f32; }
+.top5-code { width: 32px; font-weight: 700; flex-shrink: 0; }
+.top5-name { flex: 1; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.top5-grid-col { width: 28px; text-align: center; color: var(--text-muted); flex-shrink: 0; }
+.top5-delta { width: 30px; text-align: center; font-weight: 700; border-radius: 3px; padding: 1px 0; flex-shrink: 0; }
+.top5-delta.gain { color: #44ff88; }
+.top5-delta.loss { color: #ff6060; }
+.top5-delta.same { color: var(--text-muted); }
+.top5-pts { width: 26px; text-align: right; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+.race-auto-insight {
+  margin-top: 10px; font-size: 12px; color: var(--text-secondary);
+  background: var(--bg-secondary); border-radius: 4px; padding: 8px 10px;
+  line-height: 1.55; border-left: 2px solid rgba(212,168,67,.3);
+}
+.race-auto-insight strong { color: var(--text-primary); }
+
+/* ─── TEAM ANALYSIS BARS ─── */
+.team-analysis-wrap {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px;
+  margin-bottom: 32px;
+}
+.team-analysis-title {
+  font-size: 12px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: 16px;
+}
+.team-bar-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 9px;
+}
+.team-bar-label {
+  width: 90px; font-size: 12px; color: var(--text-secondary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;
+}
+.team-bar-track {
+  flex: 1; height: 24px; background: rgba(255,255,255,.04);
+  border-radius: 4px; overflow: hidden;
+}
+.team-bar-fill {
+  height: 100%; border-radius: 4px;
+  display: flex; align-items: center; padding: 0 8px;
+  transition: width 0.9s cubic-bezier(.2,.8,.4,1);
+  min-width: 2px;
+}
+.team-bar-pts { font-size: 11px; font-weight: 800; color: rgba(0,0,0,.85); white-space: nowrap; }
+.team-bar-meta { width: 64px; text-align: right; font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+
+/* ─── INSIGHTS BOX ─── */
+.insights-box {
+  background: rgba(212,168,67,.04); border: 1px solid rgba(212,168,67,.15);
+  border-radius: var(--radius); padding: 20px 24px;
+  margin-bottom: 32px;
+}
+.insights-box-title {
+  font-size: 12px; font-weight: 700; color: var(--gold);
+  text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px;
+}
+.insight-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.insight-item:last-child { border-bottom: none; padding-bottom: 0; }
+.insight-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.insight-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.insight-text strong { color: var(--text-primary); }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
@@ -385,6 +471,22 @@
       <div class="season-info-stat">
         <span class="val" id="info-points">—</span>
         <span class="lbl">Champion PTS</span>
+      </div>
+    </div>
+
+    <!-- INSIGHTS BOX (filled by JS after season loads) -->
+    <div id="insights-section" style="display:none">
+      <div class="insights-box">
+        <div class="insights-box-title">📋 Season Analysis</div>
+        <div id="insights-list"></div>
+      </div>
+    </div>
+
+    <!-- TEAM CONSTRUCTOR BATTLE (filled by JS) -->
+    <div id="team-analysis-section" style="display:none">
+      <div class="team-analysis-wrap">
+        <div class="team-analysis-title">🏗️ <span id="team-analysis-year">2024</span> Constructor Battle — Points from Top 5 Finishes</div>
+        <div id="team-bars"></div>
       </div>
     </div>
 
@@ -599,49 +701,38 @@
 
 <script src="/static/assets/js/app.js"></script>
 <script>
-/* ═══════════════════════════════════════
-   HISTORY PAGE JS  — 5-year real data
-═══════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   HISTORY PAGE JS  — Race Analysis Hub
+═══════════════════════════════════════════════════ */
 
-// Fallback meta (shown instantly before API resolves)
 const SEASON_META_FALLBACK = {
-  2020: { champion: 'Hamilton',   champion_team: 'Mercedes',       total_races: 17, champion_pts: 347, constructor_champion: 'Mercedes'    },
-  2021: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 22, champion_pts: 395.5, constructor_champion: 'Mercedes' },
-  2022: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 22, champion_pts: 454, constructor_champion: 'Red Bull Racing' },
-  2023: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 22, champion_pts: 575, constructor_champion: 'Red Bull Racing' },
-  2024: { champion: 'Verstappen', champion_team: 'Red Bull Racing', total_races: 24, champion_pts: 437, constructor_champion: 'McLaren'     },
+  2020: { champion:'Hamilton',   champion_team:'Mercedes',        total_races:17,   champion_pts:347,   constructor_champion:'Mercedes'     },
+  2021: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:22,   champion_pts:395.5, constructor_champion:'Mercedes'     },
+  2022: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:22,   champion_pts:454,   constructor_champion:'Red Bull Racing' },
+  2023: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:22,   champion_pts:575,   constructor_champion:'Red Bull Racing' },
+  2024: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:24,   champion_pts:437,   constructor_champion:'McLaren'      },
 };
 
-// Flag emoji per nationality
-const FLAGS = {
-  British:'🇬🇧', German:'🇩🇪', Dutch:'🇳🇱', Finnish:'🇫🇮', Spanish:'🇪🇸',
-  French:'🇫🇷', Australian:'🇦🇺', Mexican:'🇲🇽', Monegasque:'🇲🇨', Canadian:'🇨🇦',
-  Thai:'🇹🇭', Danish:'🇩🇰', Chinese:'🇨🇳', American:'🇺🇸', Italian:'🇮🇹',
-  Japanese:'🇯🇵', Brazilian:'🇧🇷', Austrian:'🇦🇹', Argentinian:'🇦🇷',
-};
-
-// Country → flag for race circuit country
 const COUNTRY_FLAG = {
-  Bahrain:'🇧🇭', 'Saudi Arabia':'🇸🇦', Australia:'🇦🇺', Japan:'🇯🇵', China:'🇨🇳',
-  USA:'🇺🇸', 'United States':'🇺🇸', Italy:'🇮🇹', Monaco:'🇲🇨', Canada:'🇨🇦',
-  Spain:'🇪🇸', Austria:'🇦🇹', UK:'🇬🇧', 'United Kingdom':'🇬🇧', Hungary:'🇭🇺',
-  Belgium:'🇧🇪', Netherlands:'🇳🇱', Azerbaijan:'🇦🇿', Singapore:'🇸🇬',
-  Mexico:'🇲🇽', Brazil:'🇧🇷', 'Abu Dhabi':'🇦🇪', UAE:'🇦🇪', Qatar:'🇶🇦',
-  'Las Vegas':'🇺🇸', Miami:'🇺🇸',
+  Bahrain:'🇧🇭','Saudi Arabia':'🇸🇦',Australia:'🇦🇺',Japan:'🇯🇵',China:'🇨🇳',
+  USA:'🇺🇸','United States':'🇺🇸',Italy:'🇮🇹',Monaco:'🇲🇨',Canada:'🇨🇦',
+  Spain:'🇪🇸',Austria:'🇦🇹',UK:'🇬🇧','United Kingdom':'🇬🇧',Hungary:'🇭🇺',
+  Belgium:'🇧🇪',Netherlands:'🇳🇱',Azerbaijan:'🇦🇿',Singapore:'🇸🇬',
+  Mexico:'🇲🇽',Brazil:'🇧🇷','Abu Dhabi':'🇦🇪',UAE:'🇦🇪',Qatar:'🇶🇦',
+  'Las Vegas':'🇺🇸',Miami:'🇺🇸',
 };
 
 let currentSeason = 2024;
 const seasonCache = {};
 
-// ─── HELPER ───
 async function apiFetch(path) {
   const token = localStorage.getItem('throttenix_token');
-  const res = await fetch(path, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+  const res = await fetch(path, token ? { headers:{ Authorization:`Bearer ${token}` } } : {});
   if (!res.ok) throw new Error(res.status);
   return res.json();
 }
 
-// ─── UPDATE INFO BAR ───
+// ─── INFO BAR ───
 function updateInfoBar(year, meta) {
   document.getElementById('info-year').textContent = year;
   document.getElementById('info-champion').textContent = meta.champion || '—';
@@ -650,7 +741,157 @@ function updateInfoBar(year, meta) {
   document.getElementById('info-points').textContent = meta.champion_pts ? meta.champion_pts + ' pts' : '—';
 }
 
-// ─── RENDER STANDINGS ───
+// ─── BUILD TEAM STATS ───
+function buildTeamData(races) {
+  const teams = {};
+  races.forEach(race => {
+    (race.top5 || []).forEach(d => {
+      if (!teams[d.team]) teams[d.team] = { wins:0, podiums:0, pts:0, color:d.color };
+      teams[d.team].pts  += (d.pts || 0);
+      if (d.pos === 1) teams[d.team].wins++;
+      if (d.pos <= 3) teams[d.team].podiums++;
+    });
+  });
+  return Object.entries(teams).sort((a, b) => b[1].pts - a[1].pts);
+}
+
+// ─── TEAM BARS ───
+function renderTeamAnalysis(races, year) {
+  const sec = document.getElementById('team-analysis-section');
+  if (!races || !races.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('team-analysis-year').textContent = year;
+  const teams = buildTeamData(races);
+  const maxPts = teams[0]?.[1].pts || 1;
+  document.getElementById('team-bars').innerHTML = teams.slice(0, 10).map(([name, d]) => {
+    const pct = Math.max(2, (d.pts / maxPts * 100)).toFixed(1);
+    const shortName = name.replace(' F1 Team','').replace(' Racing','').replace(' AMR','');
+    const wStr = d.wins    ? `${d.wins}W`    : '';
+    const pStr = d.podiums ? `${d.podiums}P` : '';
+    const meta = [wStr, pStr].filter(Boolean).join(' · ') || '—';
+    // darken color for legibility: wrap in a slightly opaque overlay via mix
+    return `<div class="team-bar-row">
+      <div class="team-bar-label" title="${name}">${shortName}</div>
+      <div class="team-bar-track">
+        <div class="team-bar-fill" style="width:${pct}%;background:${d.color}">
+          <span class="team-bar-pts">${Math.round(d.pts)} pts${wStr ? '  '+wStr : ''}</span>
+        </div>
+      </div>
+      <div class="team-bar-meta">${meta}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SEASON INSIGHTS ───
+function generateInsights(races, standings, year) {
+  if (!races || !races.length) return [];
+  const teams   = buildTeamData(races);
+  const topTeam = teams[0];
+  const insights = [];
+
+  // 1. Constructor dominance
+  if (topTeam) {
+    const totalPts = teams.reduce((s,[,d]) => s + d.pts, 0);
+    const pct = ((topTeam[1].pts / totalPts) * 100).toFixed(0);
+    insights.push({ icon:'🏆', text:`<strong>${topTeam[0]}</strong> dominated the ${year} Constructor standings — <strong>${Math.round(topTeam[1].pts)} pts</strong> (${pct}% of all top-5 scoring) with <strong>${topTeam[1].wins} race wins</strong>.` });
+  }
+
+  // 2. Driver title margin
+  if (standings && standings.length >= 2) {
+    const gap  = parseFloat(standings[0].pts||0) - parseFloat(standings[1].pts||0);
+    const n1   = standings[0].name || standings[0].code || '—';
+    const n2   = standings[1].name || standings[1].code || '—';
+    if (gap > 150) {
+      insights.push({ icon:'📊', text:`<strong>${n1}</strong> won the championship by a dominant <strong>${gap.toFixed(0)}-point margin</strong> over ${n2} — one of F1's most dominant seasons.` });
+    } else if (gap < 25) {
+      insights.push({ icon:'⚡', text:`Closest title fight: <strong>${n1}</strong> edged out <strong>${n2}</strong> by just <strong>${gap.toFixed(0)} points</strong> at season end.` });
+    } else {
+      insights.push({ icon:'📊', text:`<strong>${n1}</strong> clinched the ${year} championship with a <strong>${gap.toFixed(0)}-point</strong> margin ahead of ${n2}.` });
+    }
+  }
+
+  // 3. Best overtaker across the season
+  const gainers = {};
+  races.forEach(race => {
+    (race.top5||[]).forEach(d => {
+      if (!gainers[d.code]) gainers[d.code] = { name:d.name, team:d.team, gained:0, races:0 };
+      gainers[d.code].gained += Math.max(0, d.grid - d.pos);
+      gainers[d.code].races++;
+    });
+  });
+  const topGainer = Object.entries(gainers).sort((a,b) => b[1].gained - a[1].gained)[0];
+  if (topGainer && topGainer[1].gained >= 8) {
+    insights.push({ icon:'🚀', text:`Season's best charger: <strong>${topGainer[1].name}</strong> (${topGainer[1].team}) gained <strong>+${topGainer[1].gained} positions</strong> across all top-5 finishes, consistently making up ground from grid.` });
+  }
+
+  // 4. Most competitive race (most unique teams in top 5)
+  let best = { n:0, race:null };
+  races.forEach(race => {
+    const u = new Set((race.top5||[]).map(d=>d.team)).size;
+    if (u > best.n) best = { n:u, race };
+  });
+  if (best.race && best.n >= 4) {
+    insights.push({ icon:'🎯', text:`Most competitive race: <strong>${best.race.name}</strong> — <strong>${best.n} different teams</strong> featured in the top 5 finishers, the most open race of the season.` });
+  }
+
+  // 5. Biggest upset (winner starting from furthest back)
+  let topUpset = { delta:-1, race:null, driver:null };
+  races.forEach(race => {
+    const winner = (race.top5||[]).find(d=>d.pos===1);
+    if (winner && (winner.grid - 1) > topUpset.delta) {
+      topUpset = { delta: winner.grid - 1, race, driver: winner };
+    }
+  });
+  if (topUpset.driver && topUpset.delta >= 3) {
+    insights.push({ icon:'😮', text:`Biggest upset: <strong>${topUpset.driver.name}</strong> won the <strong>${topUpset.race.name}</strong> starting from grid position <strong>P${topUpset.driver.grid}</strong> — gaining ${topUpset.delta} places to take the victory.` });
+  }
+
+  return insights;
+}
+
+function renderInsights(races, standings, year) {
+  const sec = document.getElementById('insights-section');
+  if (!races || !races.length) { sec.style.display = 'none'; return; }
+  const ins = generateInsights(races, standings, year);
+  if (!ins.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('insights-list').innerHTML = ins.map(i =>
+    `<div class="insight-item"><span class="insight-icon">${i.icon}</span><span class="insight-text">${i.text}</span></div>`
+  ).join('');
+}
+
+// ─── PER-RACE AUTO INSIGHT ───
+function raceInsight(race) {
+  const t5 = race.top5 || [];
+  if (!t5.length) return null;
+  const parts = [];
+  // 1. Constructor 1-2
+  if (t5.length >= 2 && t5[0].team === t5[1].team)
+    parts.push(`<strong>${t5[0].team} 1-2 finish</strong> — maximum 43 constructor points.`);
+  // 2. Biggest mover
+  const sorted = [...t5].sort((a,b) => (b.grid - b.pos) - (a.grid - a.pos));
+  if (sorted[0] && (sorted[0].grid - sorted[0].pos) >= 3)
+    parts.push(`<strong>${sorted[0].code}</strong> charged from P${sorted[0].grid}→P${sorted[0].pos} (+${sorted[0].grid - sorted[0].pos} places).`);
+  // 3. Pole-sitter didn't win
+  const pole = t5.find(d => d.grid === 1);
+  if (pole && pole.pos > 2)
+    parts.push(`Polesitter <strong>${pole.code}</strong> slipped to P${pole.pos}.`);
+  // 4. Fallback
+  if (!parts.length)
+    parts.push(`<strong>${t5[0].code}</strong> converted P${t5[0].grid} qualifying into a race win.`);
+  return parts.join(' ');
+}
+
+// ─── TOGGLE RACE EXPAND ───
+function toggleRaceExpand(idx, cardEl) {
+  const panel = document.getElementById(`rdp-${idx}`);
+  const btn   = cardEl.querySelector('.race-expand-btn');
+  if (!panel) return;
+  const open = panel.classList.toggle('open');
+  if (btn) btn.textContent = open ? '▴ Hide' : '▾ Full Results';
+}
+
+// ─── STANDINGS ───
 function renderStandings(standings) {
   const list = document.getElementById('standings-list');
   if (!standings || !standings.length) {
@@ -658,176 +899,179 @@ function renderStandings(standings) {
     return;
   }
   list.innerHTML = standings.map((s, i) => {
-    // support both our normalized format and Jolpica raw format
-    const pos = s.pos || s.position || (i + 1);
-    const posClass = pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : '';
-    const driverName = s.name || (s.Driver ? `${s.Driver.givenName} ${s.Driver.familyName}` : '—');
-    // show last name only to save space
-    const lastName = driverName.split(' ').slice(-1)[0];
-    const code = s.code || '';
-    const pts = parseFloat(s.pts || s.points || 0).toFixed(0);
+    const pos  = s.pos || s.position || (i + 1);
+    const posC = pos===1?'p1':pos===2?'p2':pos===3?'p3':'';
+    const name = s.name || (s.Driver ? `${s.Driver.givenName} ${s.Driver.familyName}` : '—');
+    const last = name.split(' ').slice(-1)[0];
+    const pts  = parseFloat(s.pts || s.points || 0).toFixed(0);
     const wins = s.wins ? `<span class="standing-wins">${s.wins}W</span>` : '';
-    const color = s.color || '';
     return `<div class="standing-row">
-      <span class="standing-pos ${posClass}">${pos}</span>
-      <span class="standing-name" style="${color ? `color:${color}` : ''}" title="${driverName}">${code || lastName}</span>
+      <span class="standing-pos ${posC}">${pos}</span>
+      <span class="standing-name" style="${s.color?`color:${s.color}`:''}" title="${name}">${s.code||last}</span>
       ${wins}
       <span class="standing-pts">${pts}</span>
     </div>`;
   }).join('');
 }
 
-// ─── RENDER SKELETON ───
+// ─── SKELETON ───
 function renderSkeleton(count) {
-  const grid = document.getElementById('races-grid');
-  grid.innerHTML = Array.from({ length: count }, (_, i) => `
-    <div class="race-hist-card" style="min-height:140px;animation:pulse 1.2s ease infinite alternate">
+  document.getElementById('races-grid').innerHTML = Array.from({length:count},(_,i) =>
+    `<div class="race-hist-card" style="min-height:140px;animation:pulse 1.2s ease infinite alternate">
       <div class="race-hist-round" style="opacity:.4">R${i+1}</div>
       <div style="background:var(--bg-secondary);height:14px;border-radius:4px;width:65%;margin:8px 0 6px"></div>
       <div style="background:var(--bg-secondary);height:12px;border-radius:4px;width:40%"></div>
-    </div>
-  `).join('');
+    </div>`
+  ).join('');
 }
 
-// ─── RENDER RACES ───
+// ─── RENDER RACES (expandable) ───
 function renderRaces(races) {
   const grid = document.getElementById('races-grid');
   if (!races || !races.length) {
     grid.innerHTML = '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">No race data available</div>';
     return;
   }
-  grid.innerHTML = races.map(r => {
-    const round = r.round || r.Round || '?';
-    // our API uses r.name; Jolpica raw uses r.raceName
-    const name = r.name || r.raceName || r.race_name || '—';
-    const country = r.country || r.Circuit?.Location?.country || '';
-    const cflag = COUNTRY_FLAG[country] || '';
-    const winner = r.winner || (r.Results?.[0] ? `${r.Results[0].Driver?.givenName} ${r.Results[0].Driver?.familyName}` : null) || '—';
-    const winnerTeam = r.winner_team || r.Results?.[0]?.Constructor?.name || '';
-    const winnerColor = r.winner_color || '';
-    const date = r.date ? r.date.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3') : '';
-    const circuit = r.circuit || r.Circuit?.circuitName || '';
-    // top 3 podium dots
-    const podium = (r.top5 || []).slice(0, 3).map(p =>
-      `<span style="font-size:11px;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,0.05);color:var(--text-secondary)">${p.code}</span>`
-    ).join(' ');
-    return `<div class="race-hist-card">
+  grid.innerHTML = races.map((r, idx) => {
+    const round      = r.round || r.Round || '?';
+    const name       = r.name  || r.raceName || '—';
+    const country    = r.country || '';
+    const cflag      = COUNTRY_FLAG[country] || '';
+    const winner     = r.winner || '—';
+    const winnerTeam = r.winner_team || '';
+    const winnerColor= r.winner_color || '';
+    const date       = r.date ? r.date.replace(/(\d{4})-(\d{2})-(\d{2})/,'$1/$2/$3') : '';
+
+    // ── top5 table ──
+    const rows = (r.top5 || []).map(d => {
+      const delta = d.grid - d.pos;
+      const dCls  = delta > 0 ? 'gain' : delta < 0 ? 'loss' : 'same';
+      const dStr  = delta > 0 ? `+${delta}` : delta < 0 ? String(delta) : '—';
+      const pCls  = d.pos===1?'p1':d.pos===2?'p2':d.pos===3?'p3':'';
+      return `<div class="top5-row">
+        <span class="top5-pos ${pCls}">${d.pos}</span>
+        <span class="top5-code" style="color:${d.color||'var(--text-secondary)'}">${d.code}</span>
+        <span class="top5-name">${d.name.split(' ').slice(-1)[0]}</span>
+        <span class="top5-grid-col" title="Grid">P${d.grid}</span>
+        <span class="top5-delta ${dCls}">${dStr}</span>
+        <span class="top5-pts">${d.pts}</span>
+      </div>`;
+    }).join('');
+
+    const insight = raceInsight(r);
+
+    return `<div class="race-hist-card" onclick="toggleRaceExpand(${idx}, this)">
       <div class="race-hist-round">R${round}</div>
       <div class="race-hist-name">${name}</div>
-      <div class="race-hist-country">${cflag} ${country}${circuit ? ` · ${circuit}` : ''}</div>
+      <div class="race-hist-country">${cflag} ${country}</div>
       <div class="race-hist-winner">
         <span class="winner-label">Winner</span>
-        <span class="winner-name" style="${winnerColor ? `color:${winnerColor}` : ''}">${winner}</span>
+        <span class="winner-name" style="${winnerColor?`color:${winnerColor}`:''}'">${winner}</span>
       </div>
       ${winnerTeam ? `<div class="race-hist-team">${winnerTeam}</div>` : ''}
-      ${podium ? `<div style="margin-top:6px;display:flex;gap:4px">${podium}</div>` : ''}
       ${date ? `<div class="race-hist-date">${date}</div>` : ''}
+      <div class="race-expand-btn">▾ Full Results</div>
+      <div class="race-detail-panel" id="rdp-${idx}">
+        <div class="top5-header">
+          <span class="top5-pos">#</span>
+          <span class="top5-code">Code</span>
+          <span class="top5-name">Driver</span>
+          <span class="top5-grid-col">Grid</span>
+          <span class="top5-delta same">+/-</span>
+          <span class="top5-pts">Pts</span>
+        </div>
+        ${rows}
+        ${insight ? `<div class="race-auto-insight">${insight}</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
 
 // ─── SEASON SELECTION ───
 async function selectSeason(year, btnEl) {
-  // Clamp: only 2020-2024 have real data
   const supported = [2020, 2021, 2022, 2023, 2024];
-
   currentSeason = year;
   document.getElementById('race-section-year').textContent = year;
 
-  // Update active button
-  document.querySelectorAll('.season-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.trim() === String(year));
+  document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  else document.querySelectorAll('.season-btn').forEach(b => {
+    if (b.textContent.trim() === String(year)) b.classList.add('active');
   });
-  if (btnEl) {
-    document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
-    btnEl.classList.add('active');
-  }
 
-  // Show fallback meta instantly
   const fallback = SEASON_META_FALLBACK[year];
   if (fallback) updateInfoBar(year, fallback);
   else {
-    document.getElementById('info-year').textContent = year;
-    document.getElementById('info-champion').textContent = '—';
-    document.getElementById('info-races').textContent = '—';
-    document.getElementById('info-constructor').textContent = '—';
-    document.getElementById('info-points').textContent = '—';
+    ['info-year','info-champion','info-races','info-constructor','info-points'].forEach(id => {
+      document.getElementById(id).textContent = id === 'info-year' ? year : '—';
+    });
   }
 
-  // Only fetch real data for supported years
   if (!supported.includes(year)) {
     document.getElementById('standings-list').innerHTML =
       '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">Legendary season data<br>coming soon</div>';
     document.getElementById('races-grid').innerHTML =
       '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Legendary season data coming soon</div>';
+    document.getElementById('insights-section').style.display    = 'none';
+    document.getElementById('team-analysis-section').style.display = 'none';
     return;
   }
 
-  // Use cache
+  // Cache hit
   if (seasonCache[year]) {
     const c = seasonCache[year];
-    updateInfoBar(year, c.meta);
-    renderStandings(c.standings);
-    renderRaces(c.races);
+    updateInfoBar(year, c.meta || fallback || {});
+    renderTeamAnalysis(c.races || [], year);
+    renderInsights(c.races || [], c.standings || [], year);
+    renderStandings(c.standings || []);
+    renderRaces(c.races || []);
     return;
   }
 
-  // Show loading skeleton
-  const meta = fallback || {};
-  renderSkeleton(meta.total_races || 10);
+  // Loading state
+  renderSkeleton((fallback||{}).total_races || 10);
   document.getElementById('races-loading').style.display = 'inline';
   document.getElementById('standings-list').innerHTML =
     '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">Loading...</div>';
+  document.getElementById('insights-section').style.display    = 'none';
+  document.getElementById('team-analysis-section').style.display = 'none';
 
   try {
     const data = await apiFetch(`/api/history/season/${year}`);
     seasonCache[year] = data;
     updateInfoBar(year, data.meta || fallback || {});
+    renderTeamAnalysis(data.races || [], year);
+    renderInsights(data.races || [], data.standings || [], year);
     renderStandings(data.standings || []);
     renderRaces(data.races || []);
   } catch (e) {
-    // Fallback: show fallback races from /api/races/history if year=2024
     if (year === 2024) {
-      try {
-        const h = await apiFetch('/api/races/history?limit=24');
-        renderRaces(h.races || []);
-      } catch {}
+      try { const h = await apiFetch('/api/races/history?limit=24'); renderRaces(h.races||[]); } catch {}
     } else {
       document.getElementById('races-grid').innerHTML =
-        '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Failed to load data, please try again later</div>';
+        '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Failed to load — please try again</div>';
     }
-    if (fallback) renderStandings([
-      { Driver: { familyName: fallback.champion }, points: fallback.champion_pts, wins: '' },
-    ]);
   } finally {
     document.getElementById('races-loading').style.display = 'none';
   }
 }
 
-// ─── PULSE ANIMATION ───
-const styleEl = document.createElement('style');
-styleEl.textContent = `@keyframes pulse { from { opacity:.7 } to { opacity:1 } }`;
-document.head.appendChild(styleEl);
+// ─── PULSE + INIT ───
+document.head.appendChild(Object.assign(document.createElement('style'), {
+  textContent: `@keyframes pulse { from{opacity:.7} to{opacity:1} }`
+}));
 
-// ─── INIT ───
 document.addEventListener('DOMContentLoaded', () => {
   selectSeason(2024, null);
-
-  // Scroll-in animation for legend cards
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-      }
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
     });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.legend-card, .unlock-card').forEach((card, i) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    card.style.transition = `opacity 0.4s ease ${i * 0.06}s, transform 0.4s ease ${i * 0.06}s`;
-    observer.observe(card);
+  }, { threshold:0.1 });
+  document.querySelectorAll('.legend-card, .unlock-card').forEach((card,i) => {
+    card.style.opacity='0'; card.style.transform='translateY(20px)';
+    card.style.transition=`opacity 0.4s ease ${i*.06}s, transform 0.4s ease ${i*.06}s`;
+    obs.observe(card);
   });
 });
 </script>

@@ -1,4 +1,4 @@
-"""Profile — 戰績和排行榜"""
+"""Profile — Stats and Leaderboard"""
 from fastapi import APIRouter, HTTPException, Header
 from database import get_db
 from routes.auth import get_current_user
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/profile", tags=["profile"])
 
 @router.get("")
 async def my_profile(authorization: str = Header(None)):
-    """取得個人戰績"""
+    """Get personal stats"""
     user = await get_current_user(authorization)
     username = user["username"]
     balance = await get_balance(username)
@@ -49,7 +49,7 @@ async def my_profile(authorization: str = Header(None)):
 
 @router.get("/sharecard")
 async def share_card(authorization: str = Header(None)):
-    """生成可分享的戰績卡數據"""
+    """Generate shareable stats card data"""
     user = await get_current_user(authorization)
     username = user["username"]
     balance = await get_balance(username)
@@ -94,7 +94,7 @@ async def share_card(authorization: str = Header(None)):
 
 @router.get("/leaderboard")
 async def leaderboard():
-    """PitLane 下注排行榜"""
+    """Throttenix betting leaderboard"""
     db = await get_db()
     try:
         rows = await db.execute_fetchall(

@@ -1,4 +1,4 @@
-"""P2P 對賭系統"""
+"""P2P Betting System"""
 import secrets
 from fastapi import APIRouter, HTTPException, Header
 from database import get_db
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/p2p", tags=["p2p"])
 
 @router.post("/create")
 async def create_order(body: dict, authorization: str = Header(None)):
-    """開單：押某車手，設定賠率和金額"""
+    """Place order: bet on a driver with specified odds and amount"""
     user = await get_current_user(authorization)
     username = user["username"]
     race_id = body.get("race_id", "")
@@ -22,14 +22,14 @@ async def create_order(body: dict, authorization: str = Header(None)):
     amount = float(body.get("amount", 500))
 
     if amount < 1000 or amount > 500000:
-        raise HTTPException(400, "金額需在 100-50000 之間")
+        raise HTTPException(400, "Amount must be between 100 and 50000")
     if odds < 1.1 or odds > 50.0:
-        raise HTTPException(400, "賠率需在 1.1-50.0 之間")
+        raise HTTPException(400, "Odds must be between 1.1 and 50.0")
 
     fee_info = apply_fee(amount, "p2p_maker")
     balance = await get_balance(username)
     if balance < fee_info["total"]:
-        raise HTTPException(400, f"USDClaw 餘額不足（需要 {fee_info['total']:,.0f}）")
+        raise HTTPException(400, f"Insufficient USDClaw balance (need {fee_info['total']:,.0f})")
 
     await debit(username, fee_info["total"], "p2p_create", f"p2p:{race_id}:{prediction}")
 
@@ -52,13 +52,13 @@ async def create_order(body: dict, authorization: str = Header(None)):
         "odds": odds,
         "prediction": prediction,
         "status": "open",
-        "waiting_for": f"需要對手押 {amount * (odds - 1):,.0f} USDClaw 接單",
+        "waiting_for": f"Waiting for opponent to stake {amount * (odds - 1):,.0f} USDClaw",
     }
 
 
 @router.get("/available")
 async def available_orders(authorization: str = Header(None)):
-    """查看可接的單"""
+    """View available orders to accept"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:
@@ -79,7 +79,7 @@ async def available_orders(authorization: str = Header(None)):
 
 @router.post("/accept/{order_id}")
 async def accept_order(order_id: int, authorization: str = Header(None)):
-    """接單"""
+    """Accept an order"""
     user = await get_current_user(authorization)
     username = user["username"]
 
@@ -89,16 +89,16 @@ async def accept_order(order_id: int, authorization: str = Header(None)):
             "SELECT * FROM p2p_orders WHERE id = ? AND status = 'open'", (order_id,)
         )
         if not rows:
-            raise HTTPException(404, "訂單不存在或已被接走")
+            raise HTTPException(404, "Order not found or already taken")
         order = rows[0]
         if order[1] == username:  # creator
-            raise HTTPException(400, "不能接自己的單")
+            raise HTTPException(400, "Cannot accept your own order")
 
         taker_amount = round(order[7] * (order[6] - 1), 2)  # amount * (odds - 1)
         fee_info = apply_fee(taker_amount, "p2p_taker")
         balance = await get_balance(username)
         if balance < fee_info["total"]:
-            raise HTTPException(400, f"USDClaw 餘額不足（需要 {fee_info['total']:,.0f}）")
+            raise HTTPException(400, f"Insufficient USDClaw balance (need {fee_info['total']:,.0f})")
 
         await debit(username, fee_info["total"], "p2p_accept", f"p2p_accept:{order_id}")
 
@@ -125,7 +125,7 @@ async def accept_order(order_id: int, authorization: str = Header(None)):
 
 @router.get("/my")
 async def my_orders(authorization: str = Header(None)):
-    """我的 P2P 記錄"""
+    """My P2P order history"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:

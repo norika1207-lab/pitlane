@@ -1,4 +1,4 @@
-"""朋友挑戰房間"""
+"""Friend Challenge Rooms"""
 import secrets
 from fastapi import APIRouter, HTTPException, Header
 from database import get_db
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/challenge", tags=["challenge"])
 
 @router.post("/create")
 async def create_challenge(body: dict, authorization: str = Header(None)):
-    """建立挑戰房間"""
+    """Create a challenge room"""
     user = await get_current_user(authorization)
     username = user["username"]
     race_id = body.get("race_id", "")
@@ -20,12 +20,12 @@ async def create_challenge(body: dict, authorization: str = Header(None)):
     creator_pick = body.get("prediction", "")
 
     if amount < 1000 or amount > 500000:
-        raise HTTPException(400, "金額需在 100-50000 之間")
+        raise HTTPException(400, "Amount must be between 100 and 50000")
 
     fee_info = apply_fee(amount, "challenge_room")
     balance = await get_balance(username)
     if balance < fee_info["total"]:
-        raise HTTPException(400, f"USDClaw 餘額不足")
+        raise HTTPException(400, f"Insufficient USDClaw balance")
 
     await debit(username, fee_info["total"], "challenge_create", f"challenge:{race_id}")
     code = secrets.token_hex(4).upper()
@@ -48,20 +48,20 @@ async def create_challenge(body: dict, authorization: str = Header(None)):
         "fee": fee_info["fee"],
         "your_pick": creator_pick,
         "status": "waiting",
-        "message": f"分享邀請碼 {code} 給朋友！",
+        "message": f"Share invite code {code} with your friend!",
     }
 
 
 @router.get("/{code}")
 async def get_challenge(code: str):
-    """查看挑戰房間"""
+    """View a challenge room"""
     db = await get_db()
     try:
         rows = await db.execute_fetchall(
             "SELECT * FROM challenges WHERE code = ?", (code,)
         )
         if not rows:
-            raise HTTPException(404, "挑戰房間不存在")
+            raise HTTPException(404, "Challenge room not found")
         r = rows[0]
         return {
             "code": r[1], "creator": r[2], "race_id": r[3], "race_name": r[4],
@@ -74,7 +74,7 @@ async def get_challenge(code: str):
 
 @router.post("/join")
 async def join_challenge(body: dict, authorization: str = Header(None)):
-    """加入挑戰"""
+    """Join a challenge"""
     user = await get_current_user(authorization)
     username = user["username"]
     code = body.get("code", "")
@@ -86,18 +86,18 @@ async def join_challenge(body: dict, authorization: str = Header(None)):
             "SELECT * FROM challenges WHERE code = ? AND status = 'waiting'", (code,)
         )
         if not rows:
-            raise HTTPException(404, "房間不存在或已滿")
+            raise HTTPException(404, "Room not found or already full")
         challenge = rows[0]
         if challenge[2] == username:
-            raise HTTPException(400, "不能挑戰自己")
+            raise HTTPException(400, "Cannot challenge yourself")
         if joiner_pick == challenge[7]:
-            raise HTTPException(400, "不能跟對手押一樣的車手")
+            raise HTTPException(400, "Cannot pick the same driver as your opponent")
 
         amount = challenge[5]
         fee_info = apply_fee(amount, "challenge_room")
         balance = await get_balance(username)
         if balance < fee_info["total"]:
-            raise HTTPException(400, "USDClaw 餘額不足")
+            raise HTTPException(400, "Insufficient USDClaw balance")
 
         await debit(username, fee_info["total"], "challenge_join", f"challenge_join:{code}")
 
@@ -122,7 +122,7 @@ async def join_challenge(body: dict, authorization: str = Header(None)):
 
 @router.get("/my/list")
 async def my_challenges(authorization: str = Header(None)):
-    """我的挑戰記錄"""
+    """My challenge history"""
     user = await get_current_user(authorization)
     db = await get_db()
     try:
