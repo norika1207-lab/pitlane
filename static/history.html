@@ -329,37 +329,6 @@
 }
 .race-auto-insight strong { color: var(--text-primary); }
 
-/* ─── TEAM ANALYSIS BARS ─── */
-.team-analysis-wrap {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px 24px;
-  margin-bottom: 32px;
-}
-.team-analysis-title {
-  font-size: 12px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: .07em;
-  margin-bottom: 16px;
-}
-.team-bar-row {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 9px;
-}
-.team-bar-label {
-  width: 90px; font-size: 12px; color: var(--text-secondary);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;
-}
-.team-bar-track {
-  flex: 1; height: 24px; background: rgba(255,255,255,.04);
-  border-radius: 4px; overflow: hidden;
-}
-.team-bar-fill {
-  height: 100%; border-radius: 4px;
-  display: flex; align-items: center; padding: 0 8px;
-  transition: width 0.9s cubic-bezier(.2,.8,.4,1);
-  min-width: 2px;
-}
-.team-bar-pts { font-size: 11px; font-weight: 800; color: rgba(0,0,0,.85); white-space: nowrap; }
-.team-bar-meta { width: 64px; text-align: right; font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
-
 /* ─── INSIGHTS BOX ─── */
 .insights-box {
   background: rgba(212,168,67,.04); border: 1px solid rgba(212,168,67,.15);
@@ -1175,9 +1144,6 @@ function toggleRaceExpand(idx, cardEl) {
   const open = panel.classList.toggle('open');
   if (btn) btn.textContent = open ? '▴ Hide' : '▾ Full Results';
 }
-
-// ─── STANDINGS (legacy no-op — replaced by renderFullStandings) ───
-function renderStandings() {}
 
 // ─── SKELETON ───
 function renderSkeleton(count) {
