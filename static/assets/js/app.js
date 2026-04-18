@@ -528,8 +528,37 @@ function rarityLabel(rarity) {
   return map[rarity] || map.silverstone;
 }
 
+// ─── BRAND INJECTOR ─── every page gets a favicon + "模擬下注平台" tagline
+function installBrand() {
+  // Favicon (idempotent)
+  if (!document.querySelector('link[rel="icon"]')) {
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.href = '/static/assets/favicon.svg';
+    document.head.appendChild(link);
+  }
+  // Tagline next to the brand (works for both .nav-logo and .nav-brand markup)
+  const brand = document.querySelector('.nav-brand, .nav-logo');
+  if (brand && !brand.querySelector('.nav-tagline')) {
+    const tag = document.createElement('span');
+    tag.className = 'nav-tagline';
+    tag.textContent = '模擬下注平台';
+    Object.assign(tag.style, {
+      marginLeft: '10px', paddingLeft: '10px',
+      borderLeft: '1px solid #333',
+      fontFamily: "'Barlow Condensed', sans-serif",
+      fontSize: '10px', fontWeight: '700',
+      letterSpacing: '.15em', color: '#888',
+      textTransform: 'none', whiteSpace: 'nowrap',
+    });
+    brand.appendChild(tag);
+  }
+}
+
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded', () => {
+  installBrand();
   updateAuthUI();
   document.getElementById('modal-overlay')?.addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeModal();
