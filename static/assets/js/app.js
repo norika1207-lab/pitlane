@@ -613,16 +613,6 @@ function installBrand() {
          when content height changes and the scrollbar toggles). */
       html { scrollbar-gutter: stable; overflow-y: scroll; }
 
-      /* Logo block — allow it to shrink without wrapping */
-      .nav-brand, .nav-logo {
-        min-width: 0;
-        overflow: hidden;
-      }
-      .nav-tagline {
-        flex-shrink: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
       /* Auth cluster — keep it on one line, hugging the right edge */
       #nav-auth { flex-shrink: 0 !important; }
       #nav-auth > * { flex-shrink: 0; }
@@ -635,10 +625,6 @@ function installBrand() {
       /* <820px: hide the center link bar entirely; nav becomes brand | auth */
       @media (max-width: 820px) {
         .nav-links { display: none !important; }
-      }
-      /* <600px: drop the subtitle tagline — nav is cramped */
-      @media (max-width: 600px) {
-        .nav-tagline { display: none !important; }
       }
       /* <520px: shrink Sign Up label and gaps so both buttons still fit */
       @media (max-width: 520px) {
@@ -673,40 +659,14 @@ function installBrand() {
   // takes zero horizontal space and cannot collide with nav links. Wrap the
   // existing "THROTTENIX" text node in a flex-column span and append the
   // tagline below it.
-  if (!brand.querySelector('.nav-wordstack')) {
-    // Find the first text node (the brand name) and wrap it
-    const textNode = [...brand.childNodes].find(
-      n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()
-    );
-    if (textNode) {
-      const stack = document.createElement('span');
-      stack.className = 'nav-wordstack';
-      Object.assign(stack.style, {
-        display: 'inline-flex', flexDirection: 'column',
-        justifyContent: 'center', lineHeight: '1',
-        minWidth: '0',
-      });
-      const nameEl = document.createElement('span');
-      nameEl.className = 'nav-wordmark';
-      nameEl.textContent = textNode.textContent.trim();
-      Object.assign(nameEl.style, { lineHeight: '1', whiteSpace: 'nowrap' });
-
-      const tag = document.createElement('span');
-      tag.className = 'nav-tagline';
-      tag.textContent = 'SIMULATED BETTING · F1';
-      Object.assign(tag.style, {
-        marginTop: '3px',
-        fontFamily: "'Barlow Condensed', 'IBM Plex Mono', monospace",
-        fontSize: '9px', fontWeight: '700',
-        letterSpacing: '.22em', color: '#888',
-        textTransform: 'none', whiteSpace: 'nowrap',
-      });
-
-      stack.appendChild(nameEl);
-      stack.appendChild(tag);
-      textNode.replaceWith(stack);
+  // Remove any leftover tagline from previous versions
+  brand.querySelectorAll('.nav-tagline, .nav-wordstack').forEach(el => {
+    if (el.classList.contains('nav-wordstack')) {
+      el.replaceWith(document.createTextNode(el.querySelector('.nav-wordmark')?.textContent || 'THROTTENIX'));
+    } else {
+      el.remove();
     }
-  }
+  });
 }
 
 // ─── INIT ───
