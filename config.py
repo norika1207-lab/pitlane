@@ -8,10 +8,11 @@ BASE_PATH = "/racing"
 # Database — Throttenix local data (bets, cache)
 DB_PATH = "/opt/racing/pitlane.db"
 
-# MongoDB — shared exchange accounts and USDClaw
-MONGO_URI = "mongodb://clawApp:9SoPkGneSXeT11stDJnYvwnzjTaYWTy0woXUwyDMuM4@127.0.0.1:27017/?authSource=admin"
+# Shared Auth service (standalone, replaces CSM dependency)
+SHARED_AUTH_URL = "http://127.0.0.1:8010"
+SERVICE_KEY = "1d5aea0d4aa78cdb7cf89e61e74b81ced211fe9cfb91e6d5d343c82fda77961d"
 
-# JWT — shared exchange JWT secret, validates the same token
+# JWT — same secret as shared_auth, for local decode
 JWT_SECRET = "1d5aea0d4aa78cdb7cf89e61e74b81ced211fe9cfb91e6d5d343c82fda77961d"
 JWT_ALGORITHM = "HS256"
 

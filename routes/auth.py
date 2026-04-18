@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
-TRADING_API = "http://127.0.0.1:8000"
+TRADING_API = "http://127.0.0.1:8010"
 
 
 class LoginRequest(BaseModel):
@@ -62,15 +62,10 @@ async def login(data: LoginRequest):
                 timeout=10,
             )
         except httpx.ConnectError:
-            raise HTTPException(503, "Trading platform unavailable")
+            raise HTTPException(503, "Auth service unavailable")
 
     if resp.status_code != 200:
-        detail = "Invalid username or password"
-        try:
-            detail = resp.json().get("detail", detail)
-        except Exception:
-            pass
-        raise HTTPException(401, detail)
+        raise HTTPException(401, "Invalid username or password")
 
     result = resp.json()
     token = result.get("access_token")
@@ -99,16 +94,19 @@ async def register(data: RegisterRequest):
                 timeout=10,
             )
         except httpx.ConnectError:
-            raise HTTPException(503, "Trading platform unavailable")
+            raise HTTPException(503, "Auth service unavailable")
 
     if resp.status_code not in (200, 201):
-        detail = "Registration failed"
+        detail = "Registration failed — username or email already taken"
         try:
             body = resp.json()
-            if isinstance(body.get("detail"), list):
-                detail = body["detail"][0].get("msg", detail)
-            else:
-                detail = body.get("detail", detail)
+            raw = body["detail"][0].get("msg", "") if isinstance(body.get("detail"), list) else body.get("detail", "")
+            if "username" in raw.lower() or "2-30" in raw:
+                detail = "Username must be 2–30 alphanumeric characters"
+            elif "email" in raw.lower():
+                detail = "Invalid email address"
+            elif "密碼" in raw or "password" in raw.lower() or "8" in raw:
+                detail = "Password must be 8–72 characters with letters and numbers"
         except Exception:
             pass
         raise HTTPException(400, detail)
