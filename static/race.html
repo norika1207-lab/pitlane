@@ -527,7 +527,7 @@
   <!-- ─── BETTING PANEL ─── -->
   <section class="bet-section">
     <div class="container">
-      <div class="strip-title" style="margin-bottom:20px">Place Your Bet</div>
+      <div class="strip-title" style="margin-bottom:20px">Pit In</div>
 
       <!-- Tabs -->
       <div class="bet-tabs">
@@ -618,7 +618,7 @@
       <!-- ADVANCED TAB -->
       <div class="tab-pane" id="pane-advanced">
         <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">
-          Pit stop strategy, DNF prediction, lap count — high-difficulty bets for veteran F1 fans.
+          Pit stop strategy, DNF prediction, lap count — high-difficulty pits for veteran F1 fans.
         </p>
         <div class="adv-grid">
           <div class="adv-field">
@@ -656,7 +656,7 @@
       <!-- AMOUNT + SUMMARY + BUTTON -->
       <div style="margin-top:24px">
         <div class="amount-section">
-          <div class="amount-header">Bet Amount (USDClaw ◆) · Click to add</div>
+          <div class="amount-header">Pit Stake (USDClaw ◆) · Click to add</div>
           <div class="amount-display" id="bet-amount-display" style="font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:#e8ff00;text-align:center;padding:12px 0;letter-spacing:0.02em">
             ◆ 0
           </div>
@@ -692,7 +692,7 @@
         </div>
 
         <button class="btn btn-gold" id="place-bet-btn" style="width:100%;padding:14px;font-size:15px" onclick="placeBet()" disabled>
-          Confirm Bet
+          Confirm Pit
         </button>
         <div id="bet-result-area"></div>
       </div>
@@ -1537,7 +1537,7 @@ async function placeBet() {
 
     resultEl.innerHTML = `
       <div class="bet-result-msg success">
-        <strong style="color:var(--green)">✓ Bet placed!</strong><br>
+        <strong style="color:var(--green)">✓ Pit placed!</strong><br>
         <span style="color:var(--text-secondary)">
           Bet ◆${(res.amount || betAmount).toLocaleString()} · Odds x${res.odds || '?'} · Potential Payout ◆${(res.potential_win || 0).toLocaleString()}
           <br>Remaining USDClaw ◆${(res.remaining_balance || 0).toLocaleString()}
@@ -1554,7 +1554,7 @@ async function placeBet() {
     resultEl.innerHTML = `<div class="bet-result-msg error">${e.message}</div>`;
     btn.disabled = false;
   }
-  btn.textContent = 'Confirm Bet';
+  btn.textContent = 'Confirm Pit';
 }
 
 // ─────────────────────────────────────────────

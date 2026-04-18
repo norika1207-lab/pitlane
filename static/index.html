@@ -342,7 +342,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
   <div class="live-bar">
     <div class="live-dot"></div>
     <span class="live-text">LIVE — Saudi Arabian Grand Prix in 4 days</span>
-    <span class="live-count" id="liveCount">2,847 placing bets</span>
+    <span class="live-count" id="liveCount">2,847 placing pits</span>
   </div>
 
   <div class="top-bar">
@@ -366,7 +366,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
   <div class="main-grid">
     <!-- Hot Bets -->
     <div class="panel">
-      <div class="panel-title">Top Bets This Race</div>
+      <div class="panel-title">Top Pits This Race</div>
       <div class="bet-row">
         <span class="bet-rank">1</span>
         <div class="bet-color" style="background:#3671C6"></div>
@@ -467,7 +467,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div style="text-align:center"><div class="result-dot result-win">✓</div><span class="result-label">Australia</span></div>
         <div style="text-align:center"><div class="result-dot result-pending">?</div><span class="result-label">Jeddah</span></div>
       </div>
-      <button class="bet-now-btn" onclick="user ? location.href='/race' : showModal('login')">Bet Now →</button>
+      <button class="bet-now-btn" onclick="user ? location.href='/race' : showModal('login')">Pit Now →</button>
     </div>
   </div>
 
@@ -491,7 +491,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
     <div class="steps">
       <div class="step done">
         <div class="step-header"><div class="step-num">✓</div><div class="step-title">Create Account</div></div>
-        <div class="step-desc">Done! You have 1,000 USDC starting balance</div>
+        <div class="step-desc">Done! You have 1,000 USDClaw starting balance</div>
       </div>
       <div class="step current">
         <div class="current-arrow"></div>
@@ -500,8 +500,8 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div class="step-action">→ View Driver Cards</div>
       </div>
       <div class="step">
-        <div class="step-header"><div class="step-num">3</div><div class="step-title">Bet on the Winner</div></div>
-        <div class="step-desc">Pick a driver, bet on them to win, and wait for the race result</div>
+        <div class="step-header"><div class="step-num">3</div><div class="step-title">Pit on the Winner</div></div>
+        <div class="step-desc">Pick a driver, pit on them to win, and wait for the race result</div>
       </div>
     </div>
     <div class="panel-title" style="margin-bottom:8px">AI Today's Pick · Best choice for beginners</div>
@@ -523,7 +523,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
       <div class="rc-bet">
         <div class="rc-odds" style="color:#F47600">3.8x</div>
         <div class="rc-odds-label">Odds</div>
-        <button class="rc-bet-btn" style="background:#F47600;color:#000">Bet →</button>
+        <button class="rc-bet-btn" style="background:#F47600;color:#000">Pit →</button>
       </div>
     </div>
     <div class="panel-title" style="margin-bottom:8px">Beginner's Guide</div>
@@ -531,7 +531,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
       <div class="tip-card">
         <span class="tip-icon">🎯</span>
         <div class="tip-title">What do odds mean?</div>
-        <div class="tip-desc">Odds of <span class="tip-hi">3.8x</span> mean bet 100 USDC, win and get 380 USDC back. Higher odds = longer shot, but bigger payout.</div>
+        <div class="tip-desc">Odds of <span class="tip-hi">3.8x</span> mean pit 100 USDClaw, win and get 380 USDClaw back. Higher odds = longer shot, but bigger payout.</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">🌧</span>
@@ -541,7 +541,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
       <div class="tip-card">
         <span class="tip-icon">🏎</span>
         <div class="tip-title">Qualifying matters</div>
-        <div class="tip-desc">Overtaking is hard at Jeddah — <span class="tip-hi">pole position</span> has a big advantage. Check qualifying results before placing your bet.</div>
+        <div class="tip-desc">Overtaking is hard at Jeddah — <span class="tip-hi">pole position</span> has a big advantage. Check qualifying results before placing your pit.</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">📊</span>
@@ -603,7 +603,7 @@ async function loadPage() {
         </div>
         <div class="bet-bar-wrap"><div class="bet-bar" style="width:${o.win_probability}%;background:${tc}"></div></div>`;
       }).join('');
-      betPanel.innerHTML = `<div class="panel-title">Top Bets This Race</div>${betsHtml}`;
+      betPanel.innerHTML = `<div class="panel-title">Top Pits This Race</div>${betsHtml}`;
     }
 
     // Leader
@@ -680,7 +680,7 @@ async function loadPage() {
             <div class="dskill"><span class="dsk-n">${d.passive}</span><span class="dsk-s">Passive</span></div>
             ${d.skills.map(s=>`<div class="dskill"><span class="dsk-n">${s.n}</span><span class="dsk-s">${s.s}</span></div>`).join('')}
           </div>
-          <button class="dbet" style="background:${d.color};color:#fff" onclick="event.stopPropagation();location.href='/race'">Bet ${d.name} →</button>
+          <button class="dbet" style="background:${d.color};color:#fff" onclick="event.stopPropagation();location.href='/race'">Pit ${d.name} →</button>
         </div>` : '';
 
       slot.innerHTML = `
@@ -796,12 +796,12 @@ loadPage();
 
 // FEED
 const FEED=[
-  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'bet on <span class="hi">Verstappen to win</span> · 500 USDC',time:'just now'},
+  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'pit on <span class="hi">Verstappen to win</span> · 500 USDClaw',time:'just now'},
   {u:'SpeedDemon', c:'#E8002D',i:'SD',t:'unlocked <span class="hi">SUZUKA tier card</span> · 5 consecutive hits',time:'1 min ago'},
-  {u:'F1Expert',   c:'#F47600',i:'FE',t:'challenged MX · <span class="hi">Norris vs Hamilton</span> · 1,000 USDC',time:'2 min ago'},
-  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'hit prediction <span class="hi">fastest lap Norris</span> · +300 USDC',time:'3 min ago'},
+  {u:'F1Expert',   c:'#F47600',i:'FE',t:'challenged MX · <span class="hi">Norris vs Hamilton</span> · 1,000 USDClaw',time:'2 min ago'},
+  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'hit prediction <span class="hi">fastest lap Norris</span> · +300 USDClaw',time:'3 min ago'},
   {u:'ApexHunter', c:'#534AB7',i:'AH',t:'claimed <span class="hi">MONACO legend card</span> · Schumacher 2004',time:'5 min ago'},
-  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'bet on <span class="hi">Ferrari top 3 combo</span> · 800 USDC',time:'7 min ago'},
+  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'pit on <span class="hi">Ferrari top 3 combo</span> · 800 USDClaw',time:'7 min ago'},
 ];
 document.getElementById('feedList').innerHTML=FEED.map(f=>`
   <div class="feed-item">
@@ -812,7 +812,7 @@ document.getElementById('feedList').innerHTML=FEED.map(f=>`
 `).join('');
 
 let n=2847;
-setInterval(()=>{ n+=Math.floor(Math.random()*3+1); document.getElementById('liveCount').textContent=n.toLocaleString()+' placing bets'; },4000);
+setInterval(()=>{ n+=Math.floor(Math.random()*3+1); document.getElementById('liveCount').textContent=n.toLocaleString()+' placing pits'; },4000);
 
 let fi=0;
 setInterval(()=>{

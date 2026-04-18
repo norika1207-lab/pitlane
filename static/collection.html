@@ -193,7 +193,7 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
   <div class="page-header">
     <div class="page-eyebrow">Card Album · F1 Drivers</div>
     <div class="page-title">Collection</div>
-    <div class="page-sub">Each F1 card sits inside an acrylic display slab. OWNED cards are earned by placing bets.</div>
+    <div class="page-sub">Each F1 card sits inside an acrylic display slab. OWNED cards are earned by placing pits.</div>
   </div>
 
   <div class="season-bar" id="seasonBar"></div>
@@ -336,7 +336,7 @@ function buildUnit(d) {
         ${ownedBadge}
       </div>
       ${lvl}
-      <div class="col-alabel">${d.pts != null ? d.pts + ' pts' : (d.owned ? 'In your vault' : 'Bet to unlock')}</div>
+      <div class="col-alabel">${d.pts != null ? d.pts + ' pts' : (d.owned ? 'In your vault' : 'Pit to unlock')}</div>
     </div>`;
 }
 

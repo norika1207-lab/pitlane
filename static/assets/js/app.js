@@ -62,88 +62,88 @@ function showProfileDashboard() {
           <div class="pd-avatar">${(user.username||'?')[0].toUpperCase()}</div>
           <div>
             <div class="pd-uname">${user.username}</div>
-            <div class="pd-utag">Throttenix 會員</div>
+            <div class="pd-utag">Throttenix Member</div>
           </div>
           <button class="pd-close" onclick="closeProfileDashboard()">✕</button>
         </div>
         <div class="pd-balance-box">
-          <div class="pd-bal-lbl">USDClaw 餘額</div>
+          <div class="pd-bal-lbl">USDClaw Balance</div>
           <div class="pd-bal-amt">◆ ${formatNum(user.balance)}</div>
         </div>
 
         <div class="pd-menu">
-          <!-- 購入入口（置頂 highlight） -->
+          <!-- Buy CTA block (pinned at top) -->
           <div class="pd-cta-block">
-            <a class="pd-cta-btn" href="https://clawstockmarket.com" target="_blank">💎 購入 Diamond</a>
-            <a class="pd-cta-btn secondary" href="https://clawstockmarket.com" target="_blank">💱 兌換 USDClaw</a>
+            <a class="pd-cta-btn" href="https://clawstockmarket.com" target="_blank">💎 Buy Diamond</a>
+            <a class="pd-cta-btn secondary" href="https://clawstockmarket.com" target="_blank">💱 Swap USDClaw</a>
           </div>
 
-          <!-- 帳戶概覽 -->
-          <div class="pd-menu-item ${_pdTab==='overview'?'active':''}" onclick="pdSwitch('overview',this)">🏆 帳戶概覽</div>
+          <!-- Account Overview -->
+          <div class="pd-menu-item ${_pdTab==='overview'?'active':''}" onclick="pdSwitch('overview',this)">🏆 Overview</div>
 
-          <!-- F1 主選單（預設展開） -->
+          <!-- F1 primary section (expanded by default) -->
           <div class="pd-acc-head" onclick="pdToggleGroup(this)">
-            <span>🏎 F1 賽事成績</span>
+            <span>🏎 F1 Results</span>
             <span class="pd-acc-row-right">
-              <a class="pd-ext-link" href="https://throttenix.com" target="_blank" onclick="event.stopPropagation()" title="前往 Throttenix">↗</a>
+              <a class="pd-ext-link" href="https://throttenix.com" target="_blank" onclick="event.stopPropagation()" title="Open Throttenix">↗</a>
               <span class="pd-chevron">▾</span>
             </span>
           </div>
           <div class="pd-acc-body open">
-            <div class="pd-menu-item pd-sub ${_pdTab==='bets'?'active':''}" onclick="pdSwitch('bets',this)">📋 下注紀錄</div>
-            <div class="pd-menu-item pd-sub ${_pdTab==='dist'?'active':''}" onclick="pdSwitch('dist',this)">📊 下注分布圖</div>
-            <div class="pd-menu-item pd-sub ${_pdTab==='pnl'?'active':''}" onclick="pdSwitch('pnl',this)">💰 總收益</div>
-            <div class="pd-menu-item pd-sub ${_pdTab==='active'?'active':''}" onclick="pdSwitch('active',this)">⏳ 進行中下注</div>
+            <div class="pd-menu-item pd-sub ${_pdTab==='bets'?'active':''}" onclick="pdSwitch('bets',this)">📋 Pit History</div>
+            <div class="pd-menu-item pd-sub ${_pdTab==='dist'?'active':''}" onclick="pdSwitch('dist',this)">📊 Pit Distribution</div>
+            <div class="pd-menu-item pd-sub ${_pdTab==='pnl'?'active':''}" onclick="pdSwitch('pnl',this)">💰 Total P/L</div>
+            <div class="pd-menu-item pd-sub ${_pdTab==='active'?'active':''}" onclick="pdSwitch('active',this)">⏳ Active Pits</div>
           </div>
 
-          <div class="pd-menu-item ${_pdTab==='cards'?'active':''}" onclick="pdSwitch('cards',this)">🃏 卡牌收藏</div>
-          <div class="pd-menu-item ${_pdTab==='rank'?'active':''}" onclick="pdSwitch('rank',this)">🏅 排行榜</div>
+          <div class="pd-menu-item ${_pdTab==='cards'?'active':''}" onclick="pdSwitch('cards',this)">🃏 Card Collection</div>
+          <div class="pd-menu-item ${_pdTab==='rank'?'active':''}" onclick="pdSwitch('rank',this)">🏅 Leaderboard</div>
 
-          <!-- 其他賽事（預設收合） -->
-          <div class="pd-section-divider">其他賽事平台</div>
+          <!-- Other platforms (collapsed by default) -->
+          <div class="pd-section-divider">Other Platforms</div>
 
           <div class="pd-acc-head" onclick="pdToggleGroup(this)">
-            <span>🐎 賽馬 Turfenix</span>
+            <span>🐎 Horse Racing · Turfenix</span>
             <span class="pd-acc-row-right">
-              <a class="pd-ext-link" href="https://turfenix.com" target="_blank" onclick="event.stopPropagation()" title="前往 Turfenix">↗</a>
+              <a class="pd-ext-link" href="https://turfenix.com" target="_blank" onclick="event.stopPropagation()" title="Open Turfenix">↗</a>
               <span class="pd-chevron collapsed">▸</span>
             </span>
           </div>
           <div class="pd-acc-body">
-            <a class="pd-menu-item pd-sub pd-ext-item" href="https://turfenix.com" target="_blank">🏁 前往賽馬下注</a>
-            <a class="pd-menu-item pd-sub pd-ext-item" href="https://turfenix.com/leaderboard" target="_blank">🏅 賽馬排行榜</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://turfenix.com" target="_blank">🏁 Horse Racing Pits</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://turfenix.com/leaderboard" target="_blank">🏅 Horse Racing Leaderboard</a>
           </div>
 
           <div class="pd-acc-head" onclick="pdToggleGroup(this)">
-            <span>🎮 電競 Esports</span>
+            <span>🎮 Esports</span>
             <span class="pd-acc-row-right">
-              <a class="pd-ext-link" href="http://31.97.221.240:8003" target="_blank" onclick="event.stopPropagation()" title="前往 Esports">↗</a>
+              <a class="pd-ext-link" href="http://31.97.221.240:8003" target="_blank" onclick="event.stopPropagation()" title="Open Esports">↗</a>
               <span class="pd-chevron collapsed">▸</span>
             </span>
           </div>
           <div class="pd-acc-body">
-            <a class="pd-menu-item pd-sub pd-ext-item" href="http://31.97.221.240:8003" target="_blank">🏁 前往電競下注</a>
-            <a class="pd-menu-item pd-sub pd-ext-item" href="http://31.97.221.240:8003/leaderboard" target="_blank">🏅 電競排行榜</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="http://31.97.221.240:8003" target="_blank">🏁 Esports Pits</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="http://31.97.221.240:8003/leaderboard" target="_blank">🏅 Esports Leaderboard</a>
           </div>
 
-          <!-- 股市放最下面 -->
+          <!-- Stock market pinned at bottom -->
           <div class="pd-acc-head" onclick="pdToggleGroup(this)">
-            <span>🏦 股市 ClawStockMarket</span>
+            <span>🏦 Stock Market · ClawStockMarket</span>
             <span class="pd-acc-row-right">
-              <a class="pd-ext-link" href="https://clawstockmarket.com" target="_blank" onclick="event.stopPropagation()" title="前往 ClawStockMarket">↗</a>
+              <a class="pd-ext-link" href="https://clawstockmarket.com" target="_blank" onclick="event.stopPropagation()" title="Open ClawStockMarket">↗</a>
               <span class="pd-chevron collapsed">▸</span>
             </span>
           </div>
           <div class="pd-acc-body">
-            <a class="pd-menu-item pd-sub pd-ext-item" href="https://clawstockmarket.com" target="_blank">📈 前往股市交易</a>
-            <a class="pd-menu-item pd-sub pd-ext-item" href="https://clawstockmarket.com/dashboard" target="_blank">💎 購入 Diamond</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://clawstockmarket.com" target="_blank">📈 Go to Exchange</a>
+            <a class="pd-menu-item pd-sub pd-ext-item" href="https://clawstockmarket.com/dashboard" target="_blank">💎 Buy Diamond</a>
           </div>
         </div>
 
-        <button class="pd-logout-btn" onclick="logout();closeProfileDashboard()">登出</button>
+        <button class="pd-logout-btn" onclick="logout();closeProfileDashboard()">Log Out</button>
       </div>
       <div class="pd-content" id="pd-content">
-        <div class="pd-loading">載入中…</div>
+        <div class="pd-loading">Loading…</div>
       </div>
     </div>
   `;
@@ -173,7 +173,7 @@ function pdSwitch(tab, el) {
   if (el) el.classList.add('active');
   const content = document.getElementById('pd-content');
   if (!content) return;
-  content.innerHTML = '<div class="pd-loading">載入中…</div>';
+  content.innerHTML = '<div class="pd-loading">Loading…</div>';
   ({
     overview: pdOverview,
     bets:     pdBets,
@@ -189,37 +189,37 @@ async function pdOverview(el) {
   try {
     const d = await api('/api/profile');
     el.innerHTML = `
-      <div class="pd-section-title">帳戶概覽</div>
+      <div class="pd-section-title">Account Overview</div>
       <div class="pd-stat-grid">
-        <div class="pd-stat"><div class="pd-stat-v">${formatNum(d.balance)}</div><div class="pd-stat-l">USDClaw 餘額</div></div>
-        <div class="pd-stat"><div class="pd-stat-v">${d.total_bets}</div><div class="pd-stat-l">總下注次數</div></div>
-        <div class="pd-stat"><div class="pd-stat-v">${d.total_wins}</div><div class="pd-stat-l">獲勝次數</div></div>
-        <div class="pd-stat"><div class="pd-stat-v">${d.win_rate}%</div><div class="pd-stat-l">勝率</div></div>
+        <div class="pd-stat"><div class="pd-stat-v">${formatNum(d.balance)}</div><div class="pd-stat-l">USDClaw Balance</div></div>
+        <div class="pd-stat"><div class="pd-stat-v">${d.total_bets}</div><div class="pd-stat-l">Total Pits</div></div>
+        <div class="pd-stat"><div class="pd-stat-v">${d.total_wins}</div><div class="pd-stat-l">Wins</div></div>
+        <div class="pd-stat"><div class="pd-stat-v">${d.win_rate}%</div><div class="pd-stat-l">Win Rate</div></div>
       </div>
       <div class="pd-level-row">
         <span class="pd-level-badge level-${d.rarity_level}">${d.rarity_name}</span>
         <span style="color:#888;font-size:12px">${d.rarity_label}</span>
       </div>
       <div class="pd-quick-links">
-        <a class="pd-qlink" href="/race">🏁 前往下注</a>
-        <a class="pd-qlink" href="/collection">🃏 我的卡牌</a>
-        <a class="pd-qlink" href="https://clawstockmarket.com" target="_blank">🏦 交易所 ↗</a>
+        <a class="pd-qlink" href="/race">🏁 Pit In</a>
+        <a class="pd-qlink" href="/collection">🃏 My Cards</a>
+        <a class="pd-qlink" href="https://clawstockmarket.com" target="_blank">🏦 Exchange ↗</a>
       </div>
     `;
-  } catch(e) { el.innerHTML = `<div class="pd-err">載入失敗</div>`; }
+  } catch(e) { el.innerHTML = `<div class="pd-err">Failed to load</div>`; }
 }
 
 async function pdBets(el) {
   try {
     const d = await api('/api/bets/my');
     const bets = d.bets || [];
-    if (!bets.length) { el.innerHTML = `<div class="pd-section-title">下注紀錄</div><div class="pd-empty">尚無下注紀錄</div>`; return; }
+    if (!bets.length) { el.innerHTML = `<div class="pd-section-title">Pit History</div><div class="pd-empty">No pits yet</div>`; return; }
     el.innerHTML = `
-      <div class="pd-section-title">下注紀錄 <span class="pd-count">${bets.length} 筆</span></div>
+      <div class="pd-section-title">Pit History <span class="pd-count">${bets.length} entries</span></div>
       <div class="pd-table-wrap">
       <table class="pd-table">
         <thead><tr>
-          <th>賽事</th><th>預測車手</th><th>下注金額</th><th>方式</th><th>日期</th><th>勝率估算</th><th>結果</th><th>收益</th>
+          <th>Race</th><th>Driver Pick</th><th>Pit Stake</th><th>Type</th><th>Date</th><th>Implied %</th><th>Result</th><th>P/L</th>
         </tr></thead>
         <tbody>
           ${bets.map(b => {
@@ -233,7 +233,7 @@ async function pdBets(el) {
               <td><span class="pd-bet-type">${b.bet_type || '—'}</span></td>
               <td class="pd-date">${b.created_at ? b.created_at.slice(0,10) : '—'}</td>
               <td class="pd-num">${b.odds ? (b.odds*100).toFixed(0)+'%' : '—'}</td>
-              <td><span class="pd-result ${won?'won':lost?'lost':'pending'}">${won?'✓ 勝':lost?'✗ 敗':b.result||'待定'}</span></td>
+              <td><span class="pd-result ${won?'won':lost?'lost':'pending'}">${won?'✓ Won':lost?'✗ Lost':b.result||'Pending'}</span></td>
               <td class="pd-num ${pnl>0?'pos':pnl<0?'neg':''}">${pnl!=null?(pnl>0?'+':'')+formatNum(pnl):'—'}</td>
             </tr>`;
           }).join('')}
@@ -241,29 +241,29 @@ async function pdBets(el) {
       </table>
       </div>
     `;
-  } catch(e) { el.innerHTML = `<div class="pd-err">載入失敗</div>`; }
+  } catch(e) { el.innerHTML = `<div class="pd-err">Failed to load</div>`; }
 }
 
 async function pdDist(el) {
   try {
     const d = await api('/api/bets/my');
     const bets = d.bets || [];
-    if (!bets.length) { el.innerHTML = `<div class="pd-section-title">下注分布圖</div><div class="pd-empty">尚無下注資料</div>`; return; }
+    if (!bets.length) { el.innerHTML = `<div class="pd-section-title">Pit Distribution</div><div class="pd-empty">No pit data yet</div>`; return; }
     const byDriver = {};
     bets.forEach(b => {
-      const k = b.prediction || '不明';
+      const k = b.prediction || 'Unknown';
       byDriver[k] = (byDriver[k] || 0) + Number(b.amount);
     });
     const sorted = Object.entries(byDriver).sort((a,b)=>b[1]-a[1]);
     const total = sorted.reduce((s,[,v])=>s+v, 0);
     const COLORS = ['#e8ff00','#00D2BE','#E10600','#00b0ff','#ff9800','#a020f0','#ff5555','#44ff88','#ff88cc','#88aaff'];
     el.innerHTML = `
-      <div class="pd-section-title">下注分布圖 <span class="pd-count">依車手</span></div>
+      <div class="pd-section-title">Pit Distribution <span class="pd-count">by driver</span></div>
       <div class="pd-dist-wrap">
         <div class="pd-donut-wrap">
           <svg viewBox="0 0 120 120" class="pd-donut">
             ${pdDonutSlices(sorted, total, COLORS)}
-            <text x="60" y="55" text-anchor="middle" class="pd-donut-lbl1">總下注</text>
+            <text x="60" y="55" text-anchor="middle" class="pd-donut-lbl1">Total Pits</text>
             <text x="60" y="70" text-anchor="middle" class="pd-donut-lbl2">${formatNum(total)}</text>
           </svg>
         </div>
@@ -279,7 +279,7 @@ async function pdDist(el) {
         </div>
       </div>
     `;
-  } catch(e) { el.innerHTML = `<div class="pd-err">載入失敗</div>`; }
+  } catch(e) { el.innerHTML = `<div class="pd-err">Failed to load</div>`; }
 }
 
 function pdDonutSlices(sorted, total, colors) {
@@ -305,7 +305,7 @@ async function pdPnl(el) {
   try {
     const d = await api('/api/bets/my');
     const bets = (d.bets || []).filter(b => b.result && b.result !== 'pending').reverse();
-    if (!bets.length) { el.innerHTML = `<div class="pd-section-title">總收益</div><div class="pd-empty">尚無已結算下注</div>`; return; }
+    if (!bets.length) { el.innerHTML = `<div class="pd-section-title">Total P/L</div><div class="pd-empty">No settled pits yet</div>`; return; }
     let cum = 0;
     const points = bets.map(b => {
       cum += (b.payout||0) - (b.amount||0);
@@ -322,11 +322,11 @@ async function pdPnl(el) {
     const last = points[points.length-1].val;
     const totalColor = last >= 0 ? '#00D2BE' : '#E10600';
     el.innerHTML = `
-      <div class="pd-section-title">總收益</div>
+      <div class="pd-section-title">Total P/L</div>
       <div class="pd-pnl-summary">
-        <div class="pd-stat"><div class="pd-stat-v" style="color:${totalColor}">${last>=0?'+':''}${formatNum(last)}</div><div class="pd-stat-l">累計收益</div></div>
-        <div class="pd-stat"><div class="pd-stat-v">${bets.length}</div><div class="pd-stat-l">已結算下注</div></div>
-        <div class="pd-stat"><div class="pd-stat-v" style="color:#00D2BE">${formatNum(Math.max(...points.map(p=>p.val)))}</div><div class="pd-stat-l">歷史最高</div></div>
+        <div class="pd-stat"><div class="pd-stat-v" style="color:${totalColor}">${last>=0?'+':''}${formatNum(last)}</div><div class="pd-stat-l">Cumulative P/L</div></div>
+        <div class="pd-stat"><div class="pd-stat-v">${bets.length}</div><div class="pd-stat-l">Settled Pits</div></div>
+        <div class="pd-stat"><div class="pd-stat-v" style="color:#00D2BE">${formatNum(Math.max(...points.map(p=>p.val)))}</div><div class="pd-stat-l">All-time High</div></div>
       </div>
       <div class="pd-chart-wrap">
         <svg viewBox="0 0 ${W} ${H}" class="pd-line-chart">
@@ -343,17 +343,17 @@ async function pdPnl(el) {
         </svg>
       </div>
     `;
-  } catch(e) { el.innerHTML = `<div class="pd-err">載入失敗</div>`; }
+  } catch(e) { el.innerHTML = `<div class="pd-err">Failed to load</div>`; }
 }
 
 async function pdActiveBets(el) {
   try {
     const d = await api('/api/bets/my');
     const bets = (d.bets || []).filter(b => !b.result || b.result === 'pending');
-    el.innerHTML = `<div class="pd-section-title">進行中下注 <span class="pd-count">${bets.length} 筆</span></div>`;
-    if (!bets.length) { el.innerHTML += `<div class="pd-empty">目前無進行中下注</div>`; return; }
+    el.innerHTML = `<div class="pd-section-title">Active Pits <span class="pd-count">${bets.length} entries</span></div>`;
+    if (!bets.length) { el.innerHTML += `<div class="pd-empty">No active pits right now</div>`; return; }
     el.innerHTML += `<div class="pd-table-wrap"><table class="pd-table">
-      <thead><tr><th>賽事</th><th>預測車手</th><th>下注金額</th><th>方式</th><th>下注日期</th><th>勝率估算</th></tr></thead>
+      <thead><tr><th>Race</th><th>Driver Pick</th><th>Pit Stake</th><th>Type</th><th>Pit Date</th><th>Implied %</th></tr></thead>
       <tbody>${bets.map(b=>`<tr>
         <td class="pd-td-race">${b.race_name||b.race_id}</td>
         <td><span class="pd-driver">${b.prediction||'—'}</span></td>
@@ -363,26 +363,26 @@ async function pdActiveBets(el) {
         <td class="pd-num">${b.odds?(b.odds*100).toFixed(0)+'%':'—'}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
-  } catch(e) { el.innerHTML = `<div class="pd-err">載入失敗</div>`; }
+  } catch(e) { el.innerHTML = `<div class="pd-err">Failed to load</div>`; }
 }
 
 function pdCards(el) {
   el.innerHTML = `
-    <div class="pd-section-title">卡牌收藏</div>
+    <div class="pd-section-title">Card Collection</div>
     <div class="pd-quick-links" style="flex-direction:column;gap:10px">
-      <a class="pd-qlink-big" href="/collection">🃏 瀏覽所有賽季卡牌</a>
-      <a class="pd-qlink-big" href="/cards">🏎 我的 F1 卡牌</a>
+      <a class="pd-qlink-big" href="/collection">🃏 Browse all seasons</a>
+      <a class="pd-qlink-big" href="/cards">🏎 My F1 Cards</a>
     </div>
   `;
 }
 
 function pdRank(el) {
-  el.innerHTML = `<div class="pd-section-title">排行榜</div><div class="pd-loading">載入中…</div>`;
+  el.innerHTML = `<div class="pd-section-title">Leaderboard</div><div class="pd-loading">Loading…</div>`;
   api('/api/profile/leaderboard').then(d => {
     const rows = d.leaderboard || [];
-    el.innerHTML = `<div class="pd-section-title">排行榜 <span class="pd-count">Top ${rows.length}</span></div>
+    el.innerHTML = `<div class="pd-section-title">Leaderboard <span class="pd-count">Top ${rows.length}</span></div>
     <div class="pd-table-wrap"><table class="pd-table">
-      <thead><tr><th>#</th><th>用戶</th><th>勝率</th><th>下注次數</th><th>級別</th></tr></thead>
+      <thead><tr><th>#</th><th>User</th><th>Win Rate</th><th>Total Pits</th><th>Tier</th></tr></thead>
       <tbody>${rows.map((r,i)=>`<tr class="${r.username===user?.username?'pd-me':''}">
         <td class="pd-num">${i+1}</td>
         <td>${r.username}</td>
@@ -391,7 +391,7 @@ function pdRank(el) {
         <td><span class="pd-level-badge level-${r.rarity_level||'silverstone'}">${r.rarity_name||'—'}</span></td>
       </tr>`).join('')}</tbody>
     </table></div>`;
-  }).catch(()=>{ el.innerHTML=`<div class="pd-section-title">排行榜</div><div class="pd-err">載入失敗</div>`; });
+  }).catch(()=>{ el.innerHTML=`<div class="pd-section-title">Leaderboard</div><div class="pd-err">Failed to load</div>`; });
 }
 
 function formatNum(n) {

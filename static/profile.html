@@ -219,7 +219,7 @@ body{background:#0d0d0d;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height
       </div>
       <div class="stat-box">
         <div class="stat-val" id="s-bets">0</div>
-        <div class="stat-lbl">BETS</div>
+        <div class="stat-lbl">PITS</div>
       </div>
       <div class="stat-box">
         <div class="stat-val" style="color:#00ff88" id="s-wins">0</div>
@@ -545,7 +545,7 @@ function renderProfile(d) {
 function renderBets(bets) {
   const el = document.getElementById('bet-history');
   if (!bets.length) {
-    el.innerHTML = '<div class="bets-empty">No predictions yet — head to the <a href="/race" style="color:#e8ff00">Race page</a> to place your first bet!</div>';
+    el.innerHTML = '<div class="bets-empty">No predictions yet — head to the <a href="/race" style="color:#e8ff00">Race page</a> to place your first pit!</div>';
     return;
   }
   el.innerHTML = '<div style="display:grid;gap:7px">' + bets.slice(0,30).map(b => `
@@ -595,7 +595,7 @@ function renderCoinLeaderboard(lb) {
           <span class="lb-user">${p.username}</span>
         </div>
         <span class="lb-val">◆ ${(p.total_payout||0).toLocaleString()}</span>
-        <span style="font-size:11px;color:#444;margin-left:12px;min-width:80px;text-align:right">${p.total_bets||0} bets · ${p.win_rate||0}%</span>
+        <span style="font-size:11px;color:#444;margin-left:12px;min-width:80px;text-align:right">${p.total_bets||0} pits · ${p.win_rate||0}%</span>
       </div>
     `).join('')
     : '<div style="color:#444;font-size:13px;text-align:center;padding:20px">No players yet</div>';

@@ -612,15 +612,15 @@ function renderProgress(userBets, legends, authed) {
   wrap.innerHTML = `
     <div class="hof-progress-wrap">
       <div class="hof-progress-header">
-        <span class="hof-progress-label">Your Total Bets</span>
-        <span class="hof-progress-value">${userBets.toLocaleString()} bets</span>
+        <span class="hof-progress-label">Your Total Pits</span>
+        <span class="hof-progress-value">${userBets.toLocaleString()} pits</span>
       </div>
       <div class="hof-progress-bar-bg">
         <div class="hof-progress-bar-fill" id="prog-fill" style="width: 0%"></div>
       </div>
       <div class="hof-progress-next">
         ${nextUnlock
-          ? `<span>${(nextUnlock.unlock_bets - userBets).toLocaleString()}</span> bets away from claiming <span>${nextUnlock.name}</span> (requires ${nextUnlock.unlock_bets} total)`
+          ? `<span>${(nextUnlock.unlock_bets - userBets).toLocaleString()}</span> pits away from claiming <span>${nextUnlock.name}</span> (requires ${nextUnlock.unlock_bets} total)`
           : `<span>All legends are now unlockable!</span>`}
       </div>
     </div>`;
@@ -718,7 +718,7 @@ function renderCard(legend) {
       ${isLocked ? `
         <div class="legend-lock-overlay">
           <div class="legend-lock-count">${legend.unlock_bets.toLocaleString()}</div>
-          <div class="legend-lock-text">bets to unlock</div>
+          <div class="legend-lock-text">pits to unlock</div>
           <div class="legend-lock-icon">🔒</div>
         </div>
       ` : ''}
