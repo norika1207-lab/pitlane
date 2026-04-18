@@ -23,16 +23,17 @@
 
 /* ─── TABS ─── */
 .tab-bar {
-  display: flex; gap: 4px;
+  display: inline-flex; gap: 4px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 4px;
   margin-bottom: 32px;
-  max-width: 480px;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 .tab-btn {
-  flex: 1; padding: 10px 16px;
+  flex: 0 0 auto; padding: 10px 18px;
   border-radius: calc(var(--radius) - 2px);
   border: none; background: transparent;
   color: var(--text-secondary); font-size: 14px; font-weight: 600;
