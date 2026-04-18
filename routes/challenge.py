@@ -25,7 +25,7 @@ async def create_challenge(body: dict, authorization: str = Header(None)):
     fee_info = apply_fee(amount, "challenge_room")
     balance = await get_balance(username)
     if balance < fee_info["total"]:
-        raise HTTPException(400, f"Insufficient USDClaw balance")
+        raise HTTPException(400, f"Insufficient Pit balance")
 
     await debit(username, fee_info["total"], "challenge_create", f"challenge:{race_id}")
     code = secrets.token_hex(4).upper()
@@ -97,7 +97,7 @@ async def join_challenge(body: dict, authorization: str = Header(None)):
         fee_info = apply_fee(amount, "challenge_room")
         balance = await get_balance(username)
         if balance < fee_info["total"]:
-            raise HTTPException(400, "Insufficient USDClaw balance")
+            raise HTTPException(400, "Insufficient Pit balance")
 
         await debit(username, fee_info["total"], "challenge_join", f"challenge_join:{code}")
 
