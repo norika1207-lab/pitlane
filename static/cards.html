@@ -183,6 +183,8 @@ nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:56
     <span class="filter-lbl">SEASON</span>
     <div class="filter-pills">
       <div class="season-pill active" onclick="filterSeason('all',this)">All Seasons</div>
+      <div class="season-pill" onclick="filterSeason(2026,this)">2026 ⚡</div>
+      <div class="season-pill" onclick="filterSeason(2025,this)">2025</div>
       <div class="season-pill" onclick="filterSeason(2024,this)">2024</div>
       <div class="season-pill" onclick="filterSeason(2023,this)">2023</div>
       <div class="season-pill" onclick="filterSeason(2022,this)">2022</div>
@@ -269,6 +271,16 @@ const HIST_HEADSHOTS = {
   SAR: F1CDN('SAR','Logan','Sargeant'),
   LAW: F1CDN('LAW','Liam','Lawson'),
   DEV: F1CDN('DEV','Nyck','De_Vries'),
+  // 2025+ drivers
+  PIA: F1CDN('PIA','Oscar','Piastri'),
+  // 2025-2026 new entries
+  ANT: F1CDN('ANT','Andrea','Antonelli'),
+  HAD: F1CDN('HAD','Isack','Hadjar'),
+  BEA: F1CDN('BEA','Oliver','Bearman'),
+  BOR: F1CDN('BOR','Gabriel','Bortoleto'),
+  COL: F1CDN('COL','Franco','Colapinto'),
+  DOO: F1CDN('DOO','Jack','Doohan'),
+  LIN: F1CDN('LIN','Arvid','Lindblad'),
 };
 let sortAsc             = false;
 let currentTierFilter   = 'all';
@@ -424,10 +436,10 @@ function setHistStatus(msg) {
 // ── Load 2020-2023 from standings ──
 async function loadAllHistorical() {
   try {
-  const years = [2020, 2021, 2022, 2023];
-  const raceCounts = {2020:17, 2021:22, 2022:22, 2023:22};
+  const years = [2020, 2021, 2022, 2023, 2025, 2026];
+  const raceCounts = {2020:17, 2021:22, 2022:22, 2023:22, 2025:24, 2026:3};
 
-  setHistStatus('⏳ Loading 2020–2023...');
+  setHistStatus('⏳ Loading 2020–2026...');
 
   const results = await Promise.allSettled(
     years.map(y => api(`/api/history/standings/${y}`))

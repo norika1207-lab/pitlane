@@ -1,9 +1,10 @@
 """routes/historical.py — Real 5-year F1 historical data endpoints"""
+import asyncio
 from fastapi import APIRouter
 from services.historical_data import (
     get_driver_stats, get_race_history,
     get_season_races, get_season_standings, get_season_meta,
-    get_all_seasons, get_driver_career,
+    get_all_seasons, get_driver_career, get_constructor_standings,
 )
 
 router = APIRouter(prefix="/api", tags=["historical"])
@@ -32,16 +33,20 @@ async def all_seasons():
 
 @router.get("/history/season/{year}")
 async def season_detail(year: int):
-    """Full season data: meta, top-10 standings, all race results."""
-    if year not in range(2020, 2025):
-        return {"error": "Only 2020-2024 available"}
-    races = await get_season_races(year)
-    standings = await get_season_standings(year)
-    meta = await get_season_meta(year)
+    """Full season data: meta, full standings, constructor standings, all race results."""
+    if year not in range(2020, 2027):
+        return {"error": "Only 2020-2026 available"}
+    races, standings, constructors, meta = await asyncio.gather(
+        get_season_races(year),
+        get_season_standings(year),
+        get_constructor_standings(year),
+        get_season_meta(year),
+    )
     return {
         "year": year,
         "meta": meta,
-        "standings": standings[:10],
+        "standings": standings,
+        "constructors": constructors,
         "races": races,
     }
 
@@ -49,8 +54,8 @@ async def season_detail(year: int):
 @router.get("/history/standings/{year}")
 async def season_standings(year: int):
     """Championship standings for a given year."""
-    if year not in range(2020, 2025):
-        return {"error": "Only 2020-2024 available"}
+    if year not in range(2020, 2027):
+        return {"error": "Only 2020-2026 available"}
     standings = await get_season_standings(year)
     return {"year": year, "standings": standings}
 

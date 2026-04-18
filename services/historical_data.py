@@ -9,7 +9,7 @@ import asyncio
 from datetime import datetime, timedelta
 from database import get_db
 
-SEASONS = [2020, 2021, 2022, 2023, 2024]
+SEASONS = [2020, 2021, 2022, 2023, 2024, 2025, 2026]
 JOLPICA = "https://api.jolpi.ca/ergast/f1"
 CACHE_HIST  = 86400 * 3650  # 10 years — historical race results never change
 CACHE_STATS = 3600          # 1 hour — computed stats
@@ -22,6 +22,19 @@ TEAM_COLORS = {
     "Haas": "#B6BABD", "Alfa Romeo": "#A42134", "Kick Sauber": "#52E252",
     "Renault": "#FFD700", "Racing Point": "#F596C8",
 }
+
+
+def _team_color(team: str) -> str:
+    """Map team name (including Jolpica 'Xxx F1 Team' variants) to brand color."""
+    if not team:
+        return "#888"
+    if team in TEAM_COLORS:
+        return TEAM_COLORS[team]
+    normalized = (team
+        .replace(" F1 Team", "")
+        .replace(" Racing", "")
+        .strip())
+    return TEAM_COLORS.get(normalized, "#888")
 
 # ─── 2024 fallback (accurate from Jolpica verification) ─────────────────────
 _F24_STANDINGS = [
@@ -44,6 +57,8 @@ _SEASON_META: dict[int, dict] = {
     2022: {"champion":"Verstappen","champion_id":"verstappen","champion_team":"Red Bull Racing","champion_pts":454,"champion_wins":15,"total_races":22,"constructor_champion":"Red Bull Racing"},
     2023: {"champion":"Verstappen","champion_id":"verstappen","champion_team":"Red Bull Racing","champion_pts":575,"champion_wins":19,"total_races":22,"constructor_champion":"Red Bull Racing"},
     2024: {"champion":"Verstappen","champion_id":"verstappen","champion_team":"Red Bull Racing","champion_pts":437,"champion_wins":9,"total_races":24,"constructor_champion":"McLaren"},
+    2025: {"champion":"Norris","champion_id":"norris","champion_team":"McLaren","champion_pts":423,"champion_wins":7,"total_races":24,"constructor_champion":"McLaren"},
+    2026: {"champion":"Antonelli","champion_id":"antonelli","champion_team":"Mercedes","champion_pts":72,"champion_wins":2,"total_races":3,"constructor_champion":"Mercedes","in_progress":True},
 }
 
 # Race winners per season (fallback — verified from Jolpica)
@@ -204,7 +219,7 @@ async def _jolpica_paginate(path: str) -> list[dict]:
         timeout=aiohttp.ClientTimeout(total=20),
     ) as session:
         while offset < total:
-            url = f"{JOLPICA}/{path}?format=json&limit=100&offset={offset}"
+            url = f"{JOLPICA}/{path}.json?limit=100&offset={offset}"
             try:
                 async with session.get(url) as resp:
                     if resp.status != 200:
@@ -228,7 +243,7 @@ async def _jolpica_paginate(path: str) -> list[dict]:
 
 async def _jolpica_get(path: str) -> dict:
     """Single GET, returns MRData dict."""
-    url = f"{JOLPICA}/{path}?format=json"
+    url = f"{JOLPICA}/{path}.json"
     try:
         async with aiohttp.ClientSession(
             headers={"User-Agent": "PitLane/2.0"},
@@ -256,7 +271,7 @@ def _format_race(r: dict) -> dict:
             "code": d.get("code", ""),
             "name": f"{d.get('givenName','')} {d.get('familyName','')}".strip(),
             "team": team,
-            "color": TEAM_COLORS.get(team, "#888"),
+            "color": _team_color(team),
             "pts": float(res.get("points", 0)),
             "grid": int(res.get("grid", 0)),
             "status": res.get("status", ""),
@@ -292,7 +307,7 @@ async def get_season_races(year: int) -> list[dict]:
     # Fallback
     fallback = _RACE_WINNERS.get(year, [])
     # Convert to same format
-    result = [{**r, "top5": [], "winner_color": TEAM_COLORS.get(r.get("winner_team",""), "#888")} for r in fallback]
+    result = [{**r, "top5": [], "winner_color": _team_color(r.get("winner_team",""))} for r in fallback]
     return result
 
 
@@ -319,7 +334,7 @@ async def get_season_standings(year: int) -> list[dict]:
                 "name": f"{d.get('givenName','')} {d.get('familyName','')}".strip(),
                 "driver_id": d.get("driverId", ""),
                 "team": team,
-                "color": TEAM_COLORS.get(team, "#888"),
+                "color": _team_color(team),
                 "pts": float(s.get("points", 0)),
                 "wins": int(s.get("wins", 0)),
             })
@@ -328,9 +343,115 @@ async def get_season_standings(year: int) -> list[dict]:
 
     # Fallback
     if year == 2024:
-        return [{**s, "driver_id": s["code"].lower(), "color": TEAM_COLORS.get(s["team"], "#888")}
+        return [{**s, "driver_id": s["code"].lower(), "color": _team_color(s["team"])}
                 for s in _F24_STANDINGS]
     return []
+
+
+# ─── Constructor standings ────────────────────────────────────────────────
+_CONSTRUCTOR_FALLBACK: dict[int, list[dict]] = {
+    2020: [
+        {"pos":1,"team":"Mercedes","pts":573,"wins":13},
+        {"pos":2,"team":"Red Bull Racing","pts":319,"wins":2},
+        {"pos":3,"team":"McLaren","pts":202,"wins":0},
+        {"pos":4,"team":"Racing Point","pts":195,"wins":1},
+        {"pos":5,"team":"Renault","pts":181,"wins":0},
+        {"pos":6,"team":"Ferrari","pts":131,"wins":0},
+        {"pos":7,"team":"AlphaTauri","pts":107,"wins":1},
+        {"pos":8,"team":"Aston Martin","pts":0,"wins":0},
+        {"pos":9,"team":"Williams","pts":0,"wins":0},
+        {"pos":10,"team":"Haas","pts":3,"wins":0},
+    ],
+    2021: [
+        {"pos":1,"team":"Mercedes","pts":613.5,"wins":8},
+        {"pos":2,"team":"Red Bull Racing","pts":585.5,"wins":11},
+        {"pos":3,"team":"Ferrari","pts":323.5,"wins":0},
+        {"pos":4,"team":"McLaren","pts":275,"wins":1},
+        {"pos":5,"team":"Alpine","pts":155,"wins":1},
+        {"pos":6,"team":"AlphaTauri","pts":142,"wins":0},
+        {"pos":7,"team":"Aston Martin","pts":77,"wins":0},
+        {"pos":8,"team":"Williams","pts":23,"wins":0},
+        {"pos":9,"team":"Alfa Romeo","pts":13,"wins":0},
+        {"pos":10,"team":"Haas","pts":0,"wins":0},
+    ],
+    2022: [
+        {"pos":1,"team":"Red Bull Racing","pts":759,"wins":17},
+        {"pos":2,"team":"Ferrari","pts":554,"wins":4},
+        {"pos":3,"team":"Mercedes","pts":515,"wins":1},
+        {"pos":4,"team":"Alpine","pts":173,"wins":0},
+        {"pos":5,"team":"McLaren","pts":159,"wins":0},
+        {"pos":6,"team":"Alfa Romeo","pts":55,"wins":0},
+        {"pos":7,"team":"Aston Martin","pts":55,"wins":0},
+        {"pos":8,"team":"Haas","pts":37,"wins":0},
+        {"pos":9,"team":"AlphaTauri","pts":35,"wins":0},
+        {"pos":10,"team":"Williams","pts":8,"wins":0},
+    ],
+    2023: [
+        {"pos":1,"team":"Red Bull Racing","pts":860,"wins":21},
+        {"pos":2,"team":"Mercedes","pts":409,"wins":0},
+        {"pos":3,"team":"Ferrari","pts":406,"wins":0},
+        {"pos":4,"team":"McLaren","pts":302,"wins":0},
+        {"pos":5,"team":"Aston Martin","pts":280,"wins":0},
+        {"pos":6,"team":"Alpine","pts":120,"wins":0},
+        {"pos":7,"team":"Williams","pts":28,"wins":0},
+        {"pos":8,"team":"AlphaTauri","pts":25,"wins":0},
+        {"pos":9,"team":"Alfa Romeo","pts":16,"wins":0},
+        {"pos":10,"team":"Haas","pts":12,"wins":0},
+    ],
+    2024: [
+        {"pos":1,"team":"McLaren","pts":666,"wins":6},
+        {"pos":2,"team":"Ferrari","pts":652,"wins":5},
+        {"pos":3,"team":"Red Bull Racing","pts":589,"wins":8},
+        {"pos":4,"team":"Mercedes","pts":468,"wins":4},
+        {"pos":5,"team":"Aston Martin","pts":94,"wins":0},
+        {"pos":6,"team":"Alpine","pts":65,"wins":0},
+        {"pos":7,"team":"Haas","pts":58,"wins":0},
+        {"pos":8,"team":"Racing Bulls","pts":46,"wins":0},
+        {"pos":9,"team":"Williams","pts":17,"wins":0},
+        {"pos":10,"team":"Kick Sauber","pts":4,"wins":0},
+    ],
+    2025: [
+        {"pos":1,"team":"McLaren","pts":858,"wins":12},
+        {"pos":2,"team":"Red Bull Racing","pts":682,"wins":5},
+        {"pos":3,"team":"Ferrari","pts":621,"wins":3},
+        {"pos":4,"team":"Mercedes","pts":516,"wins":2},
+        {"pos":5,"team":"Williams","pts":163,"wins":0},
+        {"pos":6,"team":"Aston Martin","pts":109,"wins":0},
+        {"pos":7,"team":"Alpine","pts":81,"wins":0},
+        {"pos":8,"team":"Racing Bulls","pts":60,"wins":0},
+        {"pos":9,"team":"Haas","pts":58,"wins":0},
+        {"pos":10,"team":"Kick Sauber","pts":6,"wins":0},
+    ],
+}
+
+async def get_constructor_standings(year: int) -> list[dict]:
+    """Constructor championship standings for a season."""
+    key = f"hist:constructor_standings:{year}"
+    cached = await _get_cached(key, CACHE_HIST)
+    if cached is not None:
+        return cached
+
+    mr = await _jolpica_get(f"{year}/constructorStandings")
+    lists = mr.get("StandingsTable", {}).get("StandingsLists", [])
+    standings_raw = lists[0].get("ConstructorStandings", []) if lists else []
+
+    if standings_raw:
+        result = []
+        for s in standings_raw:
+            c = s.get("Constructor", {})
+            team = c.get("name", "")
+            result.append({
+                "pos": int(s.get("position", 99)),
+                "team": team,
+                "color": _team_color(team),
+                "pts": float(s.get("points", 0)),
+                "wins": int(s.get("wins", 0)),
+            })
+        await _set_cached(key, result)
+        return result
+
+    fallback = _CONSTRUCTOR_FALLBACK.get(year, [])
+    return [{"color": _team_color(r["team"]), **r} for r in fallback]
 
 
 # ─── Season meta ──────────────────────────────────────────────────────────

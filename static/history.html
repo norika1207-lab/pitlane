@@ -379,6 +379,120 @@
 .insight-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 .insight-text strong { color: var(--text-primary); }
 
+/* ─── SEASON STORY CARD ─── */
+.story-card {
+  background: linear-gradient(135deg, rgba(255,255,255,.03) 0%, rgba(212,168,67,.04) 100%);
+  border: 1px solid rgba(212,168,67,.2);
+  border-radius: var(--radius); padding: 28px 32px; margin-bottom: 28px;
+}
+.story-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+.story-year-badge {
+  font-size:11px; font-weight:800; letter-spacing:.1em; color:#000;
+  background: var(--gold); padding:4px 10px; border-radius:4px; flex-shrink:0;
+}
+.story-headline {
+  font-size:1.25rem; font-weight:800; line-height:1.3; color:var(--text-primary);
+  font-style:italic;
+}
+.story-text {
+  font-size:14px; color:var(--text-secondary); line-height:1.75;
+  margin-bottom:24px; max-width:860px;
+}
+.story-kpis { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:24px; }
+.story-kpi {
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:8px; padding:12px 18px; text-align:center; min-width:90px;
+}
+.story-kpi-val { font-size:1.6rem; font-weight:900; color:var(--gold); line-height:1; }
+.story-kpi-lbl { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; margin-top:4px; }
+
+/* ─── KEY MOMENTS ─── */
+.moments-title {
+  font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;
+  letter-spacing:.1em; margin-bottom:12px;
+}
+.moments-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.moment-card {
+  background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:10px; padding:14px 16px; cursor:default;
+  transition: border-color .15s, background .15s;
+}
+.moment-card:hover { border-color: rgba(212,168,67,.35); background:rgba(212,168,67,.04); }
+.moment-emoji { font-size:1.4rem; margin-bottom:8px; }
+.moment-label {
+  font-size:10px; font-weight:700; letter-spacing:.1em;
+  color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;
+}
+.moment-title { font-size:13px; font-weight:800; color:var(--text-primary); margin-bottom:6px; }
+.moment-text { font-size:12px; color:var(--text-muted); line-height:1.55; }
+
+/* ─── CHAMPIONSHIP BATTLE ─── */
+.battle-wrap {
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:var(--radius); padding:20px 24px; margin-bottom:24px;
+}
+.battle-title {
+  font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;
+  letter-spacing:.1em; margin-bottom:16px;
+}
+.battle-row { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+.battle-pos { font-size:11px; font-weight:700; color:var(--text-muted); width:20px; flex-shrink:0; }
+.battle-driver { font-size:13px; font-weight:700; color:var(--text-primary); width:110px; flex-shrink:0; }
+.battle-track { flex:1; height:20px; background:rgba(255,255,255,.05); border-radius:4px; overflow:hidden; }
+.battle-fill {
+  height:100%; border-radius:4px; display:flex; align-items:center; padding:0 8px;
+  transition:width 1.1s cubic-bezier(.2,.8,.4,1);
+}
+.battle-pts { font-size:11px; font-weight:800; color:rgba(0,0,0,.85); white-space:nowrap; }
+.battle-gap { font-size:11px; color:var(--text-muted); width:80px; text-align:right; flex-shrink:0; }
+
+/* ─── CONSTRUCTOR STANDINGS ─── */
+.constructor-wrap {
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:var(--radius); padding:20px 24px; margin-bottom:24px;
+}
+.constructor-title {
+  font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;
+  letter-spacing:.1em; margin-bottom:16px;
+}
+.constructor-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+.constructor-pos { font-size:11px; font-weight:700; color:var(--text-muted); width:20px; flex-shrink:0; }
+.constructor-name { font-size:12px; font-weight:700; color:var(--text-primary); width:120px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.constructor-track { flex:1; height:18px; background:rgba(255,255,255,.04); border-radius:4px; overflow:hidden; }
+.constructor-fill {
+  height:100%; border-radius:4px; display:flex; align-items:center; padding:0 8px;
+  transition:width 1.1s cubic-bezier(.2,.8,.4,1);
+}
+.constructor-fill-pts { font-size:10px; font-weight:800; color:rgba(0,0,0,.85); white-space:nowrap; }
+.constructor-wins { font-size:11px; color:var(--text-muted); width:36px; text-align:right; flex-shrink:0; }
+
+/* ─── FULL DRIVER STANDINGS ─── */
+.standings-full-wrap {
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden; margin-bottom:32px;
+}
+.standings-full-header {
+  padding:12px 16px; border-bottom:1px solid var(--border);
+  font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;
+  letter-spacing:.07em; display:flex; align-items:center; gap:0;
+}
+.sf-row {
+  display:grid; grid-template-columns:36px 44px 1fr 120px 44px 56px;
+  padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.04);
+  align-items:center; transition:background .1s;
+}
+.sf-row:hover { background:rgba(255,255,255,.03); }
+.sf-row:last-child { border-bottom:none; }
+.sf-pos { font-size:13px; font-weight:700; text-align:center; }
+.sf-pos.p1 { color:#FFD700; }
+.sf-pos.p2 { color:#C0C0C0; }
+.sf-pos.p3 { color:#CD7F32; }
+.sf-code { font-size:12px; font-weight:800; color:var(--text-muted); }
+.sf-name { font-size:13px; font-weight:600; color:var(--text-primary); }
+.sf-team { font-size:11px; color:var(--text-muted); }
+.sf-wins { font-size:12px; font-weight:700; text-align:center; }
+.sf-pts { font-size:13px; font-weight:800; text-align:right; color:var(--text-primary); }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 768px) {
   .page-header h1 { font-size: 2rem; }
@@ -386,11 +500,10 @@
   .season-btn { padding: 8px 16px; font-size: 13px; }
   .season-info-bar { gap: 12px; }
   .season-divider { display: none; }
-  .legendary-grid, .race-cards-grid, .unlock-grid {
-    grid-template-columns: 1fr;
-  }
-  #season-detail-wrap { flex-direction: column; }
-  #standings-panel { width: 100% !important; flex: none !important; }
+  .legendary-grid, .race-cards-grid, .unlock-grid { grid-template-columns: 1fr; }
+  .moments-grid { grid-template-columns: 1fr; }
+  .sf-row { grid-template-columns: 32px 40px 1fr 50px 50px; }
+  .sf-team { display:none; }
 }
 </style>
 </head>
@@ -444,6 +557,8 @@
       <button class="season-btn" onclick="selectSeason(2022, this)">2022</button>
       <button class="season-btn" onclick="selectSeason(2023, this)">2023</button>
       <button class="season-btn active" onclick="selectSeason(2024, this)">2024</button>
+      <button class="season-btn" onclick="selectSeason(2025, this)">2025</button>
+      <button class="season-btn" onclick="selectSeason(2026, this)">2026 ⚡</button>
     </div>
 
     <!-- SEASON INFO BAR -->
@@ -474,7 +589,37 @@
       </div>
     </div>
 
-    <!-- INSIGHTS BOX (filled by JS after season loads) -->
+    <!-- SEASON STORY (filled by JS) -->
+    <div id="story-section" style="display:none">
+      <div class="story-card">
+        <div class="story-header">
+          <span class="story-year-badge" id="story-year-badge">2024</span>
+          <span class="story-headline" id="story-headline">—</span>
+        </div>
+        <div class="story-text" id="story-text"></div>
+        <div class="story-kpis" id="story-kpis"></div>
+        <div class="moments-title">DEFINING MOMENTS</div>
+        <div class="moments-grid" id="moments-grid"></div>
+      </div>
+    </div>
+
+    <!-- CHAMPIONSHIP BATTLE (filled by JS) -->
+    <div id="battle-section" style="display:none">
+      <div class="battle-wrap">
+        <div class="battle-title">CHAMPIONSHIP BATTLE — DRIVER STANDINGS</div>
+        <div id="battle-rows"></div>
+      </div>
+    </div>
+
+    <!-- CONSTRUCTOR STANDINGS (filled by JS) -->
+    <div id="constructor-section" style="display:none">
+      <div class="constructor-wrap">
+        <div class="constructor-title">CONSTRUCTOR CHAMPIONSHIP</div>
+        <div id="constructor-rows"></div>
+      </div>
+    </div>
+
+    <!-- SEASON ANALYSIS BULLETS -->
     <div id="insights-section" style="display:none">
       <div class="insights-box">
         <div class="insights-box-title">📋 Season Analysis</div>
@@ -482,11 +627,11 @@
       </div>
     </div>
 
-    <!-- TEAM CONSTRUCTOR BATTLE (filled by JS) -->
-    <div id="team-analysis-section" style="display:none">
-      <div class="team-analysis-wrap">
-        <div class="team-analysis-title">🏗️ <span id="team-analysis-year">2024</span> Constructor Battle — Points from Top 5 Finishes</div>
-        <div id="team-bars"></div>
+    <!-- FULL DRIVER STANDINGS (filled by JS) -->
+    <div id="standings-full-section" style="display:none">
+      <div class="standings-full-wrap">
+        <div class="standings-full-header">FULL DRIVER STANDINGS — <span id="standings-year-label">2024</span></div>
+        <div id="standings-full-list"></div>
       </div>
     </div>
 
@@ -597,28 +742,15 @@
       </div>
     </div>
 
-    <!-- SEASON DETAIL: standings + races -->
-    <div id="season-detail-wrap" style="display:flex;gap:24px;margin-bottom:48px;align-items:flex-start;flex-wrap:wrap">
-
-      <!-- Standings sidebar -->
-      <div id="standings-panel" style="flex:0 0 220px;min-width:180px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 0;overflow:hidden">
-        <div style="padding:0 16px 12px;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)">Standings Top 10</div>
-        <div id="standings-list" style="padding:8px 0">
-          <!-- filled by JS -->
-        </div>
+    <!-- RACE RESULTS GRID -->
+    <div style="margin-bottom:48px">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+        🏁 <span id="race-section-year">2024</span> Season Results
+        <span id="races-loading" style="font-size:12px;color:var(--text-muted);font-weight:400;display:none">Loading...</span>
       </div>
-
-      <!-- Race cards grid -->
-      <div style="flex:1;min-width:0">
-        <div style="font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px">
-          🏁 <span id="race-section-year">2024</span> Season Results
-          <span id="races-loading" style="font-size:12px;color:var(--text-muted);font-weight:400;display:none">Loading...</span>
-        </div>
-        <div class="race-cards-grid" id="races-grid">
-          <!-- filled by JS -->
-        </div>
+      <div class="race-cards-grid" id="races-grid">
+        <!-- filled by JS -->
       </div>
-
     </div>
 
     <!-- UNLOCK CARDS SECTION -->
@@ -702,8 +834,86 @@
 <script src="/static/assets/js/app.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════
-   HISTORY PAGE JS  — Race Analysis Hub
+   HISTORY PAGE JS  — Full Season Analysis Hub
 ═══════════════════════════════════════════════════ */
+
+// ─── SEASON STORIES ───
+const SEASON_STORY = {
+  2020: {
+    headline: "Hamilton equals Schumacher's record — 7 championships in a COVID year",
+    text: "The pandemic reshaped the entire season, cramming 17 races into a frantic 6-month calendar. Yet Mercedes were untouchable. Lewis Hamilton surpassed Ayrton Senna's 65 career wins, equalled Schumacher's all-time record of seven world championships, and set the fastest laps tally. The drama came from the supporting cast: Pierre Gasly delivered a tearful shock win at Monza for AlphaTauri, Grosjean walked away from a 53G fireball in Bahrain that split his car in two, and Sergio Pérez finally claimed his first ever Grand Prix win at Sakhir — launching a career renaissance that would change the grid.",
+    kpis:[{v:'7th',l:'Hamilton Title'},{v:'11',l:'HAM Wins'},{v:'347',l:'Championship Pts'},{v:'17',l:'Rounds'},{v:'13',l:'Mercedes Wins'}],
+  },
+  2021: {
+    headline: "Abu Dhabi: the most controversial last lap in modern F1 history",
+    text: "For 21 rounds Verstappen and Hamilton traded blows in the most intense title fight since 2012. Both finished the season with the same number of wins — 10 each. In Abu Dhabi, a late safety car changed everything: race director Michael Masi selectively allowed only the five cars between Verstappen and Hamilton to unlap themselves, handing Verstappen fresh soft tyres and a one-lap sprint against Hamilton on worn hards. Verstappen passed him on the final lap and became world champion by 8 points. Hamilton never publicly commented. Masi was removed from his role months later. The debate continues.",
+    kpis:[{v:'10–8',l:'VER–HAM Wins'},{v:'8 pts',l:'Title Gap'},{v:'395.5',l:'Verstappen Pts'},{v:'387.5',l:'Hamilton Pts'},{v:'22',l:'Rounds'}],
+  },
+  2022: {
+    headline: "Ferrari's false dawn — Verstappen rewrites the record books",
+    text: "The ground-effect regulation revolution promised an open title fight. Charles Leclerc won 3 of the first 3 races and Ferrari led the championship. Then the errors began: a retirement at Barcelona, a disastrous strategy call in Monaco, a mechanical failure at Baku. Red Bull found their rhythm. Verstappen won 15 races — a new single-season record at the time — and clinched the title with four rounds to spare. Leclerc ultimately finished 2nd despite Ferrari scoring only 4 wins all season. The tide had turned, and a dynasty was beginning.",
+    kpis:[{v:'15',l:'VER Wins'},{v:'454',l:'VER Championship Pts'},{v:'4',l:'Ferrari Wins'},{v:'22',l:'Rounds'},{v:'P2',l:'Leclerc Final'}],
+  },
+  2023: {
+    headline: "19 from 22 — the most dominant season in Formula 1 history",
+    text: "Numbers alone cannot capture just how complete Red Bull Racing's 2023 season was. Max Verstappen won 19 of 22 races — a record that may never be beaten. Red Bull won 21 of 22 constructor victories. Only Fernando Alonso at Jeddah and Carlos Sainz at Singapore prevented a perfect season. Lewis Hamilton went winless for the first time since 2011. Alonso at 41 reinvented himself with Aston Martin's new challenger, claiming multiple podiums and reigniting memories of his championship years. The writing was already on the wall: Hamilton would soon announce his move to Ferrari.",
+    kpis:[{v:'19',l:'VER Wins'},{v:'575',l:'VER Championship Pts'},{v:'21/22',l:'RBR Race Wins'},{v:'860',l:'RBR Constructor Pts'},{v:'22',l:'Rounds'}],
+  },
+  2024: {
+    headline: "McLaren's second half surge — Hamilton says farewell to Mercedes with two wins",
+    text: "Verstappen dominated the opening 12 rounds, building a championship cushion that looked unassailable. Then McLaren found a decisive technical edge: Norris won 4 times in the second half, slashing the deficit to 63 points — but ultimate it wasn't enough. The subplot was the constructor title: McLaren's relentless upgrade programme finally dethroned Red Bull after their era of dominance, with Ferrari close behind. Lewis Hamilton's farewell to Mercedes was bittersweet — two emotional wins at Silverstone and Spa, but no title challenge. His next chapter in red had already been signed.",
+    kpis:[{v:'9',l:'VER Wins'},{v:'437',l:'VER Championship Pts'},{v:'63 pts',l:'Title Gap'},{v:'666',l:'McLaren Constr. Pts'},{v:'24',l:'Rounds'}],
+  },
+  2025: {
+    headline: "423 vs 421 — Norris claims his first title by the narrowest of margins",
+    text: "The 2025 season delivered the closest championship since 2021 — and by an even smaller margin. Lando Norris became world champion by just 2 points over Max Verstappen in one of the all-time great title fights. McLaren's Oscar Piastri finished third, giving the team a historic 1-2-3 season finish. Lewis Hamilton's first season at Ferrari ended with P6 — not the fairytale start, but competitive. Andrea Kimi Antonelli impressed at Mercedes with P7 in his rookie campaign. The old guard was making way; a new generation was arriving.",
+    kpis:[{v:'2 pts',l:'Title Margin'},{v:'423',l:'Norris Pts'},{v:'421',l:'Verstappen Pts'},{v:'7',l:'Norris Wins'},{v:'24',l:'Rounds'}],
+  },
+  2026: {
+    headline: "The new era begins — Antonelli and Mercedes surge under new regulations",
+    text: "New technical regulations rewrote the competitiveness order overnight. Mercedes found a decisive advantage with the new hybrid power unit architecture, and 18-year-old Andrea Kimi Antonelli — in just his second F1 season — stormed to two wins from the opening three rounds. Hamilton and Leclerc at Ferrari form one of the most star-studded driver pairings in decades. Red Bull, who dominated for years, are finding their feet. The full story of 2026 is yet to be written — but the new era is already delivering.",
+    kpis:[{v:'Round 3',l:'Current Point'},{v:'2',l:'Antonelli Wins'},{v:'72',l:'Leader Pts'},{v:'NEW',l:'Regulations'},{v:'4',l:'Different Winners'}],
+  },
+};
+
+// ─── KEY MOMENTS ───
+const KEY_MOMENTS = {
+  2020:[
+    { emoji:'🔥', label:'BAHRAIN GP', title:"Grosjean's Fireball", text:"Romain Grosjean's Haas split in two and erupted into flames at 180mph. He climbed free with minor burns. A miracle that shocked the world." },
+    { emoji:'🏆', label:'TURKEY GP', title:"Hamilton's 7th Crown", text:"On a wet Istanbul track, Hamilton took his 7th world championship — equalling Michael Schumacher's record in dominant style." },
+    { emoji:'🌟', label:'MONZA', title:"Gasly's Fairytale Win", text:"Pierre Gasly, demoted from Red Bull mid-2019, took a stunning victory at Monza for AlphaTauri — breaking down in tears on the radio." },
+  ],
+  2021:[
+    { emoji:'💥', label:'SILVERSTONE', title:"Lap 1 Clash: Hamilton & Verstappen", text:"Hamilton and Verstappen collided at Copse corner on the first lap. Verstappen was hospitalised. Hamilton won with a controversial penalty. The rivalry exploded." },
+    { emoji:'🌧️', label:'SÃO PAULO', title:"Hamilton from P10 to Victory", text:"Penalised and relegated to P10 after qualifying, Hamilton carved his way to victory in Brazil — perhaps the greatest individual drive of his career." },
+    { emoji:'⚠️', label:'ABU DHABI', title:"The Last Lap That Changed History", text:"A late safety car. Only some cars unlap. Verstappen on fresh softs vs Hamilton on old hards. One lap. Verstappen passes. Champion." },
+  ],
+  2022:[
+    { emoji:'🔴', label:'BAHRAIN–AUSTRALIA', title:"Ferrari's Perfect Start", text:"Leclerc won 3 of the first 3 races. Ferrari led the championship and fans dared to dream — until the mechanical failures and strategy errors began." },
+    { emoji:'🇲🇨', label:'MONACO', title:"Leclerc's Home Race Disaster", text:"On his home circuit, Leclerc qualified on pole but was pitted onto hard tyres behind Pérez on softs — handing away an almost certain win." },
+    { emoji:'🏆', label:'JAPAN', title:"Verstappen Clinches in the Rain", text:"With 4 races remaining, Verstappen was crowned champion at Suzuka in a chaotic rain-delayed finish that sparked a points confusion — before celebrating." },
+  ],
+  2023:[
+    { emoji:'🔱', label:'SEASON RECORD', title:"19 Wins from 22 Starts", text:"Verstappen's 19-win season shattered the previous records. It wasn't just dominance — it was complete, total, unprecedented control of a Formula 1 season." },
+    { emoji:'🇸🇬', label:'SINGAPORE', title:"Sainz Breaks the Red Bull Streak", text:"After 10 consecutive Red Bull wins, Carlos Sainz ended the domination at Singapore. Ferrari's only win of the season — and all the more precious for it." },
+    { emoji:'💛', label:'BAHRAIN', title:"Alonso's Aston Martin Shock", text:"At 41, Fernando Alonso qualified and finished P3 at the season opener in a Aston Martin — reminding everyone that the two-time champion was far from finished." },
+  ],
+  2024:[
+    { emoji:'🇬🇧', label:'SILVERSTONE', title:"Hamilton's Emotional Home Win", text:"In what many suspected was his final British GP in silver, Lewis Hamilton won at Silverstone for the 9th time — foreshadowing his Ferrari farewell tour." },
+    { emoji:'🧡', label:'McLAREN RESURGENCE', title:"Norris Hunts the Championship", text:"Four second-half wins made Norris a genuine title contender. The 63-point gap was ultimately too much, but McLaren proved they had the fastest car." },
+    { emoji:'🏆', label:'ABU DHABI', title:"McLaren: Constructors Champions", text:"McLaren took their first constructors' title since 1998 — ending Red Bull's three-year grip on the trophy. Norris's final win sealed the historic double." },
+  ],
+  2025:[
+    { emoji:'🤯', label:'SEASON FINALE', title:"2 Points: The Closest Title in a Decade", text:"Norris 423 pts, Verstappen 421 pts. The tightest championship margin since Nico Rosberg beat Hamilton by 5 points in 2016 — but McLaren claimed both titles." },
+    { emoji:'🔴', label:'FERRARI', title:"Hamilton's First Year in Red", text:"Lewis Hamilton completed his first season at Ferrari with P6 and his team qualified for next year's manufacturer programme. A promising foundation in Maranello." },
+    { emoji:'⭐', label:'MERCEDES ACADEMY', title:"Antonelli's Stunning Rookie Year", text:"Andrea Kimi Antonelli became the youngest Mercedes race winner in years, finishing P7 in the championship in only his first full F1 season. The heir apparent." },
+  ],
+  2026:[
+    { emoji:'⚡', label:'NEW REGULATIONS', title:"A New Era Rewrites the Order", text:"The 2026 technical rules arrived with new active aerodynamics and a revised power unit formula. Mercedes found an immediate edge — the grid reshuffled overnight." },
+    { emoji:'🌟', label:'ROUND 1 & 2', title:"Antonelli's Double at the Dawn", text:"18-year-old Antonelli won the first two races of the new era — becoming one of the youngest double race winners in F1 history under the new regulations." },
+    { emoji:'🦅', label:'FERRARI', title:"Hamilton & Leclerc: The Dream Team", text:"Hamilton and Leclerc are 3rd and 4th in the early standings, driving as Ferrari's formidable duo. Their partnership could challenge for glory as the season matures." },
+  ],
+};
 
 const SEASON_META_FALLBACK = {
   2020: { champion:'Hamilton',   champion_team:'Mercedes',        total_races:17,   champion_pts:347,   constructor_champion:'Mercedes'     },
@@ -711,6 +921,8 @@ const SEASON_META_FALLBACK = {
   2022: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:22,   champion_pts:454,   constructor_champion:'Red Bull Racing' },
   2023: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:22,   champion_pts:575,   constructor_champion:'Red Bull Racing' },
   2024: { champion:'Verstappen', champion_team:'Red Bull Racing', total_races:24,   champion_pts:437,   constructor_champion:'McLaren'      },
+  2025: { champion:'Norris',     champion_team:'McLaren',         total_races:24,   champion_pts:423,   constructor_champion:'McLaren'      },
+  2026: { champion:'Antonelli',  champion_team:'Mercedes',        total_races:3,    champion_pts:72,    constructor_champion:'Mercedes', in_progress:true },
 };
 
 const COUNTRY_FLAG = {
@@ -735,13 +947,113 @@ async function apiFetch(path) {
 // ─── INFO BAR ───
 function updateInfoBar(year, meta) {
   document.getElementById('info-year').textContent = year;
+  const champLabel = document.querySelector('#info-champion + .lbl');
+  if (champLabel) champLabel.textContent = meta.in_progress ? 'Leader' : 'Champion';
   document.getElementById('info-champion').textContent = meta.champion || '—';
-  document.getElementById('info-races').textContent = meta.total_races || '—';
+  document.getElementById('info-races').textContent = meta.in_progress ? `Rnd ${meta.total_races}` : (meta.total_races || '—');
   document.getElementById('info-constructor').textContent = meta.constructor_champion || meta.champion_team || '—';
   document.getElementById('info-points').textContent = meta.champion_pts ? meta.champion_pts + ' pts' : '—';
 }
 
-// ─── BUILD TEAM STATS ───
+// ─── SEASON STORY ───
+function renderSeasonStory(year) {
+  const story = SEASON_STORY[year];
+  const moments = KEY_MOMENTS[year];
+  const sec = document.getElementById('story-section');
+  if (!story) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('story-year-badge').textContent = year;
+  document.getElementById('story-headline').textContent = story.headline;
+  document.getElementById('story-text').textContent = story.text;
+  document.getElementById('story-kpis').innerHTML = (story.kpis||[]).map(k =>
+    `<div class="story-kpi"><div class="story-kpi-val">${k.v}</div><div class="story-kpi-lbl">${k.l}</div></div>`
+  ).join('');
+  if (moments) {
+    document.getElementById('moments-grid').innerHTML = moments.map(m =>
+      `<div class="moment-card">
+        <div class="moment-emoji">${m.emoji}</div>
+        <div class="moment-label">${m.label}</div>
+        <div class="moment-title">${m.title}</div>
+        <div class="moment-text">${m.text}</div>
+      </div>`
+    ).join('');
+  }
+}
+
+// ─── CHAMPIONSHIP BATTLE ───
+function renderChampBattle(standings, year) {
+  const sec = document.getElementById('battle-section');
+  if (!standings || !standings.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  const maxPts = standings[0].pts || 1;
+  const top = standings.slice(0, 8);
+  document.getElementById('battle-rows').innerHTML = top.map(s => {
+    const pct = Math.max(2, (s.pts / maxPts * 100)).toFixed(1);
+    const pos = s.pos;
+    const posC = pos===1?'p1':pos===2?'p2':pos===3?'p3':'';
+    const gap = pos === 1 ? '— Leader' : `-${(maxPts - s.pts).toFixed(1)} pts`;
+    const lastName = (s.name||'').split(' ').slice(-1)[0];
+    const color = s.color || '#888';
+    return `<div class="battle-row">
+      <span class="battle-pos sf-pos ${posC}">${pos}</span>
+      <span class="battle-driver">${lastName}</span>
+      <div class="battle-track">
+        <div class="battle-fill" style="width:${pct}%;background:${color}">
+          <span class="battle-pts">${s.pts} pts</span>
+        </div>
+      </div>
+      <span class="battle-gap">${gap}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── CONSTRUCTOR STANDINGS ───
+function renderConstructors(constructors, year) {
+  const sec = document.getElementById('constructor-section');
+  if (!constructors || !constructors.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  const maxPts = constructors[0].pts || 1;
+  document.getElementById('constructor-rows').innerHTML = constructors.slice(0, 10).map(c => {
+    const pct = Math.max(2, (c.pts / maxPts * 100)).toFixed(1);
+    const shortName = (c.team||'').replace(' Racing','').replace(' F1 Team','').replace(' AMR','');
+    const color = c.color || '#888';
+    const winsStr = c.wins ? `${c.wins}W` : '';
+    return `<div class="constructor-row">
+      <span class="constructor-pos">${c.pos}</span>
+      <span class="constructor-name" title="${c.team}" style="color:${color}">${shortName}</span>
+      <div class="constructor-track">
+        <div class="constructor-fill" style="width:${pct}%;background:${color}">
+          <span class="constructor-fill-pts">${Math.round(c.pts)} pts${winsStr?' '+winsStr:''}</span>
+        </div>
+      </div>
+      <span class="constructor-wins" style="color:${color}">${winsStr}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── FULL DRIVER STANDINGS ───
+function renderFullStandings(standings, year) {
+  const sec = document.getElementById('standings-full-section');
+  if (!standings || !standings.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  document.getElementById('standings-year-label').textContent = year;
+  document.getElementById('standings-full-list').innerHTML = standings.map(s => {
+    const pos = s.pos || 99;
+    const posC = pos===1?'p1':pos===2?'p2':pos===3?'p3':'';
+    const pts = parseFloat(s.pts||0).toFixed(1).replace(/\.0$/,'');
+    const winsHtml = s.wins ? `<span style="font-size:11px;color:#e8c14e;font-weight:700">${s.wins}W</span>` : '<span style="color:var(--text-muted);font-size:11px">—</span>';
+    return `<div class="sf-row">
+      <span class="sf-pos ${posC}">${pos}</span>
+      <span class="sf-code" style="color:${s.color||'var(--text-muted)'}">${s.code||'?'}</span>
+      <span class="sf-name">${s.name||'—'}</span>
+      <span class="sf-team" style="color:${s.color||'var(--text-muted)'}">${s.team||'—'}</span>
+      ${winsHtml}
+      <span class="sf-pts">${pts}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── LEGACY TEAM DATA (kept for computed insights) ───
 function buildTeamData(races) {
   const teams = {};
   races.forEach(race => {
@@ -753,33 +1065,6 @@ function buildTeamData(races) {
     });
   });
   return Object.entries(teams).sort((a, b) => b[1].pts - a[1].pts);
-}
-
-// ─── TEAM BARS ───
-function renderTeamAnalysis(races, year) {
-  const sec = document.getElementById('team-analysis-section');
-  if (!races || !races.length) { sec.style.display = 'none'; return; }
-  sec.style.display = 'block';
-  document.getElementById('team-analysis-year').textContent = year;
-  const teams = buildTeamData(races);
-  const maxPts = teams[0]?.[1].pts || 1;
-  document.getElementById('team-bars').innerHTML = teams.slice(0, 10).map(([name, d]) => {
-    const pct = Math.max(2, (d.pts / maxPts * 100)).toFixed(1);
-    const shortName = name.replace(' F1 Team','').replace(' Racing','').replace(' AMR','');
-    const wStr = d.wins    ? `${d.wins}W`    : '';
-    const pStr = d.podiums ? `${d.podiums}P` : '';
-    const meta = [wStr, pStr].filter(Boolean).join(' · ') || '—';
-    // darken color for legibility: wrap in a slightly opaque overlay via mix
-    return `<div class="team-bar-row">
-      <div class="team-bar-label" title="${name}">${shortName}</div>
-      <div class="team-bar-track">
-        <div class="team-bar-fill" style="width:${pct}%;background:${d.color}">
-          <span class="team-bar-pts">${Math.round(d.pts)} pts${wStr ? '  '+wStr : ''}</span>
-        </div>
-      </div>
-      <div class="team-bar-meta">${meta}</div>
-    </div>`;
-  }).join('');
 }
 
 // ─── SEASON INSIGHTS ───
@@ -891,28 +1176,8 @@ function toggleRaceExpand(idx, cardEl) {
   if (btn) btn.textContent = open ? '▴ Hide' : '▾ Full Results';
 }
 
-// ─── STANDINGS ───
-function renderStandings(standings) {
-  const list = document.getElementById('standings-list');
-  if (!standings || !standings.length) {
-    list.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">No data available</div>';
-    return;
-  }
-  list.innerHTML = standings.map((s, i) => {
-    const pos  = s.pos || s.position || (i + 1);
-    const posC = pos===1?'p1':pos===2?'p2':pos===3?'p3':'';
-    const name = s.name || (s.Driver ? `${s.Driver.givenName} ${s.Driver.familyName}` : '—');
-    const last = name.split(' ').slice(-1)[0];
-    const pts  = parseFloat(s.pts || s.points || 0).toFixed(0);
-    const wins = s.wins ? `<span class="standing-wins">${s.wins}W</span>` : '';
-    return `<div class="standing-row">
-      <span class="standing-pos ${posC}">${pos}</span>
-      <span class="standing-name" style="${s.color?`color:${s.color}`:''}" title="${name}">${s.code||last}</span>
-      ${wins}
-      <span class="standing-pts">${pts}</span>
-    </div>`;
-  }).join('');
-}
+// ─── STANDINGS (legacy no-op — replaced by renderFullStandings) ───
+function renderStandings() {}
 
 // ─── SKELETON ───
 function renderSkeleton(count) {
@@ -987,16 +1252,22 @@ function renderRaces(races) {
   }).join('');
 }
 
+// ─── HIDE ALL DYNAMIC SECTIONS ───
+function hideAllSections() {
+  ['story-section','battle-section','constructor-section','insights-section','standings-full-section']
+    .forEach(id => { const el = document.getElementById(id); if(el) el.style.display='none'; });
+}
+
 // ─── SEASON SELECTION ───
 async function selectSeason(year, btnEl) {
-  const supported = [2020, 2021, 2022, 2023, 2024];
+  const supported = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
   currentSeason = year;
   document.getElementById('race-section-year').textContent = year;
 
   document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
   if (btnEl) btnEl.classList.add('active');
   else document.querySelectorAll('.season-btn').forEach(b => {
-    if (b.textContent.trim() === String(year)) b.classList.add('active');
+    if (b.textContent.trim().startsWith(String(year))) b.classList.add('active');
   });
 
   const fallback = SEASON_META_FALLBACK[year];
@@ -1007,13 +1278,14 @@ async function selectSeason(year, btnEl) {
     });
   }
 
+  // Always render story for supported-with-story years even if no API data
+  renderSeasonStory(year);
+
   if (!supported.includes(year)) {
-    document.getElementById('standings-list').innerHTML =
-      '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">Legendary season data<br>coming soon</div>';
     document.getElementById('races-grid').innerHTML =
-      '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Legendary season data coming soon</div>';
-    document.getElementById('insights-section').style.display    = 'none';
-    document.getElementById('team-analysis-section').style.display = 'none';
+      '<div style="color:var(--text-muted);grid-column:1/-1;padding:40px;text-align:center">Historical data for this era coming soon</div>';
+    ['battle-section','constructor-section','insights-section','standings-full-section']
+      .forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
     return;
   }
 
@@ -1021,9 +1293,10 @@ async function selectSeason(year, btnEl) {
   if (seasonCache[year]) {
     const c = seasonCache[year];
     updateInfoBar(year, c.meta || fallback || {});
-    renderTeamAnalysis(c.races || [], year);
+    renderChampBattle(c.standings || [], year);
+    renderConstructors(c.constructors || [], year);
     renderInsights(c.races || [], c.standings || [], year);
-    renderStandings(c.standings || []);
+    renderFullStandings(c.standings || [], year);
     renderRaces(c.races || []);
     return;
   }
@@ -1031,18 +1304,17 @@ async function selectSeason(year, btnEl) {
   // Loading state
   renderSkeleton((fallback||{}).total_races || 10);
   document.getElementById('races-loading').style.display = 'inline';
-  document.getElementById('standings-list').innerHTML =
-    '<div style="padding:16px;color:var(--text-muted);font-size:13px;text-align:center">Loading...</div>';
-  document.getElementById('insights-section').style.display    = 'none';
-  document.getElementById('team-analysis-section').style.display = 'none';
+  ['battle-section','constructor-section','insights-section','standings-full-section']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
 
   try {
     const data = await apiFetch(`/api/history/season/${year}`);
     seasonCache[year] = data;
     updateInfoBar(year, data.meta || fallback || {});
-    renderTeamAnalysis(data.races || [], year);
+    renderChampBattle(data.standings || [], year);
+    renderConstructors(data.constructors || [], year);
     renderInsights(data.races || [], data.standings || [], year);
-    renderStandings(data.standings || []);
+    renderFullStandings(data.standings || [], year);
     renderRaces(data.races || []);
   } catch (e) {
     if (year === 2024) {
