@@ -578,10 +578,6 @@ function installBrand() {
       #nav-auth { flex-shrink: 0 !important; }
       #nav-auth > * { flex-shrink: 0; }
 
-      /* <1200px: drop the tagline so it can't bleed into the nav links */
-      @media (max-width: 1200px) {
-        .nav-tagline { display: none !important; }
-      }
       /* <1024px: tighten the middle link spacing */
       @media (max-width: 1024px) {
         .nav-links { gap: 14px !important; }
@@ -590,6 +586,10 @@ function installBrand() {
       /* <820px: hide the center link bar entirely; nav becomes brand | auth */
       @media (max-width: 820px) {
         .nav-links { display: none !important; }
+      }
+      /* <600px: drop the subtitle tagline — nav is cramped */
+      @media (max-width: 600px) {
+        .nav-tagline { display: none !important; }
       }
       /* <520px: shrink Sign Up label and gaps so both buttons still fit */
       @media (max-width: 520px) {
@@ -620,20 +620,43 @@ function installBrand() {
     oldDot.replaceWith(mark);
   }
 
-  // Tagline — English, racing-flavored. Hidden on <1200px via RWD rules above.
-  if (!brand.querySelector('.nav-tagline')) {
-    const tag = document.createElement('span');
-    tag.className = 'nav-tagline';
-    tag.textContent = 'SIMULATED BETTING · F1';
-    Object.assign(tag.style, {
-      marginLeft: '12px', paddingLeft: '12px',
-      borderLeft: '1px solid #2a2a35',
-      fontFamily: "'Barlow Condensed', 'IBM Plex Mono', monospace",
-      fontSize: '10px', fontWeight: '700',
-      letterSpacing: '.22em', color: '#888',
-      textTransform: 'none', whiteSpace: 'nowrap',
-    });
-    brand.appendChild(tag);
+  // Tagline — stacked UNDER the THROTTENIX wordmark as a subtitle so it
+  // takes zero horizontal space and cannot collide with nav links. Wrap the
+  // existing "THROTTENIX" text node in a flex-column span and append the
+  // tagline below it.
+  if (!brand.querySelector('.nav-wordstack')) {
+    // Find the first text node (the brand name) and wrap it
+    const textNode = [...brand.childNodes].find(
+      n => n.nodeType === Node.TEXT_NODE && n.textContent.trim()
+    );
+    if (textNode) {
+      const stack = document.createElement('span');
+      stack.className = 'nav-wordstack';
+      Object.assign(stack.style, {
+        display: 'inline-flex', flexDirection: 'column',
+        justifyContent: 'center', lineHeight: '1',
+        minWidth: '0',
+      });
+      const nameEl = document.createElement('span');
+      nameEl.className = 'nav-wordmark';
+      nameEl.textContent = textNode.textContent.trim();
+      Object.assign(nameEl.style, { lineHeight: '1', whiteSpace: 'nowrap' });
+
+      const tag = document.createElement('span');
+      tag.className = 'nav-tagline';
+      tag.textContent = 'SIMULATED BETTING · F1';
+      Object.assign(tag.style, {
+        marginTop: '3px',
+        fontFamily: "'Barlow Condensed', 'IBM Plex Mono', monospace",
+        fontSize: '9px', fontWeight: '700',
+        letterSpacing: '.22em', color: '#888',
+        textTransform: 'none', whiteSpace: 'nowrap',
+      });
+
+      stack.appendChild(nameEl);
+      stack.appendChild(tag);
+      textNode.replaceWith(stack);
+    }
   }
 }
 

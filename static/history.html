@@ -519,15 +519,15 @@
 <section class="section" style="padding-top:0">
   <div class="container">
 
-    <!-- SEASON SELECTOR -->
+    <!-- SEASON SELECTOR — newest first -->
     <div class="season-tabs" id="season-tabs">
-      <button class="season-btn" onclick="selectSeason(2020, this)">2020</button>
-      <button class="season-btn" onclick="selectSeason(2021, this)">2021</button>
-      <button class="season-btn" onclick="selectSeason(2022, this)">2022</button>
-      <button class="season-btn" onclick="selectSeason(2023, this)">2023</button>
-      <button class="season-btn active" onclick="selectSeason(2024, this)">2024</button>
+      <button class="season-btn active" onclick="selectSeason(2026, this)">2026 ⚡</button>
       <button class="season-btn" onclick="selectSeason(2025, this)">2025</button>
-      <button class="season-btn" onclick="selectSeason(2026, this)">2026 ⚡</button>
+      <button class="season-btn" onclick="selectSeason(2024, this)">2024</button>
+      <button class="season-btn" onclick="selectSeason(2023, this)">2023</button>
+      <button class="season-btn" onclick="selectSeason(2022, this)">2022</button>
+      <button class="season-btn" onclick="selectSeason(2021, this)">2021</button>
+      <button class="season-btn" onclick="selectSeason(2020, this)">2020</button>
     </div>
 
     <!-- SEASON INFO BAR -->
@@ -903,7 +903,7 @@ const COUNTRY_FLAG = {
   'Las Vegas':'🇺🇸',Miami:'🇺🇸',
 };
 
-let currentSeason = 2024;
+let currentSeason = 2026;
 const seasonCache = {};
 
 async function apiFetch(path) {
@@ -1300,7 +1300,7 @@ document.head.appendChild(Object.assign(document.createElement('style'), {
 }));
 
 document.addEventListener('DOMContentLoaded', () => {
-  selectSeason(2024, null);
+  selectSeason(2026, null);
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
