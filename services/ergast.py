@@ -122,6 +122,22 @@ async def get_qualifying_results(year: int, round_num: int):
     return races[0] if races else {}
 
 
+import os as _os
+_DRIVER_IMG_DIR = "/opt/racing/static/assets/drivers"
+
+
+def _local_headshot(acronym: str, fallback_url: str = "") -> str:
+    """Return /static/assets/drivers/{acronym}.png if we have a real photo cached
+    locally (downloaded by download_headshots.py); otherwise fall back to the
+    CDN URL the upstream gave us (may still return an F1 fallback silhouette)."""
+    if not acronym:
+        return fallback_url
+    p = _os.path.join(_DRIVER_IMG_DIR, f"{acronym.lower()}.png")
+    if _os.path.isfile(p):
+        return f"/static/assets/drivers/{acronym.lower()}.png"
+    return fallback_url
+
+
 async def get_all_drivers(year: int = None):
     """Get all drivers — use OpenF1 as primary source."""
     drivers = await _fetch_openf1("/drivers", {"session_key": "latest"})
@@ -132,15 +148,16 @@ async def get_all_drivers(year: int = None):
         num = d.get("driver_number")
         if num not in seen:
             seen.add(num)
+            acronym = d.get("name_acronym", "")
             unique.append({
-                "driverId": d.get("name_acronym", "").lower(),
+                "driverId": acronym.lower(),
                 "givenName": d.get("first_name", ""),
                 "familyName": d.get("last_name", ""),
                 "permanentNumber": str(d.get("driver_number", "")),
                 "nationality": d.get("country_code", ""),
                 "team": d.get("team_name", ""),
                 "team_colour": d.get("team_colour", ""),
-                "headshot_url": d.get("headshot_url", ""),
+                "headshot_url": _local_headshot(acronym, d.get("headshot_url", "")),
             })
     return unique
 

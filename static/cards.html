@@ -232,56 +232,11 @@ let CURRENT_DRIVERS = [];   // 2024 current with full card stats
 let HIST_DRIVERS   = [];    // 2020-2023 historical from standings
 let currentSort         = 'ovr';
 
-// F1 official CDN headshots — pattern: {first3fname}{first3lname}01
-// Cloudinary fallback means even retired drivers return 200 with their photo or silhouette
-const F1CDN = (code, fname, lname) => {
-  const id = `${fname.slice(0,3).toUpperCase()}${lname.slice(0,3).toUpperCase()}01`;
-  return `https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/${fname[0].toUpperCase()}/${id}_${fname}_${lname}/${id.toLowerCase()}.png.transform/1col/image.png`;
-};
-const HIST_HEADSHOTS = {
-  // Champions & top finishers 2020-2023
-  HAM: F1CDN('HAM','Lewis','Hamilton'),
-  VER: F1CDN('VER','Max','Verstappen'),
-  BOT: F1CDN('BOT','Valtteri','Bottas'),
-  PER: F1CDN('PER','Sergio','Perez'),
-  LEC: F1CDN('LEC','Charles','Leclerc'),
-  SAI: F1CDN('SAI','Carlos','Sainz'),
-  NOR: F1CDN('NOR','Lando','Norris'),
-  RUS: F1CDN('RUS','George','Russell'),
-  ALO: F1CDN('ALO','Fernando','Alonso'),
-  STR: F1CDN('STR','Lance','Stroll'),
-  GAS: F1CDN('GAS','Pierre','Gasly'),
-  OCO: F1CDN('OCO','Esteban','Ocon'),
-  VET: F1CDN('VET','Sebastian','Vettel'),
-  RIC: F1CDN('RIC','Daniel','Ricciardo'),
-  ALB: F1CDN('ALB','Alexander','Albon'),
-  TSU: F1CDN('TSU','Yuki','Tsunoda'),
-  MAG: F1CDN('MAG','Kevin','Magnussen'),
-  HUL: F1CDN('HUL','Nico','Hulkenberg'),
-  ZHO: F1CDN('ZHO','Guanyu','Zhou'),
-  MSC: F1CDN('MSC','Mick','Schumacher'),
-  // Retired
-  RAI: F1CDN('RAI','Kimi','Raikkonen'),
-  KVY: F1CDN('KVY','Daniil','Kvyat'),
-  GRO: F1CDN('GRO','Romain','Grosjean'),
-  GIO: F1CDN('GIO','Antonio','Giovinazzi'),
-  MAZ: F1CDN('MAZ','Nikita','Mazepin'),
-  LAT: F1CDN('LAT','Nicholas','Latifi'),
-  KUB: F1CDN('KUB','Robert','Kubica'),
-  SAR: F1CDN('SAR','Logan','Sargeant'),
-  LAW: F1CDN('LAW','Liam','Lawson'),
-  DEV: F1CDN('DEV','Nyck','De_Vries'),
-  // 2025+ drivers
-  PIA: F1CDN('PIA','Oscar','Piastri'),
-  // 2025-2026 new entries
-  ANT: F1CDN('ANT','Andrea','Antonelli'),
-  HAD: F1CDN('HAD','Isack','Hadjar'),
-  BEA: F1CDN('BEA','Oliver','Bearman'),
-  BOR: F1CDN('BOR','Gabriel','Bortoleto'),
-  COL: F1CDN('COL','Franco','Colapinto'),
-  DOO: F1CDN('DOO','Jack','Doohan'),
-  LIN: F1CDN('LIN','Arvid','Lindblad'),
-};
+// Driver headshots — served from /static/assets/drivers/{code}.png
+// Populated by /opt/racing/download_headshots.py (F1 CDN + Wikipedia fallback).
+// Accepts any 3-letter F1 acronym; returns '' when no image cached locally.
+const LOCAL_HEADSHOT = code => code ? `/static/assets/drivers/${code.toLowerCase()}.png` : '';
+const HIST_HEADSHOTS = new Proxy({}, { get: (_, code) => LOCAL_HEADSHOT(code) });
 let sortAsc             = false;
 let currentTierFilter   = 'all';
 let currentSeasonFilter = 'all';
@@ -404,7 +359,8 @@ async function loadDrivers() {
       return {
         num: d.number || '?', name: lastName, fullName: d.name||'?',
         team: card?.team || d.team || '', color, emoji:'🏎', tier,
-        headshot: card?.headshot_url || d.headshot_url || '',
+        headshot: card?.headshot_url || d.headshot_url || LOCAL_HEADSHOT(code3),
+        code: code3,
         stats: {q:s.qualifying||50, t:s.tire_management||50, w:s.wet_weather||50, o:s.overtaking||50},
         ovr, win, odds: Number(odds).toFixed(1),
         driver_id: d.driver_id,
@@ -678,7 +634,13 @@ function buildCard(d) {
         <span class="c-num">${d.num}</span>
         <div class="c-art" style="z-index:5;${monacoArtStyle}">
           ${glowCircle}
-          ${d.headshot ? `<img src="${d.headshot}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;object-position:top center;border:2px solid ${d.color};filter:${emojiFilter};${emojiAnim}" onerror="this.style.display='none'">` : `<span class="c-emoji" style="filter:${emojiFilter};${emojiAnim}">${d.emoji}</span>`}
+          ${(() => {
+            const code = (d.code || d.name?.slice(0,3) || '?').toUpperCase();
+            const placeholder = `<div style="width:80px;height:80px;border-radius:50%;border:2px solid ${d.color};background:linear-gradient(135deg,${d.color}33,${d.color}11);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;letter-spacing:.04em;color:${d.color};text-shadow:0 1px 2px rgba(0,0,0,.5)">${code}</div>`;
+            if (!d.headshot) return placeholder;
+            const safePlaceholder = placeholder.replace(/"/g, '&quot;');
+            return `<img src="${d.headshot}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;object-position:top center;border:2px solid ${d.color};filter:${emojiFilter};${emojiAnim}" onerror="this.outerHTML='${safePlaceholder}'">`;
+          })()}
         </div>
         ${monacoFlag}
         <div class="c-info">
