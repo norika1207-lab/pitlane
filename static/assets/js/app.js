@@ -18,17 +18,32 @@ async function api(path, opts = {}) {
 }
 
 // ─── AUTH ───
+// Unified nav auth renderer — inline styles so buttons look identical on every
+// page regardless of which stylesheet that page loads. Container is forced to
+// right-align to match home's layout.
+const NAV_BTN_BASE =
+  "padding:7px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;" +
+  "font-size:13px;font-weight:700;letter-spacing:.05em;cursor:pointer;line-height:1;";
+const NAV_BTN_GHOST = NAV_BTN_BASE + "border:1px solid #333;background:transparent;color:#ccc;";
+const NAV_BTN_GOLD  = NAV_BTN_BASE + "border:none;background:#e8ff00;color:#000;";
+
 function updateAuthUI() {
   const authArea = document.getElementById('nav-auth');
   if (!authArea) return;
+  // Force right-alignment identical to home, regardless of page CSS
+  Object.assign(authArea.style, {
+    display: 'flex', gap: '8px', alignItems: 'center',
+    marginLeft: 'auto', justifySelf: 'end',
+  });
   if (user) {
     authArea.innerHTML = `
-      <span class="nav-coins">◆ <span id="user-coins">${formatNum(user.balance)}</span></span>
-      <button class="nav-user-btn" onclick="showProfileDashboard()">👤 ${user.username} ▾</button>
+      <span style="color:#e8ff00;font-weight:700;font-size:13px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.05em;">◆ <span id="user-coins">${formatNum(user.balance)}</span></span>
+      <button onclick="showProfileDashboard()" style="${NAV_BTN_GHOST}">👤 ${user.username} ▾</button>
     `;
   } else {
     authArea.innerHTML = `
-      <button class="btn btn-gold btn-sm" onclick="showModal('login')">Log In</button>
+      <button onclick="showModal('login')" style="${NAV_BTN_GHOST}">Log In</button>
+      <button onclick="showModal('login')" style="${NAV_BTN_GOLD}">Sign Up</button>
     `;
   }
 }
