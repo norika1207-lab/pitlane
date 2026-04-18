@@ -20,6 +20,26 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 .page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; color: #fff; }
 .page-sub { font-size: 13px; color: #666; margin-top: 6px; }
 
+/* ─── SERIES SELECTOR (top level) ─── */
+.series-bar {
+  display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap;
+}
+.ser-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
+  padding: 10px 20px; cursor: pointer; transition: all .18s;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+  font-weight: 700; letter-spacing: .08em; color: #555; text-transform: uppercase;
+}
+.ser-btn:hover { border-color: #333; color: #aaa; }
+.ser-btn.active { border-color: var(--series-accent, #e8ff00); color: var(--series-accent, #e8ff00);
+  background: rgba(255,255,255,.03); }
+.ser-btn .ser-icon { font-size: 18px; }
+.ser-btn .ser-meta { display: flex; flex-direction: column; gap: 1px; }
+.ser-btn .ser-name { line-height: 1; }
+.ser-btn .ser-sub { font-size: 9px; font-weight: 400; color: #444; letter-spacing: .04em; }
+.ser-btn.active .ser-sub { color: #666; }
+
 /* ─── SEASON TABS ─── */
 .season-bar {
   display: flex; align-items: center; gap: 0;
@@ -29,11 +49,10 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
   background: none; border: none; border-bottom: 2px solid transparent;
   color: #555; font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
   font-weight: 700; letter-spacing: .06em; padding: 12px 20px;
-  cursor: pointer; white-space: nowrap; transition: all .18s;
-  text-transform: uppercase;
+  cursor: pointer; white-space: nowrap; transition: all .18s; text-transform: uppercase;
 }
 .s-tab:hover { color: #aaa; }
-.s-tab.active { color: #e8ff00; border-bottom-color: #e8ff00; }
+.s-tab.active { color: var(--series-accent, #e8ff00); border-bottom-color: var(--series-accent, #e8ff00); }
 .s-tab .s-champ { font-size: 9px; color: #555; display: block; margin-top: 1px; font-weight: 400; letter-spacing: .04em; }
 .s-tab.active .s-champ { color: #888; }
 
@@ -48,8 +67,7 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 .album-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 80px 40px;
-  padding: 24px 0;
+  gap: 80px 40px; padding: 24px 0;
 }
 .col-loading { grid-column: 1/-1; text-align: center; padding: 60px;
   color: #444; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; letter-spacing: .1em; }
@@ -62,19 +80,15 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
   text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.5);
 }
 
-/* ─── FRAME — sizes EXACTLY to F1 card (260×420), acrylic is added OVER it ─── */
+/* ─── FRAME ─── */
 .col-frame {
-  position: relative;
-  width: 260px; height: 420px;           /* match F1 card native dimensions */
-  margin: 32px;                          /* breathing room for acrylic overlay */
+  position: relative; width: 260px; height: 420px; margin: 32px;
   will-change: transform; transform-style: preserve-3d;
   transition: transform .55s cubic-bezier(.25,.8,.25,1);
 }
-/* The F1 card inside our frame — disable its own hover transform so the
-   acrylic slab stays aligned. The whole unit gets tilt via JS instead. */
-.col-frame .card          { width: 260px !important; cursor: default; }
-.col-frame .card:hover    { transform: none !important; }
-.col-frame .card-inner    { height: 420px; }
+.col-frame .card       { width: 260px !important; cursor: default; }
+.col-frame .card:hover { transform: none !important; }
+.col-frame .card-inner { height: 420px; }
 
 .col-frame::after {
   content: ''; position: absolute; bottom: -34px; left: 8%; right: 8%;
@@ -83,7 +97,7 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 }
 .col-unit:hover .col-frame::after { bottom: -48px; left: 12%; right: 12%; opacity: .9; }
 
-/* ─── ACRYLIC SLAB — PSA-style display case OVER the F1 card ─── */
+/* ─── ACRYLIC SLAB ─── */
 .col-acrylic {
   position: absolute; top: -34px; left: -34px; right: -34px; bottom: -34px;
   border-radius: 22px; z-index: 20; pointer-events: none;
@@ -92,13 +106,9 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
     rgba(255,255,255,.01) 42%, rgba(255,255,255,.01) 58%,
     rgba(255,255,255,.06) 78%, rgba(255,255,255,.20) 100%);
   border: 1.5px solid rgba(255,255,255,.45);
-  box-shadow:
-    0 18px 48px rgba(0,0,0,.7),
-    0 6px 14px rgba(0,0,0,.35),
-    inset 0 2px 0 rgba(255,255,255,.35),
-    inset 2px 0 0 rgba(255,255,255,.12),
-    inset -2px 0 0 rgba(0,0,0,.12),
-    inset 0 -2px 0 rgba(0,0,0,.20);
+  box-shadow: 0 18px 48px rgba(0,0,0,.7), 0 6px 14px rgba(0,0,0,.35),
+    inset 0 2px 0 rgba(255,255,255,.35), inset 2px 0 0 rgba(255,255,255,.12),
+    inset -2px 0 0 rgba(0,0,0,.12), inset 0 -2px 0 rgba(0,0,0,.20);
 }
 .col-acrylic::before {
   content: ''; position: absolute; top: 10px; left: 38px; right: 38px; height: 11px;
@@ -114,34 +124,27 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 .col-mag {
   position: absolute; width: 11px; height: 11px; border-radius: 50%;
   background: radial-gradient(circle at 38% 32%, #e0e0e0 0%, #b0b0b0 35%, #808080 65%, #505050 100%);
-  box-shadow: 0 1px 3px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.45);
-  z-index: 21;
+  box-shadow: 0 1px 3px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.45); z-index: 21;
 }
 .col-mag::after {
   content: ''; position: absolute; top: 50%; left: 50%;
   transform: translate(-50%,-50%); width: 3px; height: 3px; border-radius: 50%;
   background: radial-gradient(#333, #111);
 }
-.col-mag.tl { top: 12px; left: 12px; }
-.col-mag.tr { top: 12px; right: 12px; }
-.col-mag.bl { bottom: 12px; left: 12px; }
-.col-mag.br { bottom: 12px; right: 12px; }
+.col-mag.tl { top: 12px; left: 12px; } .col-mag.tr { top: 12px; right: 12px; }
+.col-mag.bl { bottom: 12px; left: 12px; } .col-mag.br { bottom: 12px; right: 12px; }
 
-/* ─── BACKGROUND GLOW for premium tiers ─── */
-.col-glow {
-  position: absolute; top: -40px; left: -40px; right: -40px; bottom: -40px;
-  border-radius: 28px; pointer-events: none; z-index: -1; transition: opacity .4s;
-}
+/* ─── GLOW ─── */
+.col-glow { position: absolute; top: -40px; left: -40px; right: -40px; bottom: -40px;
+  border-radius: 28px; pointer-events: none; z-index: -1; transition: opacity .4s; }
 
 /* ─── OWNED BADGE ─── */
 .col-owned-badge {
   position: absolute; top: -14px; right: -14px; z-index: 30;
-  background: #e8ff00; color: #000;
-  font-family: 'Barlow Condensed', sans-serif;
+  background: #e8ff00; color: #000; font-family: 'Barlow Condensed', sans-serif;
   font-size: 9px; font-weight: 900; letter-spacing: .08em;
   padding: 4px 10px; border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(232,255,0,.5);
-  transform: rotate(6deg);
+  box-shadow: 0 2px 12px rgba(232,255,0,.5); transform: rotate(6deg);
 }
 
 /* ─── BELOW CARD ─── */
@@ -150,21 +153,27 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
             font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
 .col-lv-bg { width: 100%; height: 4px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
 .col-lv-f  { height: 100%; border-radius: 2px; transition: width .6s ease; }
-
 .col-alabel { font-size: 11px; color: #444; letter-spacing: .06em;
               font-family: 'Barlow Condensed', sans-serif; text-align: center; }
 
-/* ─── EMPTY SLOT (for cards not yet earned) ─── */
+/* ─── EMPTY SLOT ─── */
 .col-empty {
   width: 260px; height: 420px; border-radius: 16px;
   border: 1px dashed #222; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 8px;
-  color: #2a2a2a; background: rgba(0,0,0,.3);
+  align-items: center; justify-content: center; gap: 8px; color: #2a2a2a; background: rgba(0,0,0,.3);
 }
 .col-empty-icon { font-size: 32px; opacity: .4; }
-.col-empty-text { font-size: 10px; letter-spacing: .12em;
-                  font-family: 'Barlow Condensed', sans-serif;
+.col-empty-text { font-size: 10px; letter-spacing: .12em; font-family: 'Barlow Condensed', sans-serif;
                   text-transform: uppercase; color: #333; }
+
+/* ─── SERIES CARD STYLES ─── */
+/* MotoGP card override — motorcycle badge */
+.card-motogp .c-series-badge {
+  position: absolute; top: 8px; left: 8px; z-index: 10;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 8px; font-weight: 900;
+  letter-spacing: .1em; padding: 2px 7px; border-radius: 4px;
+  background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.2);
+}
 </style>
 </head>
 <body>
@@ -191,9 +200,25 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 
 <div class="main">
   <div class="page-header">
-    <div class="page-eyebrow">Card Album · F1 Drivers</div>
+    <div class="page-eyebrow" id="eyebrow">Card Album · F1</div>
     <div class="page-title">Collection</div>
-    <div class="page-sub">Each F1 card sits inside an acrylic display slab. OWNED cards are earned by placing pits.</div>
+    <div class="page-sub" id="page-sub">Each driver card sits inside an acrylic display slab. OWNED cards are earned by placing pits.</div>
+  </div>
+
+  <!-- Series selector -->
+  <div class="series-bar" id="seriesBar">
+    <button class="ser-btn active" style="--series-accent:#e8ff00" data-series="f1" onclick="switchSeries('f1',this)">
+      <span class="ser-icon">🏎</span>
+      <span class="ser-meta"><span class="ser-name">Formula 1</span><span class="ser-sub">2020 – 2026 · 20 Drivers</span></span>
+    </button>
+    <button class="ser-btn" style="--series-accent:#ff6a00" data-series="motogp" onclick="switchSeries('motogp',this)">
+      <span class="ser-icon">🏍</span>
+      <span class="ser-meta"><span class="ser-name">MotoGP</span><span class="ser-sub">2022 – 2026 · 23 Riders</span></span>
+    </button>
+    <button class="ser-btn" style="--series-accent:#cfb634" data-series="nascar" onclick="switchSeries('nascar',this)">
+      <span class="ser-icon">🏁</span>
+      <span class="ser-meta"><span class="ser-name">NASCAR</span><span class="ser-sub">Cup Series · 27 Drivers</span></span>
+    </button>
   </div>
 
   <div class="season-bar" id="seasonBar"></div>
@@ -208,23 +233,61 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 <script src="/static/assets/js/f1card.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════
-   COLLECTION — wraps real F1 cards (shared f1card.js) in
-   an acrylic display slab with owned badge + XP bar
+   COLLECTION — multi-series card album
+   Series: F1 | MotoGP | NASCAR
 ════════════════════════════════════════════════════════ */
 
-/* Owned-card DB (bets-won cards). Seed data for demo. */
-const OWNED_CARDS = new Set([
-  'ver_2026', 'nor_2026', 'rus_2026',
-]);
+let currentSeries = 'f1';
+let currentYear   = 2026;
 
-const SEASON_META = {
-  2020: { champ:'Hamilton', races:17 },
-  2021: { champ:'Verstappen', races:22 },
-  2022: { champ:'Verstappen', races:22 },
-  2023: { champ:'Verstappen', races:22 },
-  2024: { champ:'Verstappen', races:24 },
-  2025: { champ:'Norris',    races:24 },
-  2026: { champ:'Antonelli', races:3  },
+const SERIES_CONFIG = {
+  f1: {
+    accent: '#e8ff00', label: 'Formula 1', eyebrow: 'Card Album · F1',
+    sub: 'Each F1 card sits inside an acrylic display slab. OWNED cards are earned by placing pits.',
+    years: [2026, 2025, 2024, 2023, 2022, 2021, 2020],
+    defaultYear: 2026,
+    yearMeta: {
+      2026: { sub: 'Current' },
+      2025: { sub: 'Champion: Norris' },
+      2024: { sub: 'Champion: Verstappen' },
+      2023: { sub: 'Champion: Verstappen' },
+      2022: { sub: 'Champion: Verstappen' },
+      2021: { sub: 'Champion: Verstappen' },
+      2020: { sub: 'Champion: Hamilton' },
+    },
+  },
+  motogp: {
+    accent: '#ff6a00', label: 'MotoGP', eyebrow: 'Card Album · MotoGP',
+    sub: 'MotoGP World Championship riders. Cards earned by predicting race winners.',
+    years: [2026, 2025, 2024, 2023, 2022],
+    defaultYear: 2026,
+    yearMeta: {
+      2026: { sub: 'Current' },
+      2025: { sub: 'Champion: Bagnaia' },
+      2024: { sub: 'Champion: Bagnaia' },
+      2023: { sub: 'Champion: Bagnaia' },
+      2022: { sub: 'Champion: Quartararo' },
+    },
+    categories: ['MotoGP', 'Moto2', 'Moto3'],
+    defaultCategory: 'MotoGP',
+  },
+  nascar: {
+    accent: '#cfb634', label: 'NASCAR', eyebrow: 'Card Album · NASCAR Cup',
+    sub: 'NASCAR Cup Series drivers. Collect cards from America\'s biggest motorsport.',
+    years: [2025],
+    defaultYear: 2025,
+    yearMeta: { 2025: { sub: 'Current Season' } },
+  },
+};
+
+const OWNED_CARDS = new Set(['ver_f1_2026', 'nor_f1_2026', 'rus_f1_2026']);
+
+/* ── F1 data ── */
+const F1_SEASON_META = {
+  2020:{champ:'Hamilton',races:17}, 2021:{champ:'Verstappen',races:22},
+  2022:{champ:'Verstappen',races:22}, 2023:{champ:'Verstappen',races:22},
+  2024:{champ:'Verstappen',races:24}, 2025:{champ:'Norris',races:24},
+  2026:{champ:'Antonelli',races:3},
 };
 
 const SW_BANK = {
@@ -239,45 +302,46 @@ const SW_BANK = {
   PER:{ str:['Tyre Management','Street Circuits'],          wk:['Qualifying','Pressure'] },
   STR:{ str:['Rain Pace','Strategy'],                       wk:['Qualifying','Consistency'] },
   GAS:{ str:['Qualifying Pace','Street Circuits'],          wk:['Race Starts','Tyre Wear'] },
-  OCO:{ str:['Qualifying','Street Circuits'],               wk:['Wheel-to-Wheel','Strategy'] },
-  BOT:{ str:['Qualifying Pace','Clean Air Pace'],           wk:['Race Craft','Wet Weather'] },
-  TSU:{ str:['Wet Weather','Overtaking'],                   wk:['Consistency','Strategy'] },
-  HUL:{ str:['Tyre Management','Race Craft'],               wk:['Qualifying','Team Orders'] },
-  MAG:{ str:['Aggression','Dirty Air Defence'],             wk:['Tyre Wear','Consistency'] },
-  ALB:{ str:['Consistency','Smooth Driving'],               wk:['Qualifying Pace','Overtaking'] },
   ANT:{ str:['Qualifying','Pace'],                          wk:['Race Craft','Experience'] },
-  BEA:{ str:['Wet Weather','Corners'],                      wk:['Experience','Pressure'] },
   HAD:{ str:['Overtaking','Aggression'],                    wk:['Tyre Management','Strategy'] },
   LAW:{ str:['Race Craft','Consistency'],                   wk:['Qualifying','Street Circuits'] },
+  BEA:{ str:['Wet Weather','Corners'],                      wk:['Experience','Pressure'] },
   BOR:{ str:['Raw Pace','Adaptability'],                    wk:['Consistency','Experience'] },
   COL:{ str:['Race Pace','Wet Weather'],                    wk:['Qualifying','Strategy'] },
   DOO:{ str:['Smooth Driving','Consistency'],               wk:['Qualifying','Wet Weather'] },
-  ZHO:{ str:['Tyre Management'],                            wk:['Qualifying','Race Pace'] },
-  SAR:{ str:['Smooth Driving'],                             wk:['Qualifying','Consistency'] },
-  VET:{ str:['Race Craft','Tyre Management','Tech Feedback'], wk:['Wheel-to-Wheel','Aggression'] },
-  RIC:{ str:['Late Braking','Overtaking','Wet Weather'],    wk:['Tyre Management','Qualifying'] },
-  RAI:{ str:['Consistency','Smooth Driving'],               wk:['Qualifying Pace','Motivation'] },
-  MSC:{ str:['Rain Pace','Tyre Management'],                wk:['Consistency','Racecraft'] },
-  GRO:{ str:['Race Pace'],                                  wk:['Consistency','Crash Rate'] },
-  GIO:{ str:['Consistency'],                                wk:['Qualifying','Overtaking'] },
-  KVY:{ str:['Race Craft'],                                 wk:['Consistency','Wet Weather'] },
-  MAZ:{ str:['Aggression'],                                 wk:['Race Craft','Consistency'] },
-  LAT:{ str:['Consistency'],                                wk:['Qualifying','Race Pace'] },
-  KUB:{ str:['Experience','Race Craft'],                    wk:['Physical Fitness','Pace'] },
-  DEV:{ str:['Simulator Pace','Strategy'],                  wk:['Race Craft','Wet Weather'] },
 };
 const SW_DEFAULT = { str:['Race Pace','Consistency'], wk:['Qualifying'] };
 
-/* Tier assignment by championship position */
+/* MotoGP rider skills */
+const MOTO_SW = {
+  MAR:{ str:['Corner Speed','Late Braking','Wet Weather'],   wk:['Consistency'] },
+  BAG:{ str:['Ducati Mastery','Race Pace','Tyre Mgmt'],      wk:['Qualifying'] },
+  MIL:{ str:['Qualifying','Sprint Pace'],                    wk:['Rear Tyre','Pressure'] },
+  BEZ:{ str:['Corner Entry','Wet Weather','Overtaking'],     wk:['Consistency','Strategy'] },
+  MAR2:{ str:['Late Braking','Aggression'],                  wk:['Tyre Conservation'] },
+  ACO:{ str:['Raw Pace','Adaptability'],                     wk:['Experience','Strategy'] },
+};
+const MOTO_DEFAULT = { str:['Race Pace','Bike Setup'], wk:['Consistency'] };
+
+/* NASCAR driver skills */
+const NASCAR_SW = {
+  LAR:{ str:['Superspeedway','Dirt','Short Track'],   wk:['Pressure','Street Circuits'] },
+  ELL:{ str:['Road Courses','Qualifying'],             wk:['Plate Racing'] },
+  HAM:{ str:['Intermediate Tracks','Strategy'],        wk:['Road Courses'] },
+  BEL:{ str:['Road Courses','Short Tracks'],           wk:['Plate Racing'] },
+  BLA:{ str:['Intermediate Tracks','Plate Racing'],    wk:['Short Tracks'] },
+};
+const NASCAR_DEFAULT = { str:['Short Track','Consistency'], wk:['Road Courses'] };
+
+/* Tier by position */
 function posTier(pos) {
-  if (pos === 1)  return 'monaco';
-  if (pos <= 3)   return 'spa';
-  if (pos <= 8)   return 'suzuka';
-  if (pos <= 15)  return 'monza';
+  if (pos === 1) return 'monaco';
+  if (pos <= 3)  return 'spa';
+  if (pos <= 8)  return 'suzuka';
+  if (pos <= 15) return 'monza';
   return 'silverstone';
 }
 
-/* Derive stat values from standings */
 function deriveStats(pos, wins, pts, maxPts, totalRaces) {
   const f = Math.max(0, Math.min(1, pts / Math.max(maxPts, 1)));
   const winRate = wins / Math.max(totalRaces, 1);
@@ -289,15 +353,13 @@ function deriveStats(pos, wins, pts, maxPts, totalRaces) {
   };
 }
 
-/* Tier label pill config */
 const TIER_PILL = {
-  silverstone: { label:'SILVERSTONE · STARTER', c:'#aaa',    bg:'#111',    bc:'#333'    },
-  monza:       { label:'MONZA · ADVANCED',      c:'#6ab0ff', bg:'#0a1020', bc:'#1a3a6a' },
-  suzuka:      { label:'SUZUKA · RARE',         c:'#AFA9EC', bg:'#0a0a18', bc:'#534AB7' },
-  spa:         { label:'SPA · HOLOGRAPHIC',     c:'#00ccff', bg:'#060810', bc:'#00b8ff' },
-  monaco:      { label:'MONACO · LEGENDARY',    c:'#c9a84c', bg:'#0a0700', bc:'#c9a84c' },
+  silverstone: { label:'SILVERSTONE · STARTER',   c:'#aaa',    bg:'#111',    bc:'#333'    },
+  monza:       { label:'MONZA · ADVANCED',         c:'#6ab0ff', bg:'#0a1020', bc:'#1a3a6a' },
+  suzuka:      { label:'SUZUKA · RARE',            c:'#AFA9EC', bg:'#0a0a18', bc:'#534AB7' },
+  spa:         { label:'SPA · HOLOGRAPHIC',        c:'#00ccff', bg:'#060810', bc:'#00b8ff' },
+  monaco:      { label:'MONACO · LEGENDARY',       c:'#c9a84c', bg:'#0a0700', bc:'#c9a84c' },
 };
-
 const TIER_GLOW = {
   silverstone: '',
   monza:       'box-shadow:0 0 28px rgba(54,113,198,.22),0 0 56px rgba(54,113,198,.08);',
@@ -306,7 +368,9 @@ const TIER_GLOW = {
   monaco:      'box-shadow:0 0 44px rgba(201,168,76,.50),0 0 88px rgba(201,168,76,.25),0 0 140px rgba(201,168,76,.10);',
 };
 
-/* Build one collection unit: tier pill + acrylic slab + F1 card + level bar */
+/* ═══════════════════════════════════════════
+   CARD BUILDER
+═══════════════════════════════════════════ */
 function buildUnit(d) {
   const pill = TIER_PILL[d.tier] || TIER_PILL.silverstone;
   const glow = TIER_GLOW[d.tier] || '';
@@ -315,10 +379,8 @@ function buildUnit(d) {
   const lvl = d.lv ? `
     <div class="col-lv">
       <div class="col-lv-t" style="color:${pill.c}">Lv.${d.lv} · ${Math.round((d.xp||0)/Math.max(d.nxp||100,1)*100)}%</div>
-      <div class="col-lv-bg">
-        <div class="col-lv-f" style="width:${Math.round((d.xp||0)/Math.max(d.nxp||100,1)*100)}%;
-          background:linear-gradient(90deg,${pill.c}66,${pill.c})"></div>
-      </div>
+      <div class="col-lv-bg"><div class="col-lv-f" style="width:${Math.round((d.xp||0)/Math.max(d.nxp||100,1)*100)}%;
+        background:linear-gradient(90deg,${pill.c}66,${pill.c})"></div></div>
     </div>` : '';
 
   return `
@@ -340,94 +402,203 @@ function buildUnit(d) {
     </div>`;
 }
 
-/* Load current season from /api/drivers */
-async function loadCurrent() {
-  const res  = await fetch('/api/drivers');
+/* ═══════════════════════════════════════════
+   F1
+═══════════════════════════════════════════ */
+async function loadF1(year) {
+  currentYear = year;
+  let drivers;
+  if (year === 2026) {
+    const res  = await fetch('/api/drivers');
+    const data = await res.json();
+    drivers = (data.drivers || []).map((d, i) => {
+      const pos  = d.championship_pos || (i + 1);
+      const last = d.name.split(' ').slice(-1)[0] || '?';
+      const code = last.slice(0,3).toUpperCase();
+      const sw   = SW_BANK[code] || SW_DEFAULT;
+      const meta = F1_SEASON_META[year] || { races: 24 };
+      const stats = deriveStats(pos, d.wins||0, d.points||0, 400, meta.races);
+      return {
+        series: 'f1', num: d.number || String(pos), name: last, fullName: d.name,
+        team: d.team||'', color: d.team_colour ? '#'+d.team_colour : '#888',
+        tier: posTier(pos), code,
+        headshot: d.headshot_url || F1Card.LOCAL_HEADSHOT(code),
+        stats, ovr: Math.round((stats.q+stats.t+stats.w+stats.o)/4),
+        win: Math.round((d.wins||0)/meta.races*100),
+        odds: pos===1?'2.0':pos<=3?'4.0':pos<=8?'10.0':'25.0',
+        pts2024: d.points||0, str: sw.str, wk: sw.wk,
+        owned: OWNED_CARDS.has(`${code.toLowerCase()}_f1_2026`),
+        lv:0, xp:0, nxp:100, pts: d.points||0, season: year,
+      };
+    });
+  } else {
+    const res  = await fetch(`/api/history/standings/${year}`);
+    const data = await res.json();
+    const standings = data.standings || [];
+    const meta = F1_SEASON_META[year] || { races: 22 };
+    const maxPts = standings.length ? standings[0].pts : 400;
+    drivers = standings.map(d => {
+      const sw   = SW_BANK[d.code] || SW_DEFAULT;
+      const stats = deriveStats(d.pos, d.wins, d.pts, maxPts, meta.races);
+      const last  = d.name?.split(' ').slice(-1)[0] || d.code || '?';
+      const code  = d.code || last.slice(0,3).toUpperCase();
+      return {
+        series: 'f1', num: String(d.pos), name: last, fullName: d.name,
+        team: d.team||'?', color: d.color||'#888', tier: posTier(d.pos), code,
+        headshot: F1Card.LOCAL_HEADSHOT(code), stats,
+        ovr: Math.round((stats.q+stats.t+stats.w+stats.o)/4),
+        win: Math.round(d.wins/meta.races*100),
+        odds: d.pos===1?'1.5':d.pos<=3?'3.5':d.pos<=8?'9.0':'22.0',
+        pts2024: d.pts||0, str: sw.str, wk: sw.wk,
+        owned: false, lv:0, xp:0, nxp:100, pts: d.pts, season: year,
+      };
+    });
+  }
+  renderStats(drivers, `F1 ${year}`);
+  renderGrid(drivers);
+}
+
+/* ═══════════════════════════════════════════
+   MotoGP
+═══════════════════════════════════════════ */
+let motoCategory = 'MotoGP';
+
+async function loadMotoGP(year, category = motoCategory) {
+  currentYear = year; motoCategory = category;
+  const res  = await fetch(`/api/motorsport/motogp/drivers?year=${year}&category=${category}`);
+  const data = await res.json();
+  const riders = data.drivers || [];
+  const maxPts = riders.length ? riders[0].max_pts : 400;
+  const totalRaces = Math.max(1, Math.ceil(maxPts / 25));
+
+  const cards = riders.map(d => {
+    const sw    = MOTO_SW[d.code] || MOTO_DEFAULT;
+    const stats = deriveStats(d.pos, d.wins, d.points, maxPts, totalRaces);
+    return {
+      series: 'motogp', num: d.number, name: d.last_name, fullName: d.full_name,
+      team: d.team, color: d.color, tier: posTier(d.pos), code: d.code,
+      headshot: '', stats, ovr: Math.round((stats.q+stats.t+stats.w+stats.o)/4),
+      win: Math.round(d.wins/totalRaces*100),
+      odds: d.pos===1?'2.0':d.pos<=3?'4.0':d.pos<=8?'10.0':'25.0',
+      pts2024: d.points, str: sw.str, wk: sw.wk,
+      owned: OWNED_CARDS.has(`${d.code.toLowerCase()}_motogp_${year}`),
+      lv:0, xp:0, nxp:100, pts: d.points, season: year,
+      manufacturer: d.manufacturer,
+    };
+  });
+
+  renderStats(cards, `MotoGP ${year} · ${category}`);
+  renderGrid(cards);
+}
+
+/* ═══════════════════════════════════════════
+   NASCAR
+═══════════════════════════════════════════ */
+async function loadNASCAR(year) {
+  currentYear = year;
+  const res  = await fetch(`/api/motorsport/nascar/drivers?year=${year}`);
   const data = await res.json();
   const drivers = data.drivers || [];
+  const maxPts = drivers.length ? drivers[0].points : 2000;
 
-  drivers.sort((a, b) => {
-    const pa = a.championship_pos || 99, pb = b.championship_pos || 99;
-    return pa - pb || a.name.localeCompare(b.name);
-  });
-
-  const cards = drivers.map((d, i) => {
-    const pos   = d.championship_pos || (i + 1);
-    const last  = d.name.split(' ').slice(-1)[0] || '?';
-    const code  = last.slice(0,3).toUpperCase();
-    const sw    = SW_BANK[code] || SW_DEFAULT;
-    const stats = deriveStats(pos, d.wins || 0, d.points || 0, 400, 24);
-    const ovr   = Math.round((stats.q + stats.t + stats.w + stats.o) / 4);
-    const tier  = posTier(pos);
-
+  const cards = drivers.map(d => {
+    const sw    = NASCAR_SW[d.code] || NASCAR_DEFAULT;
+    const stats = deriveStats(d.pos, d.wins, d.points, maxPts, 36);
     return {
-      num: d.number || String(pos),
-      name: last, fullName: d.name,
-      team: d.team || '',
-      color: d.team_colour ? '#' + d.team_colour : '#888',
-      tier, code,
-      headshot: d.headshot_url || F1Card.LOCAL_HEADSHOT(code),
-      stats, ovr,
-      win: Math.round((d.wins || 0) / 24 * 100),
-      odds: pos === 1 ? '2.0' : pos <= 3 ? '4.0' : pos <= 8 ? '10.0' : '25.0',
-      pts2024: d.points || 0,
-      str: sw.str, wk: sw.wk,
-      driver_id: d.driver_id,
-      owned: OWNED_CARDS.has(`${code.toLowerCase()}_2026`),
-      lv: 0, xp: 0, nxp: 100,
-      pts: d.points || 0,
-      season: 2026, isHistorical: false,
+      series: 'nascar', num: d.number, name: d.last_name, fullName: d.full_name,
+      team: d.team, color: d.color, tier: posTier(d.pos), code: d.code,
+      headshot: '', stats, ovr: Math.round((stats.q+stats.t+stats.w+stats.o)/4),
+      win: Math.round(d.wins/36*100),
+      odds: d.pos===1?'3.0':d.pos<=3?'6.0':d.pos<=8?'12.0':'30.0',
+      pts2024: d.points, str: sw.str, wk: sw.wk,
+      owned: OWNED_CARDS.has(`${d.code.toLowerCase()}_nascar_${year}`),
+      lv:0, xp:0, nxp:100, pts: d.points, season: year,
+      manufacturer: d.manufacturer,
     };
   });
 
-  renderStats(cards, '2026 Season');
+  renderStats(cards, `NASCAR ${year} Cup Series`);
   renderGrid(cards);
 }
 
-/* Load historical season */
-async function loadHistorical(year) {
-  const res  = await fetch(`/api/history/standings/${year}`);
-  const data = await res.json();
-  const standings = data.standings || [];
-  const meta = SEASON_META[year] || { races: 22 };
-  const maxPts = standings.length ? standings[0].pts : 400;
+/* ═══════════════════════════════════════════
+   SERIES SWITCH
+═══════════════════════════════════════════ */
+function switchSeries(series, el) {
+  currentSeries = series;
+  const cfg = SERIES_CONFIG[series];
 
-  const cards = standings.map(d => {
-    const sw    = SW_BANK[d.code] || SW_DEFAULT;
-    const stats = deriveStats(d.pos, d.wins, d.pts, maxPts, meta.races);
-    const ovr   = Math.round((stats.q + stats.t + stats.w + stats.o) / 4);
-    const tier  = posTier(d.pos);
-    const last  = d.name?.split(' ').slice(-1)[0] || d.code || '?';
-    const code  = d.code || last.slice(0,3).toUpperCase();
+  // Update series button styles
+  document.querySelectorAll('.ser-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
 
-    return {
-      num: String(d.pos),
-      name: last, fullName: d.name,
-      team: d.team || '?', color: d.color || '#888',
-      tier, code,
-      headshot: F1Card.LOCAL_HEADSHOT(code),
-      stats, ovr,
-      win: Math.round(d.wins / meta.races * 100),
-      odds: d.pos === 1 ? '1.5' : d.pos <= 3 ? '3.5' : d.pos <= 8 ? '9.0' : '22.0',
-      pts2024: d.pts || 0,
-      str: sw.str, wk: sw.wk,
-      driver_id: d.driver_id,
-      owned: false,
-      lv: 0, xp: 0, nxp: 100,
-      pts: d.pts,
-      season: year, isHistorical: true,
-    };
-  });
+  // Update header text
+  document.getElementById('eyebrow').textContent = cfg.eyebrow;
+  document.getElementById('page-sub').textContent = cfg.sub;
 
-  renderStats(cards, `${year} Season`);
-  renderGrid(cards);
+  // Update CSS accent variable on :root
+  document.documentElement.style.setProperty('--series-accent', cfg.accent);
+
+  // Rebuild season tabs
+  buildSeasonTabs(series);
+
+  // Load default year
+  const year = cfg.defaultYear;
+  document.getElementById('albumGrid').innerHTML = '<div class="col-loading">LOADING…</div>';
+  loadSeries(series, year);
 }
 
+function switchSeason(year, el, category) {
+  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('albumGrid').innerHTML = '<div class="col-loading">LOADING…</div>';
+  loadSeries(currentSeries, year, category);
+}
+
+function loadSeries(series, year, category) {
+  if (series === 'f1')     return loadF1(year);
+  if (series === 'motogp') return loadMotoGP(year, category || motoCategory);
+  if (series === 'nascar') return loadNASCAR(year);
+}
+
+function buildSeasonTabs(series) {
+  const cfg = SERIES_CONFIG[series];
+  const bar = document.getElementById('seasonBar');
+
+  if (series === 'motogp') {
+    // Category tabs + year tabs
+    const catTabs = cfg.categories.map((cat, i) =>
+      `<button class="s-tab ${i===0?'active':''}" onclick="switchMotoCategory('${cat}',this)">${cat}</button>`
+    ).join('');
+    const yearTabs = cfg.years.map((y, i) => {
+      const m = cfg.yearMeta[y] || {};
+      return `<button class="s-tab ${i===0?'active':''}" data-year="${y}" onclick="switchSeason(${y},this)">${y}<span class="s-champ">${m.sub||''}</span></button>`;
+    }).join('');
+    bar.innerHTML = `<div style="display:flex;gap:0;border-right:1px solid #1e1e1e;margin-right:8px">${catTabs}</div>${yearTabs}`;
+  } else {
+    bar.innerHTML = cfg.years.map((y, i) => {
+      const m = cfg.yearMeta[y] || {};
+      return `<button class="s-tab ${i===0?'active':''}" data-year="${y}" onclick="switchSeason(${y},this)">${y}<span class="s-champ">${m.sub||''}</span></button>`;
+    }).join('');
+  }
+}
+
+function switchMotoCategory(cat, el) {
+  motoCategory = cat;
+  document.querySelectorAll('.s-tab').forEach(t => { if(t.textContent.trim().startsWith('Moto') || t.textContent.trim()==='MotoGP') t.classList.remove('active'); });
+  el.classList.add('active');
+  document.getElementById('albumGrid').innerHTML = '<div class="col-loading">LOADING…</div>';
+  loadMotoGP(currentYear, cat);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════ */
 function renderStats(cards, label) {
   const owned  = cards.filter(c => c.owned).length;
-  const monaco = cards.filter(c => c.tier === 'monaco').length;
-  const spa    = cards.filter(c => c.tier === 'spa').length;
-  const suzuka = cards.filter(c => c.tier === 'suzuka').length;
+  const monaco = cards.filter(c => c.tier==='monaco').length;
+  const spa    = cards.filter(c => c.tier==='spa').length;
+  const suzuka = cards.filter(c => c.tier==='suzuka').length;
   document.getElementById('statsRow').innerHTML = `
     <div class="col-stat-pill"><div class="csp-num">${cards.length}</div><div class="csp-label">${label.toUpperCase()}</div></div>
     <div class="col-stat-pill"><div class="csp-num" style="color:#c9a84c">${monaco}</div><div class="csp-label">LEGENDARY</div></div>
@@ -438,31 +609,13 @@ function renderStats(cards, label) {
 }
 
 function renderGrid(cards) {
-  document.getElementById('albumGrid').innerHTML = cards.map(buildUnit).join('');
+  document.getElementById('albumGrid').innerHTML = cards.length
+    ? cards.map(buildUnit).join('')
+    : '<div class="col-loading">NO DATA AVAILABLE</div>';
   attachTilt();
 }
 
-async function buildTabs() {
-  const bar = document.getElementById('seasonBar');
-  const years = [2026, 2025, 2024, 2023, 2022, 2021, 2020];
-  bar.innerHTML = years.map((y, i) => {
-    const m = SEASON_META[y] || {};
-    const active = i === 0 ? 'active' : '';
-    const year = y === 2026 ? '2026' : String(y);
-    const sub = y === 2026 ? 'Current' : `Champion: ${m.champ || '—'}`;
-    return `<button class="s-tab ${active}" data-season="${y}" onclick="switchSeason(${y},this)">${year}<span class="s-champ">${sub}</span></button>`;
-  }).join('');
-}
-
-function switchSeason(year, el) {
-  document.querySelectorAll('.s-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('albumGrid').innerHTML = '<div class="col-loading">LOADING DRIVERS…</div>';
-  if (year === 2026) loadCurrent();
-  else loadHistorical(year);
-}
-
-/* 3D tilt on hover */
+/* ─── 3D TILT ─── */
 const MAX_TILT = 18, PERSPECTIVE = 600;
 function attachTilt() {
   document.querySelectorAll('.col-unit').forEach(unit => {
@@ -487,7 +640,10 @@ function attachTilt() {
   });
 }
 
-buildTabs().then(() => loadCurrent());
+/* ─── INIT ─── */
+document.documentElement.style.setProperty('--series-accent', '#e8ff00');
+buildSeasonTabs('f1');
+loadF1(2026);
 </script>
 </body>
 </html>

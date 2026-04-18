@@ -39,6 +39,7 @@ from routes.challenge import router as challenge_router
 from routes.rpg import router as rpg_router
 from routes.historical import router as historical_router
 from routes.halloffame import router as halloffame_router
+from routes.motorsport import router as motorsport_router
 
 app.include_router(auth_router)
 app.include_router(races_router)
@@ -50,6 +51,7 @@ app.include_router(challenge_router)
 app.include_router(rpg_router)
 app.include_router(historical_router)
 app.include_router(halloffame_router)
+app.include_router(motorsport_router)
 
 # AI analysis + track + odds endpoints
 from fastapi import APIRouter, Header
