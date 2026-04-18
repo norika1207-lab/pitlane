@@ -45,7 +45,7 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 /* ─── ALBUM GRID ─── */
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 64px 48px;
   padding: 8px 0;
 }
@@ -66,16 +66,22 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 }
 .col-unit:hover .col-frame::after { bottom: -38px; left: 12%; right: 12%; opacity: .8; }
 
-/* ─── CARD BODY 260×420 ─── */
+/* ─── CARD BODY 260×420 — matches cards.html F1 original ─── */
 .col-card {
-  width: 260px; height: 420px; border-radius: 10px; overflow: hidden;
+  width: 260px; height: 420px; border-radius: 16px; overflow: hidden;
   position: relative; display: flex; flex-direction: column; z-index: 5;
 }
+/* Tier-specific borders matching cards.html .card-inner */
+.col-card.silverstone { border: 1px solid #2a2a35; }
+.col-card.monza       { border: 1px solid #1a3a6a; }
+.col-card.suzuka      { border: 2px solid #534AB7; box-shadow: 0 0 15px rgba(127,119,221,.4), 0 0 30px rgba(127,119,221,.15); }
+.col-card.spa         { border: 2px solid #00b8ff; box-shadow: 0 0 20px rgba(0,180,255,.5),   0 0 40px rgba(0,180,255,.2); }
+.col-card.monaco      { border: 2px solid #c9a84c; box-shadow: 0 0 25px rgba(201,168,76,.6), 0 0 50px rgba(201,168,76,.3), 0 0 80px rgba(201,168,76,.1); }
 
-/* ─── ACRYLIC PLATE ─── */
+/* ─── ACRYLIC PLATE — slab slightly oversized to accommodate tier glows ─── */
 .col-acrylic {
-  position: absolute; top: -14px; left: -14px; right: -14px; bottom: -14px;
-  border-radius: 7px; z-index: 10; pointer-events: none;
+  position: absolute; top: -22px; left: -22px; right: -22px; bottom: -22px;
+  border-radius: 20px; z-index: 10; pointer-events: none;
   background: linear-gradient(135deg,
     rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 18%,
     rgba(255,255,255,.01) 42%, rgba(255,255,255,.01) 58%,
@@ -85,9 +91,9 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
     inset 0 2px 0 rgba(255,255,255,.28), inset 2px 0 0 rgba(255,255,255,.10);
 }
 .col-acrylic::before {
-  content: ''; position: absolute; top: 4px; left: 20px; right: 20px; height: 6px;
+  content: ''; position: absolute; top: 6px; left: 28px; right: 28px; height: 7px;
   background: linear-gradient(to bottom, rgba(255,255,255,.28), transparent);
-  border-radius: 4px; filter: blur(1.5px);
+  border-radius: 5px; filter: blur(1.5px);
 }
 .col-mag { position: absolute; width: 10px; height: 10px; border-radius: 50%;
   background: radial-gradient(circle at 38% 32%, #d8d8d8 0%, #b0b0b0 35%, #808080 65%, #505050 100%);
@@ -392,7 +398,7 @@ function buildCard(d) {
         <div class="col-mag bl"></div><div class="col-mag br"></div>
       </div>
       ${d.owned ? '<div class="col-owned-badge">OWNED</div>' : ''}
-      <div class="col-card" style="background:${t.bg}">
+      <div class="col-card ${d.tier || 'silverstone'}" style="background:${t.bg}">
         ${isMonaco ? '<div class="col-mo-r"></div>' : ''}
         <div class="col-bg" style="background:linear-gradient(135deg,${t.c},transparent)"></div>
         ${isSpa    ? '<div class="col-spa-rb"></div>' : ''}
