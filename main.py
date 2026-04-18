@@ -57,7 +57,7 @@ from routes.auth import get_current_user
 from services.ai_analysis import (generate_race_preview, generate_driver_analysis,
     generate_driver_track_analysis, generate_race_postmortem, generate_learning_progress)
 from services.track_data import get_track, get_all_tracks
-from services.pit_analysis import get_team_pit_stats
+from services.pit_analysis import get_team_pit_stats, get_session_pit_leaderboard
 from services.odds_engine import get_market_odds
 from services import openf1
 
@@ -234,14 +234,30 @@ async def team_pit_stats(team: str):
 
 
 @extra.get("/api/pit-stats")
-async def all_pit_stats():
-    """All team pit stop data"""
-    from routes.races import current_race
-    race = await current_race()
-    sk = race.get("session_key")
+async def all_pit_stats(session_key: int | None = None):
+    """All team pit stop data. Accepts ?session_key= to analyze a specific session."""
+    sk = session_key
+    if not sk:
+        from routes.races import current_race
+        race = await current_race()
+        sk = race.get("session_key")
     if not sk:
         return {}
     return await get_team_pit_stats(sk)
+
+
+@extra.get("/api/pit-leaderboard")
+async def pit_leaderboard(session_key: int | None = None, limit: int = 10):
+    """Fastest individual pit stops of the session."""
+    sk = session_key
+    if not sk:
+        from routes.races import current_race
+        race = await current_race()
+        sk = race.get("session_key")
+    if not sk:
+        return {"entries": [], "session_key": None}
+    entries = await get_session_pit_leaderboard(sk, limit=limit)
+    return {"entries": entries, "session_key": sk}
 
 
 app.include_router(extra)

@@ -721,10 +721,19 @@
           <div class="gforce-tooltip" id="gforce-tooltip"></div>
         </div>
       </div>
-      <!-- Pit Stop Comparison -->
+      <!-- Pit Stop Analytics (v2) -->
       <div class="pit-compare" id="pit-compare">
-        <div class="pit-compare-title">Pit Stop Time Comparison</div>
-        <div id="pit-compare-bars" class="loading"><div class="spinner"></div></div>
+        <div class="pit-compare-title">Pit Stop Analytics</div>
+        <div class="pit-v2-grid">
+          <div>
+            <div class="pit-v2-subtitle">Team Performance · Fastest / Avg / Reliability</div>
+            <div id="pit-compare-bars" class="loading"><div class="spinner"></div></div>
+          </div>
+          <div>
+            <div class="pit-v2-subtitle">Fastest Stops · Leaderboard</div>
+            <div id="pit-leaderboard" class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -991,22 +1000,99 @@ function renderAIAnalysis(data) {
   const wrap = document.getElementById('ai-analysis-card');
   if (!data) { wrap.style.display = 'none'; return; }
 
+  // Structured insight blocks (may be objects or JSON strings)
+  const coerce = v => {
+    if (!v) return null;
+    if (typeof v === 'string') {
+      try { return JSON.parse(v); } catch { return { summary: v }; }
+    }
+    return v;
+  };
+  const track     = coerce(data.track_analysis);
+  const weather   = coerce(data.weather_impact);
+  const standings = coerce(data.standings_strategy);
+  const pitPred   = coerce(data.pit_prediction);
+
   const topPicks = data.top_picks || [];
   const darkHorse = data.dark_horse || data.dark_horse_pick;
   const keyFactor = data.key_factor || data.key_factors;
   const stratPred = data.strategy_prediction;
   const riskWarn = data.risk_warning;
-  const isFallback = data.source === 'data_fallback';
+  const oneLiner = data.one_liner;
+  const isFallback = data.source === 'data_fallback' || data.fallback;
+
+  // Standings strategy role block helper
+  const roleBlock = (role, cls, label) => {
+    if (!role) return '';
+    const name = role.name || role.driver || '';
+    const strat = role.strategy || role.play || '';
+    const reason = role.reasoning || role.reason || '';
+    const gap = role.gap ? ` · ${role.gap}` : '';
+    return `
+      <div class="ai-strategy-role">
+        <div class="ai-strategy-role-label ${cls}">${label}</div>
+        <div>
+          <div class="ai-strategy-name">${name}${gap}</div>
+          ${strat ? `<div class="ai-strategy-play"><strong>${strat}</strong>${reason ? ' — ' + reason : ''}</div>` : ''}
+        </div>
+      </div>`;
+  };
 
   wrap.style.display = 'block';
   wrap.innerHTML = `
     <div class="ai-card" style="margin-bottom:24px">
       <div class="ai-card-header">
         <div class="ai-title">
-          <span>🤖</span> AI Analysis
+          <span>🤖</span> AI Race Intelligence
         </div>
-        ${isFallback ? `<span class="ai-source-note">⚠ Based on historical data estimates</span>` : ''}
+        ${isFallback ? `<span class="ai-source-note">⚠ Based on data estimates</span>` : `<span class="ai-source-note">Powered by Gemini</span>`}
       </div>
+
+      ${oneLiner ? `
+      <div style="font-size:15px;font-style:italic;color:var(--gold);margin-bottom:16px;padding:10px 14px;background:rgba(212,168,67,0.06);border-left:3px solid var(--gold);border-radius:4px">
+        ${oneLiner}
+      </div>` : ''}
+
+      ${(track || weather || pitPred) ? `
+      <div class="ai-insight-grid">
+        ${track ? (() => {
+          const benefits = Array.isArray(track.who_benefits) ? track.who_benefits.join('、') : (track.who_benefits || '');
+          const detail = [track.key_point, benefits && ('利好：' + benefits), track.historical_pattern].filter(Boolean).join(' · ');
+          return `
+          <div class="ai-insight-card">
+            <div class="ai-insight-label">▸ Track</div>
+            <div class="ai-insight-summary">${track.summary || '—'}</div>
+            ${detail ? `<div class="ai-insight-detail">${detail}</div>` : ''}
+          </div>`;
+        })() : ''}
+        ${weather ? (() => {
+          const detail = [weather.impact, weather.if_rain && ('雨戰：' + weather.if_rain)].filter(Boolean).join(' · ');
+          return `
+          <div class="ai-insight-card">
+            <div class="ai-insight-label">▸ Weather</div>
+            <div class="ai-insight-summary">${weather.summary || '—'}</div>
+            ${detail ? `<div class="ai-insight-detail">${detail}</div>` : ''}
+          </div>`;
+        })() : ''}
+        ${pitPred ? (() => {
+          const detail = [pitPred.best_pit_team && ('最佳車組：' + pitPred.best_pit_team),
+                          pitPred.risk_team && ('高風險：' + pitPred.risk_team)].filter(Boolean).join(' · ');
+          return `
+          <div class="ai-insight-card">
+            <div class="ai-insight-label">▸ Pit Strategy</div>
+            <div class="ai-insight-summary">${pitPred.mainstream || pitPred.summary || '—'}</div>
+            ${detail ? `<div class="ai-insight-detail">${detail}</div>` : ''}
+          </div>`;
+        })() : ''}
+      </div>` : ''}
+
+      ${standings ? `
+      <div style="margin-bottom:18px;padding:12px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px">
+        <div class="ai-insight-label" style="margin-bottom:8px">▸ Championship Roles</div>
+        ${roleBlock(standings.leader, 'leader', 'Leader')}
+        ${roleBlock(standings.chaser, 'chaser', 'Chaser')}
+        ${roleBlock(standings.dark_horse, 'dark', 'Dark Horse')}
+      </div>` : ''}
 
       ${topPicks.length ? `
       <div style="margin-bottom:18px">
@@ -1041,6 +1127,7 @@ function renderAIAnalysis(data) {
         </div>
       </div>` : ''}
 
+      ${(keyFactor || stratPred) ? `
       <div class="ai-factors">
         ${keyFactor ? `
         <div class="ai-factor-item">
@@ -1052,7 +1139,7 @@ function renderAIAnalysis(data) {
           <div class="ai-factor-label">Strategy Prediction</div>
           <div style="color:var(--text-secondary)">${stratPred}</div>
         </div>` : ''}
-      </div>
+      </div>` : ''}
 
       ${riskWarn ? `
       <div class="risk-warning">
@@ -1579,31 +1666,62 @@ function renderGforceMap(circuit) {
 // PIT STOP COMPARISON
 // ─────────────────────────────────────────────
 async function loadPitComparison() {
-  const el = document.getElementById('pit-compare-bars');
-  try {
-    const data = await api('/api/pit-stats');
-    if (!data || Object.keys(data).length === 0) {
-      el.innerHTML = '<p style="color:var(--text-muted);font-size:12px;font-family:var(--font-hud)">NO PIT DATA AVAILABLE</p>';
-      return;
-    }
-    const teams = Object.entries(data).sort((a, b) => a[1].average - b[1].average);
-    const maxTime = Math.max(...teams.map(t => t[1].average), 4);
-    const teamColors = {'McLaren':'#F47600','Red Bull Racing':'#3671C6','Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75','Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Racing Bulls':'#6692FF','Audi':'#52E252'};
+  const barsEl = document.getElementById('pit-compare-bars');
+  const lbEl = document.getElementById('pit-leaderboard');
+  const teamColors = {
+    'McLaren':'#F47600','Red Bull Racing':'#3671C6','Red Bull':'#3671C6',
+    'Ferrari':'#E8002D','Mercedes':'#27F4D2','Aston Martin':'#358C75',
+    'Alpine':'#FF87BC','Williams':'#64C4FF','Haas':'#B6BABD','Haas F1 Team':'#B6BABD',
+    'Racing Bulls':'#6692FF','RB':'#6692FF','Kick Sauber':'#52E252','Audi':'#52E252',
+  };
 
-    el.innerHTML = teams.map(([team, stats]) => {
-      const pct = (stats.average / maxTime) * 100;
+  // Load in parallel
+  const [statsRes, lbRes] = await Promise.allSettled([
+    api('/api/pit-stats'), api('/api/pit-leaderboard?limit=8'),
+  ]);
+
+  // ── Team bars ─────────────────────────────────
+  const data = statsRes.status === 'fulfilled' ? statsRes.value : null;
+  if (!data || Object.keys(data).length === 0) {
+    barsEl.innerHTML = '<p style="color:var(--text-muted);font-size:12px;font-family:var(--font-hud)">NO PIT DATA — RACE HAS NOT STARTED</p>';
+  } else {
+    const teams = Object.entries(data).sort((a, b) => a[1].fastest - b[1].fastest);
+    const worstAvg = Math.max(...teams.map(t => t[1].average), 4);
+    barsEl.innerHTML = teams.map(([team, s]) => {
+      const pct = Math.max(10, (s.fastest / worstAvg) * 100);
       const color = teamColors[team] || 'var(--gold)';
+      const relClass = s.reliability >= 80 ? 'good' : s.reliability >= 50 ? 'ok' : 'bad';
       return `
-        <div class="pit-compare-row">
-          <span class="pit-compare-team" style="color:${color}">${team}</span>
-          <div class="pit-compare-bar-bg">
-            <div class="pit-compare-bar-fill" style="width:${pct}%;background:${color}"></div>
+        <div class="pit-v2-row">
+          <span class="pit-v2-team" style="color:${color}" title="${team}">${team.replace(' F1 Team','').replace(' Racing','')}</span>
+          <span class="pit-v2-fast">${s.fastest.toFixed(2)}s</span>
+          <div class="pit-v2-bar-bg">
+            <div class="pit-v2-bar-fill" style="width:${pct}%;background:${color}"></div>
           </div>
-          <span class="pit-compare-time">${stats.average}s</span>
+          <span class="pit-v2-avg" title="avg ${s.average}s over ${s.total_stops} stops">avg ${s.average}s</span>
+          <span class="pit-v2-rel ${relClass}" title="reliability (100 = perfect, drops with slow avg or errors)">${s.reliability}</span>
         </div>`;
     }).join('');
-  } catch (e) {
-    el.innerHTML = '<p style="color:var(--text-muted);font-size:12px;font-family:var(--font-hud)">PIT DATA UNAVAILABLE</p>';
+  }
+
+  // ── Fastest stops leaderboard ────────────────
+  const lb = lbRes.status === 'fulfilled' ? (lbRes.value?.entries || []) : [];
+  if (!lb.length) {
+    lbEl.innerHTML = '<p style="color:var(--text-muted);font-size:12px;font-family:var(--font-hud)">AWAITING RACE DATA</p>';
+  } else {
+    lbEl.innerHTML = lb.map((e, i) => {
+      const posCls = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
+      const color = teamColors[e.team] || e.color || 'var(--gold)';
+      const teamShort = (e.team || '').replace(' F1 Team','').replace(' Racing','');
+      const driverLast = (e.driver || '').split(' ').slice(-1)[0] || e.driver;
+      return `
+        <div class="pit-lb-row">
+          <span class="pit-lb-pos ${posCls}">${i + 1}</span>
+          <span class="pit-lb-time">${e.duration.toFixed(2)}s</span>
+          <span class="pit-lb-driver" style="color:${color}">${driverLast}<span style="color:var(--text-muted);font-size:10px"> · L${e.lap || '—'}</span></span>
+          <span class="pit-lb-team">${teamShort}</span>
+        </div>`;
+    }).join('');
   }
 }
 
