@@ -184,18 +184,18 @@
                 </div>`;
               }).join('')}
             </div>
+            ${d.str && d.wk ? `
+            <div class="c-sw">
+              <div class="c-sw-row">
+                <span class="c-sw-lbl" style="color:#44ff88">▲</span>
+                <div class="c-sw-tags">${d.str.map(s=>`<span class="c-sw-tag str">${s}</span>`).join('')}</div>
+              </div>
+              <div class="c-sw-row">
+                <span class="c-sw-lbl" style="color:#ff6060">▼</span>
+                <div class="c-sw-tags">${d.wk.map(w=>`<span class="c-sw-tag wk">${w}</span>`).join('')}</div>
+              </div>
+            </div>` : ''}
           </div>
-          ${d.str && d.wk ? `
-          <div class="c-sw">
-            <div class="c-sw-row">
-              <span class="c-sw-lbl" style="color:#44ff88">▲</span>
-              <div class="c-sw-tags">${d.str.map(s=>`<span class="c-sw-tag str">${s}</span>`).join('')}</div>
-            </div>
-            <div class="c-sw-row">
-              <span class="c-sw-lbl" style="color:#ff6060">▼</span>
-              <div class="c-sw-tags">${d.wk.map(w=>`<span class="c-sw-tag wk">${w}</span>`).join('')}</div>
-            </div>
-          </div>` : ''}
           <div class="c-divider" style="background:${t.divider};"></div>
           ${d.last5?.length ? `<div style="padding:4px 12px 0;display:flex;align-items:center;gap:3px;position:relative;z-index:5;">
             <span style="font-size:7px;color:#666;letter-spacing:.05em;font-family:'Barlow Condensed',sans-serif;margin-right:2px">L5</span>
