@@ -528,7 +528,23 @@ function rarityLabel(rarity) {
   return map[rarity] || map.silverstone;
 }
 
-// ─── BRAND INJECTOR ─── every page gets a favicon + "模擬下注平台" tagline
+// ─── BRAND INJECTOR ─── every page gets favicon + racing chevron logo + tagline
+const BRAND_LOGO_SVG = `<svg viewBox="0 0 48 48" width="26" height="26" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+  <defs>
+    <linearGradient id="_tg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffea3a"/><stop offset="55%" stop-color="#d4a843"/><stop offset="100%" stop-color="#8a6d2c"/>
+    </linearGradient>
+    <linearGradient id="_yg" x1="0" x2="1" y1="0" y2="0.6">
+      <stop offset="0%" stop-color="#fff07a"/><stop offset="100%" stop-color="#e8ff00"/>
+    </linearGradient>
+  </defs>
+  <line x1="3" y1="9"  x2="15" y2="9"  stroke="#e8ff00" stroke-width="1.2" opacity=".55"/>
+  <line x1="3" y1="13" x2="10" y2="13" stroke="#e8ff00" stroke-width=".9"  opacity=".30"/>
+  <line x1="3" y1="39" x2="12" y2="39" stroke="#e8ff00" stroke-width=".9"  opacity=".30"/>
+  <path d="M4 13 L13 13 L26 24 L13 35 L4 35 L17 24 Z"   fill="url(#_tg)"/>
+  <path d="M20 13 L29 13 L42 24 L29 35 L20 35 L33 24 Z" fill="url(#_yg)"/>
+</svg>`;
+
 function installBrand() {
   // Favicon (idempotent)
   if (!document.querySelector('link[rel="icon"]')) {
@@ -538,18 +554,34 @@ function installBrand() {
     link.href = '/static/assets/favicon.svg';
     document.head.appendChild(link);
   }
-  // Tagline next to the brand (works for both .nav-logo and .nav-brand markup)
+
   const brand = document.querySelector('.nav-brand, .nav-logo');
-  if (brand && !brand.querySelector('.nav-tagline')) {
+  if (!brand) return;
+
+  // Replace the old ".dot" / ".logo-dot" placeholder with the racing chevron SVG
+  const oldDot = brand.querySelector('.dot, .logo-dot');
+  if (oldDot && !brand.querySelector('.nav-mark')) {
+    const mark = document.createElement('span');
+    mark.className = 'nav-mark';
+    mark.innerHTML = BRAND_LOGO_SVG;
+    Object.assign(mark.style, {
+      display: 'inline-flex', alignItems: 'center',
+      filter: 'drop-shadow(0 0 6px rgba(232,255,0,.25))',
+    });
+    oldDot.replaceWith(mark);
+  }
+
+  // Tagline — English, racing-flavored
+  if (!brand.querySelector('.nav-tagline')) {
     const tag = document.createElement('span');
     tag.className = 'nav-tagline';
-    tag.textContent = '模擬下注平台';
+    tag.textContent = 'SIMULATED BETTING · F1';
     Object.assign(tag.style, {
-      marginLeft: '10px', paddingLeft: '10px',
-      borderLeft: '1px solid #333',
-      fontFamily: "'Barlow Condensed', sans-serif",
+      marginLeft: '12px', paddingLeft: '12px',
+      borderLeft: '1px solid #2a2a35',
+      fontFamily: "'Barlow Condensed', 'IBM Plex Mono', monospace",
       fontSize: '10px', fontWeight: '700',
-      letterSpacing: '.15em', color: '#888',
+      letterSpacing: '.22em', color: '#888',
       textTransform: 'none', whiteSpace: 'nowrap',
     });
     brand.appendChild(tag);

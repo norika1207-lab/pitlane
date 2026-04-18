@@ -47,9 +47,9 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
 /* ─── ALBUM GRID ─── */
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 72px 32px;
-  padding: 20px 0;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 80px 40px;
+  padding: 24px 0;
 }
 .col-loading { grid-column: 1/-1; text-align: center; padding: 60px;
   color: #444; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; letter-spacing: .1em; }
@@ -62,44 +62,53 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
   text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.5);
 }
 
-/* ─── FRAME — sizes to card (260x420), acrylic overlays outside bounds ─── */
+/* ─── FRAME — sizes EXACTLY to F1 card (260×420), acrylic is added OVER it ─── */
 .col-frame {
-  position: relative; margin: 28px;
+  position: relative;
+  width: 260px; height: 420px;           /* match F1 card native dimensions */
+  margin: 32px;                          /* breathing room for acrylic overlay */
   will-change: transform; transform-style: preserve-3d;
   transition: transform .55s cubic-bezier(.25,.8,.25,1);
 }
+/* The F1 card inside our frame — disable its own hover transform so the
+   acrylic slab stays aligned. The whole unit gets tilt via JS instead. */
+.col-frame .card          { width: 260px !important; cursor: default; }
+.col-frame .card:hover    { transform: none !important; }
+.col-frame .card-inner    { height: 420px; }
+
 .col-frame::after {
-  content: ''; position: absolute; bottom: -30px; left: 8%; right: 8%;
-  height: 16px; background: radial-gradient(ellipse, rgba(0,0,0,.75), transparent 70%);
+  content: ''; position: absolute; bottom: -34px; left: 8%; right: 8%;
+  height: 18px; background: radial-gradient(ellipse, rgba(0,0,0,.75), transparent 70%);
   filter: blur(10px); z-index: -1; transition: all .5s;
 }
-.col-unit:hover .col-frame::after { bottom: -44px; left: 12%; right: 12%; opacity: .85; }
+.col-unit:hover .col-frame::after { bottom: -48px; left: 12%; right: 12%; opacity: .9; }
 
-/* ─── ACRYLIC SLAB — bigger than card, pure overlay, doesn't clip tier glows ─── */
+/* ─── ACRYLIC SLAB — PSA-style display case OVER the F1 card ─── */
 .col-acrylic {
-  position: absolute; top: -28px; left: -28px; right: -28px; bottom: -28px;
+  position: absolute; top: -34px; left: -34px; right: -34px; bottom: -34px;
   border-radius: 22px; z-index: 20; pointer-events: none;
   background: linear-gradient(135deg,
-    rgba(255,255,255,.22) 0%, rgba(255,255,255,.06) 18%,
+    rgba(255,255,255,.26) 0%, rgba(255,255,255,.08) 18%,
     rgba(255,255,255,.01) 42%, rgba(255,255,255,.01) 58%,
-    rgba(255,255,255,.05) 78%, rgba(255,255,255,.16) 100%);
-  border: 1px solid rgba(255,255,255,.40);
+    rgba(255,255,255,.06) 78%, rgba(255,255,255,.20) 100%);
+  border: 1.5px solid rgba(255,255,255,.45);
   box-shadow:
-    0 12px 40px rgba(0,0,0,.6),
-    0 4px 10px rgba(0,0,0,.3),
-    inset 0 2px 0 rgba(255,255,255,.30),
-    inset 2px 0 0 rgba(255,255,255,.10),
-    inset -2px 0 0 rgba(0,0,0,.10);
+    0 18px 48px rgba(0,0,0,.7),
+    0 6px 14px rgba(0,0,0,.35),
+    inset 0 2px 0 rgba(255,255,255,.35),
+    inset 2px 0 0 rgba(255,255,255,.12),
+    inset -2px 0 0 rgba(0,0,0,.12),
+    inset 0 -2px 0 rgba(0,0,0,.20);
 }
 .col-acrylic::before {
-  content: ''; position: absolute; top: 8px; left: 32px; right: 32px; height: 9px;
-  background: linear-gradient(to bottom, rgba(255,255,255,.35), transparent);
-  border-radius: 6px; filter: blur(2px);
+  content: ''; position: absolute; top: 10px; left: 38px; right: 38px; height: 11px;
+  background: linear-gradient(to bottom, rgba(255,255,255,.40), transparent);
+  border-radius: 7px; filter: blur(2px);
 }
 .col-acrylic::after {
-  content: ''; position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-  width: 40%; height: 5px;
-  background: linear-gradient(to top, rgba(255,255,255,.18), transparent);
+  content: ''; position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  width: 45%; height: 6px;
+  background: linear-gradient(to top, rgba(255,255,255,.22), transparent);
   border-radius: 4px; filter: blur(2px);
 }
 .col-mag {
@@ -113,10 +122,10 @@ body { background: #0d0d0d; color: #e8e8e8; font-family: 'Barlow', sans-serif; m
   transform: translate(-50%,-50%); width: 3px; height: 3px; border-radius: 50%;
   background: radial-gradient(#333, #111);
 }
-.col-mag.tl { top: 10px; left: 10px; }
-.col-mag.tr { top: 10px; right: 10px; }
-.col-mag.bl { bottom: 10px; left: 10px; }
-.col-mag.br { bottom: 10px; right: 10px; }
+.col-mag.tl { top: 12px; left: 12px; }
+.col-mag.tr { top: 12px; right: 12px; }
+.col-mag.bl { bottom: 12px; left: 12px; }
+.col-mag.br { bottom: 12px; right: 12px; }
 
 /* ─── BACKGROUND GLOW for premium tiers ─── */
 .col-glow {
