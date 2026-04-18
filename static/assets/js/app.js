@@ -560,6 +560,10 @@ function installBrand() {
     const s = document.createElement('style');
     s.id = 'nav-rwd-rules';
     s.textContent = `
+      /* Kill scrollbar-induced layout shift (fixed nav appears to "jump"
+         when content height changes and the scrollbar toggles). */
+      html { scrollbar-gutter: stable; overflow-y: scroll; }
+
       /* Logo block — allow it to shrink without wrapping */
       .nav-brand, .nav-logo {
         min-width: 0;
@@ -595,6 +599,10 @@ function installBrand() {
     `;
     document.head.appendChild(s);
   }
+
+  // Remove the redundant "Profile" nav link (users access it via the
+  // username dropdown on the right). Does nothing if already removed.
+  document.querySelectorAll('.nav-links a[href="/profile"]').forEach(a => a.remove());
 
   const brand = document.querySelector('.nav-brand, .nav-logo');
   if (!brand) return;
