@@ -1,126 +1,134 @@
-"""賽事名稱中文對應表 — 從 circuit/country 對應到正式大獎賽名稱"""
+"""F1 Grand Prix names — map circuit/country to official English GP name."""
 
 CIRCUIT_TO_GP = {
-    "Melbourne": "澳洲大獎賽",
-    "Shanghai": "中國大獎賽",
-    "Suzuka": "日本大獎賽",
-    "Sakhir": "巴林大獎賽",
-    "Jeddah": "沙烏地阿拉伯大獎賽",
-    "Miami": "邁阿密大獎賽",
-    "Imola": "艾米利亞-羅馬涅大獎賽",
-    "Monaco": "摩納哥大獎賽",
-    "Barcelona": "西班牙大獎賽",
-    "Montréal": "加拿大大獎賽",
-    "Montreal": "加拿大大獎賽",
-    "Spielberg": "奧地利大獎賽",
-    "Silverstone": "英國大獎賽",
-    "Spa-Francorchamps": "比利時大獎賽",
-    "Spa": "比利時大獎賽",
-    "Budapest": "匈牙利大獎賽",
-    "Hungaroring": "匈牙利大獎賽",
-    "Zandvoort": "荷蘭大獎賽",
-    "Monza": "義大利大獎賽",
-    "Baku": "亞塞拜然大獎賽",
-    "Marina Bay": "新加坡大獎賽",
-    "Singapore": "新加坡大獎賽",
-    "Austin": "美國大獎賽",
-    "Mexico City": "墨西哥大獎賽",
-    "São Paulo": "巴西大獎賽",
-    "Sao Paulo": "巴西大獎賽",
-    "Interlagos": "巴西大獎賽",
-    "Las Vegas": "拉斯維加斯大獎賽",
-    "Lusail": "卡達大獎賽",
-    "Yas Marina": "阿布達比大獎賽",
-    "Yas Island": "阿布達比大獎賽",
-    "Portimão": "葡萄牙大獎賽",
-    "Portimao": "葡萄牙大獎賽",
-    "Istanbul": "土耳其大獎賽",
-    "Nürburgring": "艾菲爾大獎賽",
-    "Mugello": "托斯卡尼大獎賽",
-    "Losail": "卡達大獎賽",
+    "Melbourne":          "Australian Grand Prix",
+    "Shanghai":           "Chinese Grand Prix",
+    "Suzuka":             "Japanese Grand Prix",
+    "Sakhir":             "Bahrain Grand Prix",
+    "Jeddah":             "Saudi Arabian Grand Prix",
+    "Miami":              "Miami Grand Prix",
+    "Imola":              "Emilia Romagna Grand Prix",
+    "Monaco":             "Monaco Grand Prix",
+    "Barcelona":          "Spanish Grand Prix",
+    "Montréal":           "Canadian Grand Prix",
+    "Montreal":           "Canadian Grand Prix",
+    "Spielberg":          "Austrian Grand Prix",
+    "Silverstone":        "British Grand Prix",
+    "Spa-Francorchamps":  "Belgian Grand Prix",
+    "Spa":                "Belgian Grand Prix",
+    "Budapest":           "Hungarian Grand Prix",
+    "Hungaroring":        "Hungarian Grand Prix",
+    "Zandvoort":          "Dutch Grand Prix",
+    "Monza":              "Italian Grand Prix",
+    "Baku":               "Azerbaijan Grand Prix",
+    "Marina Bay":         "Singapore Grand Prix",
+    "Singapore":          "Singapore Grand Prix",
+    "Austin":             "United States Grand Prix",
+    "Mexico City":        "Mexico City Grand Prix",
+    "São Paulo":          "São Paulo Grand Prix",
+    "Sao Paulo":          "São Paulo Grand Prix",
+    "Interlagos":         "São Paulo Grand Prix",
+    "Las Vegas":          "Las Vegas Grand Prix",
+    "Lusail":             "Qatar Grand Prix",
+    "Losail":             "Qatar Grand Prix",
+    "Yas Marina":         "Abu Dhabi Grand Prix",
+    "Yas Island":         "Abu Dhabi Grand Prix",
+    "Portimão":           "Portuguese Grand Prix",
+    "Portimao":           "Portuguese Grand Prix",
+    "Istanbul":           "Turkish Grand Prix",
+    "Nürburgring":        "Eifel Grand Prix",
+    "Mugello":            "Tuscan Grand Prix",
 }
 
 COUNTRY_TO_GP = {
-    "Australia": "澳洲大獎賽",
-    "China": "中國大獎賽",
-    "Japan": "日本大獎賽",
-    "Bahrain": "巴林大獎賽",
-    "Saudi Arabia": "沙烏地阿拉伯大獎賽",
-    "United States": "美國大獎賽",
-    "Italy": "義大利大獎賽",
-    "Monaco": "摩納哥大獎賽",
-    "Spain": "西班牙大獎賽",
-    "Canada": "加拿大大獎賽",
-    "Austria": "奧地利大獎賽",
-    "United Kingdom": "英國大獎賽",
-    "Belgium": "比利時大獎賽",
-    "Hungary": "匈牙利大獎賽",
-    "Netherlands": "荷蘭大獎賽",
-    "Azerbaijan": "亞塞拜然大獎賽",
-    "Singapore": "新加坡大獎賽",
-    "Mexico": "墨西哥大獎賽",
-    "Brazil": "巴西大獎賽",
-    "Qatar": "卡達大獎賽",
-    "UAE": "阿布達比大獎賽",
-    "United Arab Emirates": "阿布達比大獎賽",
-    "Portugal": "葡萄牙大獎賽",
-    "Turkey": "土耳其大獎賽",
+    "Australia":             "Australian Grand Prix",
+    "China":                 "Chinese Grand Prix",
+    "Japan":                 "Japanese Grand Prix",
+    "Bahrain":               "Bahrain Grand Prix",
+    "Saudi Arabia":          "Saudi Arabian Grand Prix",
+    "United States":         "United States Grand Prix",
+    "USA":                   "United States Grand Prix",
+    "Italy":                 "Italian Grand Prix",
+    "Monaco":                "Monaco Grand Prix",
+    "Spain":                 "Spanish Grand Prix",
+    "Canada":                "Canadian Grand Prix",
+    "Austria":               "Austrian Grand Prix",
+    "United Kingdom":        "British Grand Prix",
+    "UK":                    "British Grand Prix",
+    "Belgium":               "Belgian Grand Prix",
+    "Hungary":               "Hungarian Grand Prix",
+    "Netherlands":           "Dutch Grand Prix",
+    "Azerbaijan":            "Azerbaijan Grand Prix",
+    "Singapore":             "Singapore Grand Prix",
+    "Mexico":                "Mexico City Grand Prix",
+    "Brazil":                "São Paulo Grand Prix",
+    "Qatar":                 "Qatar Grand Prix",
+    "UAE":                   "Abu Dhabi Grand Prix",
+    "United Arab Emirates":  "Abu Dhabi Grand Prix",
+    "Portugal":              "Portuguese Grand Prix",
+    "Turkey":                "Turkish Grand Prix",
 }
 
-# 賽道類型
+# Circuit type classification
 CIRCUIT_TYPE = {
-    "Melbourne": "street",
-    "Shanghai": "technical",
-    "Suzuka": "technical",
-    "Sakhir": "high_speed",
-    "Jeddah": "high_speed",
-    "Miami": "street",
-    "Imola": "technical",
-    "Monaco": "street",
-    "Barcelona": "technical",
-    "Montréal": "street",
-    "Montreal": "street",
-    "Spielberg": "high_speed",
-    "Silverstone": "high_speed",
-    "Spa-Francorchamps": "high_speed",
-    "Budapest": "technical",
-    "Hungaroring": "technical",
-    "Zandvoort": "technical",
-    "Monza": "high_speed",
-    "Baku": "street",
-    "Marina Bay": "street",
-    "Singapore": "street",
-    "Austin": "technical",
-    "Mexico City": "high_speed",
-    "São Paulo": "technical",
-    "Sao Paulo": "technical",
-    "Las Vegas": "street",
-    "Lusail": "high_speed",
-    "Yas Marina": "technical",
+    "Melbourne":          "street",
+    "Shanghai":           "technical",
+    "Suzuka":             "technical",
+    "Sakhir":             "high_speed",
+    "Jeddah":             "high_speed",
+    "Miami":              "street",
+    "Imola":              "technical",
+    "Monaco":             "street",
+    "Barcelona":          "technical",
+    "Montréal":           "street",
+    "Montreal":           "street",
+    "Spielberg":          "high_speed",
+    "Silverstone":        "high_speed",
+    "Spa-Francorchamps":  "high_speed",
+    "Budapest":           "technical",
+    "Hungaroring":        "technical",
+    "Zandvoort":          "technical",
+    "Monza":              "high_speed",
+    "Baku":               "street",
+    "Marina Bay":         "street",
+    "Singapore":          "street",
+    "Austin":             "technical",
+    "Mexico City":        "high_speed",
+    "São Paulo":          "technical",
+    "Sao Paulo":          "technical",
+    "Las Vegas":          "street",
+    "Lusail":             "high_speed",
+    "Yas Marina":         "technical",
 }
 
-CIRCUIT_TYPE_ZH = {
-    "high_speed": "高速型賽道",
-    "street": "街道賽道",
-    "technical": "技術型賽道",
+CIRCUIT_TYPE_LABEL = {
+    "high_speed": "High-Speed Circuit",
+    "street":     "Street Circuit",
+    "technical":  "Technical Circuit",
 }
 
 
 def get_race_name(circuit: str = "", country: str = "", meeting: str = "") -> str:
-    """Get Chinese GP name from circuit/country."""
-    if meeting and meeting != "?":
+    """Return the official English Grand Prix name for this circuit/country.
+
+    Falls back to a sensible pattern when we don't have a mapping. The
+    upstream meeting_name from OpenF1 is usually already English — accept
+    it as-is when present, unless it's the placeholder 'Race'.
+    """
+    if meeting and meeting not in ("?", "Race", ""):
         return meeting
     name = CIRCUIT_TO_GP.get(circuit, "")
     if not name:
         name = COUNTRY_TO_GP.get(country, "")
     if not name:
-        name = f"{country or circuit} 大獎賽"
+        base = country or circuit
+        name = f"{base} Grand Prix" if base else "Grand Prix"
     return name
 
 
 def get_circuit_type(circuit: str) -> str:
     ct = CIRCUIT_TYPE.get(circuit, "technical")
-    return CIRCUIT_TYPE_ZH.get(ct, "技術型賽道")
+    return CIRCUIT_TYPE_LABEL.get(ct, "Technical Circuit")
 
 
 def get_circuit_type_raw(circuit: str) -> str:
