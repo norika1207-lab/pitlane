@@ -76,7 +76,7 @@ async def login(data: LoginRequest):
     token = result.get("access_token")
     username = result.get("username")
 
-    # Get USDClaw balance
+    # Get Pit balance
     balance = await get_balance(username)
 
     return {
@@ -84,7 +84,7 @@ async def login(data: LoginRequest):
         "token_type": "bearer",
         "username": username,
         "balance": balance,
-        "currency": "USDClaw",
+        "currency": "Pit",
     }
 
 
@@ -134,18 +134,18 @@ async def register(data: RegisterRequest):
         "token_type": "bearer",
         "username": username,
         "balance": balance,
-        "currency": "USDClaw",
+        "currency": "Pit",
         "message": "Registration successful",
     }
 
 
 @router.get("/me")
 async def me(authorization: str = Header(None)):
-    """Get current user info and USDClaw balance"""
+    """Get current user info and Pit balance"""
     user = await get_current_user(authorization)
     balance = await get_balance(user["username"])
     return {
         "username": user["username"],
         "balance": balance,
-        "currency": "USDClaw",
+        "currency": "Pit",
     }

@@ -1,4 +1,4 @@
-"""Bets — Place USDClaw bets predicting F1 race results"""
+"""Bets — Place Pit bets predicting F1 race results"""
 from fastapi import APIRouter, HTTPException, Header
 from models import BetCreate
 from database import get_db
@@ -12,22 +12,22 @@ router = APIRouter(prefix="/api/bets", tags=["bets"])
 
 @router.post("")
 async def place_bet(bet: BetCreate, authorization: str = Header(None)):
-    """Place a bet using USDClaw"""
+    """Place a bet using Pit"""
     user = await get_current_user(authorization)
     username = user["username"]
 
     if bet.amount < BET_MIN or bet.amount > BET_MAX:
-        raise HTTPException(400, f"Bet must be between {BET_MIN} and {BET_MAX} USDClaw")
+        raise HTTPException(400, f"Bet must be between {BET_MIN} and {BET_MAX} Pit")
 
     balance = await get_balance(username)
     if balance < bet.amount:
-        raise HTTPException(400, f"Insufficient USDClaw balance. Current balance: {balance:,.0f}")
+        raise HTTPException(400, f"Insufficient Pit balance. Current balance: {balance:,.0f}")
 
     # Calculate odds
     stats = await calculate_driver_card(bet.prediction)
     odds = calculate_odds(stats)
 
-    # Deduct USDClaw via trading platform's token system
+    # Deduct Pit via trading platform's token system
     ref_id = f"throttenix_bet:{bet.race_id}:{bet.prediction}"
     try:
         await debit(username, bet.amount, "throttenix_bet", ref_id)
@@ -53,7 +53,7 @@ async def place_bet(bet: BetCreate, authorization: str = Header(None)):
         "odds": odds,
         "potential_win": int(bet.amount * odds),
         "remaining_balance": new_balance,
-        "currency": "USDClaw",
+        "currency": "Pit",
     }
 
 

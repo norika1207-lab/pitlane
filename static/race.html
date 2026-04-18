@@ -1057,7 +1057,7 @@ function renderAIAnalysis(data) {
       <div class="ai-insight-grid">
         ${track ? (() => {
           const benefits = Array.isArray(track.who_benefits) ? track.who_benefits.join('、') : (track.who_benefits || '');
-          const detail = [track.key_point, benefits && ('利好：' + benefits), track.historical_pattern].filter(Boolean).join(' · ');
+          const detail = [track.key_point, benefits && ('Favours: ' + benefits), track.historical_pattern].filter(Boolean).join(' · ');
           return `
           <div class="ai-insight-card">
             <div class="ai-insight-label">▸ Track</div>
@@ -1066,7 +1066,7 @@ function renderAIAnalysis(data) {
           </div>`;
         })() : ''}
         ${weather ? (() => {
-          const detail = [weather.impact, weather.if_rain && ('雨戰：' + weather.if_rain)].filter(Boolean).join(' · ');
+          const detail = [weather.impact, weather.if_rain && ('Wet race: ' + weather.if_rain)].filter(Boolean).join(' · ');
           return `
           <div class="ai-insight-card">
             <div class="ai-insight-label">▸ Weather</div>
@@ -1075,8 +1075,8 @@ function renderAIAnalysis(data) {
           </div>`;
         })() : ''}
         ${pitPred ? (() => {
-          const detail = [pitPred.best_pit_team && ('最佳車組：' + pitPred.best_pit_team),
-                          pitPred.risk_team && ('高風險：' + pitPred.risk_team)].filter(Boolean).join(' · ');
+          const detail = [pitPred.best_pit_team && ('Best team: ' + pitPred.best_pit_team),
+                          pitPred.risk_team && ('At risk: ' + pitPred.risk_team)].filter(Boolean).join(' · ');
           return `
           <div class="ai-insight-card">
             <div class="ai-insight-label">▸ Pit Strategy</div>

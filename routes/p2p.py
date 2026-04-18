@@ -29,7 +29,7 @@ async def create_order(body: dict, authorization: str = Header(None)):
     fee_info = apply_fee(amount, "p2p_maker")
     balance = await get_balance(username)
     if balance < fee_info["total"]:
-        raise HTTPException(400, f"Insufficient USDClaw balance (need {fee_info['total']:,.0f})")
+        raise HTTPException(400, f"Insufficient Pit balance (need {fee_info['total']:,.0f})")
 
     await debit(username, fee_info["total"], "p2p_create", f"p2p:{race_id}:{prediction}")
 
@@ -52,7 +52,7 @@ async def create_order(body: dict, authorization: str = Header(None)):
         "odds": odds,
         "prediction": prediction,
         "status": "open",
-        "waiting_for": f"Waiting for opponent to stake {amount * (odds - 1):,.0f} USDClaw",
+        "waiting_for": f"Waiting for opponent to stake {amount * (odds - 1):,.0f} Pit",
     }
 
 
@@ -98,7 +98,7 @@ async def accept_order(order_id: int, authorization: str = Header(None)):
         fee_info = apply_fee(taker_amount, "p2p_taker")
         balance = await get_balance(username)
         if balance < fee_info["total"]:
-            raise HTTPException(400, f"Insufficient USDClaw balance (need {fee_info['total']:,.0f})")
+            raise HTTPException(400, f"Insufficient Pit balance (need {fee_info['total']:,.0f})")
 
         await debit(username, fee_info["total"], "p2p_accept", f"p2p_accept:{order_id}")
 

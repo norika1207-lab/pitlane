@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   PitLane — Core JS (Pit integrated)
+   Throttenix — Core JS
    ═══════════════════════════════════════════ */
 
 const API = '';  // same origin

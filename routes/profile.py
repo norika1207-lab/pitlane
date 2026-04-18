@@ -35,7 +35,7 @@ async def my_profile(authorization: str = Header(None)):
         return {
             "username": username,
             "balance": balance,
-            "currency": "USDClaw",
+            "currency": "Pit",
             "total_bets": total_bets,
             "total_wins": total_wins,
             "win_rate": round(win_rate, 1),
@@ -77,7 +77,7 @@ async def share_card(authorization: str = Header(None)):
         return {
             "username": username,
             "balance": balance,
-            "currency": "USDClaw",
+            "currency": "Pit",
             "total_bets": total_bets,
             "total_wins": total_wins,
             "win_rate": round(win_rate, 1),
