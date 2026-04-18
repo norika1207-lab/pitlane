@@ -274,7 +274,7 @@ body{background:#0d0d0d;color:#e8e8e8;font-family:'Barlow',sans-serif;min-height
       </div>
       <div class="sec-body">
         <div class="titles-grid" id="titles-grid">
-          <div class="title-empty">No titles unlocked yet — keep betting!</div>
+          <div class="title-empty">No titles unlocked yet — keep pitting!</div>
         </div>
       </div>
     </div>
@@ -491,7 +491,7 @@ function renderProfile(d) {
   // Titles
   const titlesEl = document.getElementById('titles-grid');
   if (!d.auto_titles?.length) {
-    titlesEl.innerHTML = '<div class="title-empty">No titles unlocked yet — keep betting!</div>';
+    titlesEl.innerHTML = '<div class="title-empty">No titles unlocked yet — keep pitting!</div>';
   } else {
     titlesEl.innerHTML = d.auto_titles.map(t => `
       <div class="title-chip">

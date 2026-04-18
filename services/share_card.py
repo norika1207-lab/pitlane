@@ -155,8 +155,8 @@ async def generate_share_card_image(username: str) -> io.BytesIO:
         draw.line([(W - 240 - i, 20), (W - 60 - i, 200)], fill=(34, 40, 58), width=3)
 
     # ── HEADER ────────────────────────────────────────────────────────
-    # "PITLANE" wordmark, letter-spaced
-    draw.text((60, 70), "P I T L A N E", fill=GOLD, font=_font(44, bold=True), anchor="lm")
+    # "THROTTENIX" wordmark, letter-spaced
+    draw.text((60, 70), "T H R O T T E N I X", fill=GOLD, font=_font(40, bold=True), anchor="lm")
     draw.text((60, 108), "F1 PREDICTION SEASON 2026", fill=TEXT_MUTED, font=_font(16, bold=True), anchor="lm")
 
     # Season badge (top-right) — dynamic round label
@@ -200,8 +200,8 @@ async def generate_share_card_image(username: str) -> io.BytesIO:
 
     profit_val = f"+{s['profit']:,.0f}" if s["profit"] >= 0 else f"{s['profit']:,.0f}"
     kpis = [
-        (f"{s['balance']:,.0f}",    "USDClaw",     GOLD),
-        (str(s['total_bets']),       "Total Bets",  WHITE),
+        (f"{s['balance']:,.0f}",    "Pit Balance", GOLD),
+        (str(s['total_bets']),       "Total Pits",  WHITE),
         (f"{s['win_rate']:.1f}%",    "Win Rate",    (52, 211, 153) if s['win_rate'] >= 50 else (251, 146, 60)),
         (profit_val,                 "Net Profit",  (52, 211, 153) if s['profit'] >= 0 else (248, 113, 113)),
     ]
@@ -237,12 +237,12 @@ async def generate_share_card_image(username: str) -> io.BytesIO:
     if s["best_bet"]:
         race = (s["best_bet"]["race"] or "")[:38]
         pick = (s["best_bet"]["pick"] or "")[:20]
-        profit_str = f"+{s['best_bet']['profit']:,.0f} USDClaw"
+        profit_str = f"+{s['best_bet']['profit']:,.0f} Pit"
         draw.text((84, bb_y + 62), race, fill=WHITE, font=_font(26, bold=True), anchor="lm")
         draw.text((84, bb_y + 100), f"Pick: {pick}", fill=TEXT_DIM, font=_font(18), anchor="lm")
         draw.text((W - 84, bb_y + 82), profit_str, fill=(52, 211, 153), font=_font(32, bold=True), anchor="rm")
     else:
-        draw.text((84, bb_y + 78), "No completed wins yet — place your first bet!",
+        draw.text((84, bb_y + 78), "No completed wins yet — place your first pit!",
                   fill=TEXT_DIM, font=_font(22), anchor="lm")
 
     # ── CHECKERED FOOTER ─────────────────────────────────────────────
@@ -254,7 +254,7 @@ async def generate_share_card_image(username: str) -> io.BytesIO:
 
     # ── BOTTOM CTA ───────────────────────────────────────────────────
     draw.text((W // 2, foot_y + 50), "JOIN THE RACE", fill=TEXT_DIM, font=_font(14, bold=True), anchor="mm")
-    draw.text((W // 2, foot_y + 90), "pitlane.gg", fill=GOLD, font=_font(46, bold=True), anchor="mm")
+    draw.text((W // 2, foot_y + 90), "throttenix.com", fill=GOLD, font=_font(46, bold=True), anchor="mm")
     draw.text((W // 2, foot_y + 130), "F1 PREDICTION · CARDS · LEGENDS", fill=TEXT_MUTED,
               font=_font(13, bold=True), anchor="mm")
 
