@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   PitLane — Core JS (USDClaw integrated)
+   PitLane — Core JS (Pit integrated)
    ═══════════════════════════════════════════ */
 
 const API = '';  // same origin
@@ -67,7 +67,7 @@ function showProfileDashboard() {
           <button class="pd-close" onclick="closeProfileDashboard()">✕</button>
         </div>
         <div class="pd-balance-box">
-          <div class="pd-bal-lbl">USDClaw Balance</div>
+          <div class="pd-bal-lbl">Pit Balance</div>
           <div class="pd-bal-amt">◆ ${formatNum(user.balance)}</div>
         </div>
 
@@ -75,7 +75,7 @@ function showProfileDashboard() {
           <!-- Buy CTA block (pinned at top) -->
           <div class="pd-cta-block">
             <a class="pd-cta-btn" href="https://clawstockmarket.com" target="_blank">💎 Buy Diamond</a>
-            <a class="pd-cta-btn secondary" href="https://clawstockmarket.com" target="_blank">💱 Swap USDClaw</a>
+            <a class="pd-cta-btn secondary" href="https://clawstockmarket.com" target="_blank">💱 Swap Pit</a>
           </div>
 
           <!-- Account Overview -->
@@ -191,7 +191,7 @@ async function pdOverview(el) {
     el.innerHTML = `
       <div class="pd-section-title">Account Overview</div>
       <div class="pd-stat-grid">
-        <div class="pd-stat"><div class="pd-stat-v">${formatNum(d.balance)}</div><div class="pd-stat-l">USDClaw Balance</div></div>
+        <div class="pd-stat"><div class="pd-stat-v">${formatNum(d.balance)}</div><div class="pd-stat-l">Pit Balance</div></div>
         <div class="pd-stat"><div class="pd-stat-v">${d.total_bets}</div><div class="pd-stat-l">Total Pits</div></div>
         <div class="pd-stat"><div class="pd-stat-v">${d.total_wins}</div><div class="pd-stat-l">Wins</div></div>
         <div class="pd-stat"><div class="pd-stat-v">${d.win_rate}%</div><div class="pd-stat-l">Win Rate</div></div>

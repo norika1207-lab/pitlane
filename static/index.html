@@ -486,18 +486,18 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
         <div class="wb-title">Welcome to Throttenix!</div>
         <div class="wb-sub">You don't need to know racing — we break it down for you, just pick the right driver</div>
       </div>
-      <button class="wb-btn">Beginner Guide →</button>
+      <button class="wb-btn" onclick="document.querySelector('.tips').scrollIntoView({behavior:'smooth',block:'start'})">Beginner Guide →</button>
     </div>
     <div class="steps">
       <div class="step done">
         <div class="step-header"><div class="step-num">✓</div><div class="step-title">Create Account</div></div>
-        <div class="step-desc">Done! You have 1,000 USDClaw starting balance</div>
+        <div class="step-desc">Done! You've received <strong style="color:#e8ff00">1,000 Pit</strong> — Pit is the in-site token you use to back predictions. Win races, earn more Pit.</div>
       </div>
       <div class="step current">
         <div class="current-arrow"></div>
         <div class="step-header"><div class="step-num">2</div><div class="step-title">Explore Driver Cards</div></div>
         <div class="step-desc">Check each driver's stats and find who you think is strongest this race</div>
-        <div class="step-action">→ View Driver Cards</div>
+        <div class="step-action" style="cursor:pointer" onclick="location.href='/cards'">→ View Driver Cards</div>
       </div>
       <div class="step">
         <div class="step-header"><div class="step-num">3</div><div class="step-title">Pit on the Winner</div></div>
@@ -523,7 +523,7 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
       <div class="rc-bet">
         <div class="rc-odds" style="color:#F47600">3.8x</div>
         <div class="rc-odds-label">Odds</div>
-        <button class="rc-bet-btn" style="background:#F47600;color:#000">Pit →</button>
+        <button class="rc-bet-btn" style="background:#F47600;color:#000" onclick="user ? location.href='/race' : showModal('login')">Pit →</button>
       </div>
     </div>
     <div class="panel-title" style="margin-bottom:8px">Beginner's Guide</div>
@@ -531,12 +531,12 @@ footer{text-align:center;padding:24px;border-top:1px solid #1a1a1a;font-size:11p
       <div class="tip-card">
         <span class="tip-icon">🎯</span>
         <div class="tip-title">What do odds mean?</div>
-        <div class="tip-desc">Odds of <span class="tip-hi">3.8x</span> mean pit 100 USDClaw, win and get 380 USDClaw back. Higher odds = longer shot, but bigger payout.</div>
+        <div class="tip-desc">Odds of <span class="tip-hi">3.8x</span> mean pit 100 Pit, win and get 380 Pit back. Higher odds = longer shot, but bigger payout.</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">🌧</span>
         <div class="tip-title">Weather changes everything</div>
-        <div class="tip-desc">Rain completely changes the race — weaker drivers can pull off surprise wins. Check the weather forecast before betting!</div>
+        <div class="tip-desc">Rain completely changes the race — weaker drivers can pull off surprise wins. Check the weather forecast before pitting in!</div>
       </div>
       <div class="tip-card">
         <span class="tip-icon">🏎</span>
@@ -796,12 +796,12 @@ loadPage();
 
 // FEED
 const FEED=[
-  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'pit on <span class="hi">Verstappen to win</span> · 500 USDClaw',time:'just now'},
+  {u:'RacerKJ',    c:'#3671C6',i:'KJ',t:'pit on <span class="hi">Verstappen to win</span> · 500 Pit',time:'just now'},
   {u:'SpeedDemon', c:'#E8002D',i:'SD',t:'unlocked <span class="hi">SUZUKA tier card</span> · 5 consecutive hits',time:'1 min ago'},
-  {u:'F1Expert',   c:'#F47600',i:'FE',t:'challenged MX · <span class="hi">Norris vs Hamilton</span> · 1,000 USDClaw',time:'2 min ago'},
-  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'hit prediction <span class="hi">fastest lap Norris</span> · +300 USDClaw',time:'3 min ago'},
+  {u:'F1Expert',   c:'#F47600',i:'FE',t:'challenged MX · <span class="hi">Norris vs Hamilton</span> · 1,000 Pit',time:'2 min ago'},
+  {u:'PitWall99',  c:'#27F4D2',i:'PW',t:'hit prediction <span class="hi">fastest lap Norris</span> · +300 Pit',time:'3 min ago'},
   {u:'ApexHunter', c:'#534AB7',i:'AH',t:'claimed <span class="hi">MONACO legend card</span> · Schumacher 2004',time:'5 min ago'},
-  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'pit on <span class="hi">Ferrari top 3 combo</span> · 800 USDClaw',time:'7 min ago'},
+  {u:'GridQueen',  c:'#358C75',i:'GQ',t:'pit on <span class="hi">Ferrari top 3 combo</span> · 800 Pit',time:'7 min ago'},
 ];
 document.getElementById('feedList').innerHTML=FEED.map(f=>`
   <div class="feed-item">

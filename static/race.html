@@ -656,7 +656,7 @@
       <!-- AMOUNT + SUMMARY + BUTTON -->
       <div style="margin-top:24px">
         <div class="amount-section">
-          <div class="amount-header">Pit Stake (USDClaw ◆) · Click to add</div>
+          <div class="amount-header">Pit Stake (Pit ◆) · Click to add</div>
           <div class="amount-display" id="bet-amount-display" style="font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:#e8ff00;text-align:center;padding:12px 0;letter-spacing:0.02em">
             ◆ 0
           </div>
@@ -786,7 +786,7 @@
 <!-- ─── FOOTER ─── -->
 <footer class="footer">
   <div class="container">
-    <p>Throttenix — F1 Prediction Card Platform · USDClaw Virtual Currency · Shared accounts with ClawStockMarket · Data from OpenF1 & Jolpica</p>
+    <p>Throttenix — F1 Prediction Card Platform · Pit Virtual Currency · Shared accounts with ClawStockMarket · Data from OpenF1 & Jolpica</p>
   </div>
 </footer>
 
@@ -1496,7 +1496,7 @@ function updateBetSummary() {
 async function placeBet() {
   if (!user) { showModal('login'); return; }
   if (betAmount < 1000) {
-    alert('Minimum bet is 1,000 USDClaw');
+    alert('Minimum bet is 1,000 Pit');
     return;
   }
   const resultEl = document.getElementById('bet-result-area');
@@ -1540,7 +1540,7 @@ async function placeBet() {
         <strong style="color:var(--green)">✓ Pit placed!</strong><br>
         <span style="color:var(--text-secondary)">
           Bet ◆${(res.amount || betAmount).toLocaleString()} · Odds x${res.odds || '?'} · Potential Payout ◆${(res.potential_win || 0).toLocaleString()}
-          <br>Remaining USDClaw ◆${(res.remaining_balance || 0).toLocaleString()}
+          <br>Remaining Pit ◆${(res.remaining_balance || 0).toLocaleString()}
         </span>
       </div>
     `;
