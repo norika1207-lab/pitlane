@@ -555,6 +555,47 @@ function installBrand() {
     document.head.appendChild(link);
   }
 
+  // Global RWD + nav layout rules (idempotent)
+  if (!document.getElementById('nav-rwd-rules')) {
+    const s = document.createElement('style');
+    s.id = 'nav-rwd-rules';
+    s.textContent = `
+      /* Logo block — allow it to shrink without wrapping */
+      .nav-brand, .nav-logo {
+        min-width: 0;
+        overflow: hidden;
+      }
+      .nav-tagline {
+        flex-shrink: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* Auth cluster — keep it on one line, hugging the right edge */
+      #nav-auth { flex-shrink: 0 !important; }
+      #nav-auth > * { flex-shrink: 0; }
+
+      /* <1200px: drop the tagline so it can't bleed into the nav links */
+      @media (max-width: 1200px) {
+        .nav-tagline { display: none !important; }
+      }
+      /* <1024px: tighten the middle link spacing */
+      @media (max-width: 1024px) {
+        .nav-links { gap: 14px !important; }
+        .nav-links a { font-size: 12px !important; }
+      }
+      /* <820px: hide the center link bar entirely; nav becomes brand | auth */
+      @media (max-width: 820px) {
+        .nav-links { display: none !important; }
+      }
+      /* <520px: shrink Sign Up label and gaps so both buttons still fit */
+      @media (max-width: 520px) {
+        #nav-auth { gap: 6px !important; }
+        #nav-auth button { padding: 6px 10px !important; font-size: 12px !important; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
   const brand = document.querySelector('.nav-brand, .nav-logo');
   if (!brand) return;
 
@@ -571,7 +612,7 @@ function installBrand() {
     oldDot.replaceWith(mark);
   }
 
-  // Tagline — English, racing-flavored
+  // Tagline — English, racing-flavored. Hidden on <1200px via RWD rules above.
   if (!brand.querySelector('.nav-tagline')) {
     const tag = document.createElement('span');
     tag.className = 'nav-tagline';
