@@ -281,43 +281,43 @@ app.mount("/static", StaticFiles(directory="/opt/racing/static"), name="static")
 
 @app.get("/")
 async def index():
-    return FileResponse("/opt/racing/static/index.html")
+    return FileResponse("/opt/racing/static/index.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/race")
 async def race_page():
-    return FileResponse("/opt/racing/static/race.html")
+    return FileResponse("/opt/racing/static/race.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/cards")
 async def cards_page():
-    return FileResponse("/opt/racing/static/cards.html")
+    return FileResponse("/opt/racing/static/cards.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/profile")
 async def profile_page():
-    return FileResponse("/opt/racing/static/profile.html")
+    return FileResponse("/opt/racing/static/profile.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/battle")
 async def battle_page():
-    return FileResponse("/opt/racing/static/battle.html")
+    return FileResponse("/opt/racing/static/battle.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/leaderboard")
 async def leaderboard_page():
-    return FileResponse("/opt/racing/static/leaderboard.html")
+    return FileResponse("/opt/racing/static/leaderboard.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/history")
 async def history_page():
-    return FileResponse("/opt/racing/static/history.html")
+    return FileResponse("/opt/racing/static/history.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/halloffame")
 async def halloffame_page():
-    return FileResponse("/opt/racing/static/halloffame.html")
+    return FileResponse("/opt/racing/static/halloffame.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/car-explorer")
 async def car_explorer_page():
-    return FileResponse("/opt/racing/static/car_explorer.html")
+    return FileResponse("/opt/racing/static/car_explorer.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 @app.get("/collection")
 async def collection_page():
-    return FileResponse("/opt/racing/static/collection.html")
+    return FileResponse("/opt/racing/static/collection.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 
 if __name__ == "__main__":

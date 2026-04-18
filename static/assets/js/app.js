@@ -43,7 +43,7 @@ function updateAuthUI() {
   } else {
     authArea.innerHTML = `
       <button onclick="showModal('login')" style="${NAV_BTN_GHOST}">Log In</button>
-      <button onclick="showModal('login')" style="${NAV_BTN_GOLD}">Sign Up</button>
+      <button onclick="showModal('register')" style="${NAV_BTN_GOLD}">Sign Up</button>
     `;
   }
 }
@@ -432,32 +432,50 @@ function logout() {
 }
 
 // ─── MODAL ───
-function showModal(type) {
-  const overlay = document.getElementById('modal-overlay');
-  const modal = document.getElementById('auth-modal');
-  overlay.classList.add('active');
+let _authMode = 'login';
 
+function showModal(type) {
+  _authMode = type || 'login';
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('active');
+  _renderAuthModal();
+  setTimeout(() => document.getElementById('auth-un')?.focus(), 100);
+}
+
+function _renderAuthModal() {
+  const modal = document.getElementById('auth-modal');
+  const isReg = _authMode === 'register';
   modal.innerHTML = `
-    <h2>Log In to Throttenix</h2>
-    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;text-align:center">
-      Use your ClawStockMarket account
+    <h2>${isReg ? 'Create Account' : 'Log In to Throttenix'}</h2>
+    <p style="color:#888;font-size:12px;margin-bottom:18px;text-align:center">
+      ${isReg ? 'One account works across F1, Esports & more' : 'Use your Throttenix / Ragnovex account'}
     </p>
+    ${isReg ? `<div class="form-group"><label>Username</label><input type="text" id="auth-name" placeholder="2–30 chars, letters/numbers/_" autocomplete="username"/></div>` : ''}
     <div class="form-group">
-      <label>Username / Email</label>
-      <input type="text" id="login-username" placeholder="Exchange username or Email" />
+      <label>${isReg ? 'Email' : 'Username or Email'}</label>
+      <input type="text" id="auth-un" placeholder="${isReg ? 'your@email.com' : 'username or email'}" autocomplete="${isReg ? 'email' : 'username'}"/>
     </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="auth-pw" placeholder="Password" autocomplete="${isReg ? 'new-password' : 'current-password'}"/>
+    </div>
+    ${isReg ? `<div style="font-size:10px;color:#666;margin:-6px 0 10px;line-height:1.5">密碼需 8+ 字元，含英文字母與數字<br>Password: 8+ chars, letters &amp; numbers required<br><span style="color:#e8ff00">🎁 +1,000,000 Pit welcome bonus on sign up</span></div>` : ''}
     <div id="auth-error" class="error-msg"></div>
     <div class="form-actions">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-gold" onclick="handleLogin()">Log In</button>
+      <button class="btn btn-gold" onclick="${isReg ? 'handleRegister' : 'handleLogin'}()">${isReg ? 'Register' : 'Log In'}</button>
     </div>
-    <div class="switch-link" style="margin-top:16px">
-      No account? Register at <a href="https://clawstockmarket.com" target="_blank">ClawStockMarket</a>
+    <div class="switch-link" style="margin-top:14px">
+      ${isReg ? 'Already have an account?' : 'No account?'}
+      <a onclick="_switchAuth('${isReg ? 'login' : 'register'}')" style="cursor:pointer">${isReg ? 'Log In' : 'Sign Up'}</a>
     </div>
   `;
+}
 
-  // Focus username input
-  setTimeout(() => document.getElementById('login-username')?.focus(), 100);
+function _switchAuth(mode) {
+  _authMode = mode;
+  _renderAuthModal();
+  setTimeout(() => document.getElementById(_authMode === 'register' ? 'auth-name' : 'auth-un')?.focus(), 50);
 }
 
 function closeModal() {
@@ -465,11 +483,42 @@ function closeModal() {
 }
 
 async function handleLogin() {
-  const u = document.getElementById('login-username').value.trim();
+  const u = document.getElementById('auth-un').value.trim();
+  const pw = document.getElementById('auth-pw').value;
   const errEl = document.getElementById('auth-error');
+  errEl.textContent = '';
   if (!u) { errEl.textContent = 'Please enter your username or email'; return; }
+  if (!pw) { errEl.textContent = 'Please enter your password'; return; }
   try {
-    await login(u, '');
+    await login(u, pw);
+    location.reload();
+  } catch (err) {
+    errEl.textContent = err.message;
+  }
+}
+
+async function handleRegister() {
+  const name = document.getElementById('auth-name').value.trim();
+  const email = document.getElementById('auth-un').value.trim();
+  const pw = document.getElementById('auth-pw').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.textContent = '';
+  if (!name || name.length < 2) { errEl.textContent = 'Username must be at least 2 characters'; return; }
+  if (!/^[a-zA-Z0-9_ ]{2,30}$/.test(name)) { errEl.textContent = 'Username: letters, numbers, underscore only (2–30 chars)'; return; }
+  if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email address'; return; }
+  if (pw.length < 8) { errEl.textContent = 'Password must be at least 8 characters'; return; }
+  if (!/[a-zA-Z]/.test(pw) || !/[0-9]/.test(pw)) { errEl.textContent = 'Password must contain both letters and numbers'; return; }
+  try {
+    const data = await api('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ username: name, email, password: pw }),
+    });
+    token = data.access_token;
+    user = { username: data.username, balance: data.balance };
+    localStorage.setItem('throttenix_token', token);
+    localStorage.setItem('throttenix_user', JSON.stringify(user));
+    updateAuthUI();
+    closeModal();
     location.reload();
   } catch (err) {
     errEl.textContent = err.message;
@@ -668,7 +717,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === e.currentTarget) closeModal();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.getElementById('login-username')) handleLogin();
+    if (e.key === 'Enter' && document.getElementById('auth-pw')) { _authMode === 'register' ? handleRegister() : handleLogin(); }
     if (e.key === 'Escape') closeModal();
   });
+});
+
+// Re-init when browser restores page from back-forward cache
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    token = localStorage.getItem('throttenix_token');
+    user  = JSON.parse(localStorage.getItem('throttenix_user') || 'null');
+    updateAuthUI();
+  }
 });
